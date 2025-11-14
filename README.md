@@ -37,7 +37,12 @@ Example:
 
 ``` bash
 python main.py train --exp-configs configs/all_in_one/cifar100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_10-10
-./trainddp.sh 0,1,2,3 --exp-configs configs/all_in_one/cifar100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_10-10
+python main.py train --exp-configs configs/all_in_one/cifar100_10-10_tagfex_ant_resnet18.yaml
+
+./trainddp.sh 0,1 --exp-configs configs/all_in_one/cifar100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_10-10 --ckpt-dir ./logs/exp_cifar100_10-10/ckpt
+./trainddp.sh 0,1 --exp-configs configs/all_in_one/cifar100_50-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_50-10 --ckpt-dir ./logs/exp_cifar100_50-10/ckpt
+./trainddp.sh 0,1 --exp-configs configs/all_in_one/imagenet100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_imagenet100_10-10 --ckpt-dir ./logs/exp_imagenet100_10-10/ckpt
+./trainddp.sh 0,1 --exp-configs configs/all_in_one/imagenet100_50-10_tagfex_resnet50.yaml --log-dir ./logs/exp_imagenet100_50-10 --ckpt-dir ./logs/exp_imagenet100_50-10/ckpt
 ```
 
 Other useful arguments:
@@ -50,6 +55,18 @@ Other useful arguments:
 ```
 
 For more arguments, see [`argument.py`](utils/argument.py).
+
+## Plot loss components
+
+``` bash
+python plot_loss_components.py logs/<exp_name>/exp_matrix_debug0.log -t contrast
+```
+
+Example:
+
+```bash
+python plot_loss_components.py logs/exp_cifar100_10-10_antB1_nceA1_antM0.1_antLocal/exp_matrix_debug0.log -t contrast
+```
 
 ## Acknowledgements
 
