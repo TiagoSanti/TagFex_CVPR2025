@@ -766,14 +766,6 @@ def infoNCE_loss(
 ):
     cos_sim = F.cosine_similarity(feats[:, None, :], feats[None, :, :], dim=-1)
 
-    # Log original similarity matrix
-    if logger is not None:
-        logger.log_similarity_matrix(
-            cos_sim.detach().cpu(),
-            name="infoNCE_cosine_similarity",
-            description="Original cosine similarity matrix for InfoNCE loss",
-        )
-
     # ANT (Adaptive Negative Thresholding) logic
     pos_start = cos_sim.shape[0] // 2
     cos_sim_q1 = cos_sim[:pos_start, :pos_start]
@@ -864,48 +856,18 @@ def infoNCE_loss(
         # Log the distance statistics
         logger.log_ant_distance_stats(stats, task=task, epoch=epoch, batch=batch)
 
-    # Log ANT processed matrix
-    if logger is not None:
-        logger.log_similarity_matrix(
-            mq1.detach().cpu(),
-            name="infoNCE_ant_matrix",
-            description=f"ANT processed matrix (max_global={max_global}, margin={ant_margin})",
-        )
-
     # Mask out cosine similarity to itself
     self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=cos_sim.device)
     cos_sim.masked_fill_(self_mask, -9e15)
     # Find positive example -> batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
-    # Log masked similarity matrix before temperature scaling
-    if logger is not None:
-        cos_sim_vis = cos_sim.clone()
-        cos_sim_vis[self_mask] = float(
-            "nan"
-        )  # Use NaN for visualization of masked values
-        logger.log_similarity_matrix(
-            cos_sim_vis.detach().cpu(),
-            name="infoNCE_masked_similarity",
-            description="Cosine similarity with self-similarity masked (before temperature scaling)",
-        )
-
     # InfoNCE loss
     cos_sim = cos_sim / t
 
-    # Log final scaled matrix used for loss
-    if logger is not None:
-        cos_sim_vis = cos_sim.clone()
-        cos_sim_vis[self_mask] = float("nan")
-        logger.log_similarity_matrix(
-            cos_sim_vis.detach().cpu(),
-            name="infoNCE_final_logits",
-            description=f"Final logits for InfoNCE (after temperature scaling t={t})",
-        )
-
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
-    total_loss = nce_alpha * nll_mean + ant_beta * ant_loss
+    total_loss = nce_alpha * nll_mean + ant_beta * total_ant_loss
 
     # Log partial loss values
     if logger is not None:
@@ -913,8 +875,10 @@ def infoNCE_loss(
             {
                 "infoNCE_nll": nll_mean.item(),
                 "infoNCE_ant_loss": ant_loss.item(),
+                "infoNCE_gap_loss": gap_loss.item(),
+                "infoNCE_total_ant_loss": total_ant_loss.item(),
                 "infoNCE_nce_weighted": (nce_alpha * nll_mean).item(),
-                "infoNCE_ant_weighted": (ant_beta * ant_loss).item(),
+                "infoNCE_ant_weighted": (ant_beta * total_ant_loss).item(),
                 "infoNCE_total": total_loss.item(),
             },
             prefix="contrast",
@@ -943,14 +907,6 @@ def infoNCE_distill_loss(
     # print(p_feats.shape, z_feats.shape)
     cos_sim = F.cosine_similarity(p_feats[:, None, :], z_feats[None, :, :], dim=-1)
 
-    # Log original similarity matrix for distillation
-    if logger is not None:
-        logger.log_similarity_matrix(
-            cos_sim.detach().cpu(),
-            name="distill_cosine_similarity",
-            description="Original cosine similarity matrix for distillation (predicted vs old features)",
-        )
-
     # ANT (Adaptive Negative Thresholding) logic
     pos_start = cos_sim.shape[0] // 2
     cos_sim_q1 = cos_sim[:pos_start, :pos_start]
@@ -966,14 +922,6 @@ def infoNCE_distill_loss(
         q1_max = q1.max(dim=-1, keepdim=True).values
         mq1 = F.relu_(q1 - q1_max + ant_margin)
 
-    # Log ANT processed matrix for distillation
-    if logger is not None:
-        logger.log_similarity_matrix(
-            mq1.detach().cpu(),
-            name="distill_ant_matrix",
-            description=f"Distillation ANT matrix (max_global={max_global}, margin={ant_margin})",
-        )
-
     ant_loss = torch.logsumexp(mq1, dim=-1)
     ant_loss_mean = ant_loss.mean()
 
@@ -983,28 +931,8 @@ def infoNCE_distill_loss(
     # Find positive example -> batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
-    # Log masked similarity matrix before temperature scaling
-    if logger is not None:
-        cos_sim_vis = cos_sim.clone()
-        cos_sim_vis[self_mask] = float("nan")
-        logger.log_similarity_matrix(
-            cos_sim_vis.detach().cpu(),
-            name="distill_masked_similarity",
-            description="Distillation similarity with self-similarity masked (before temperature scaling)",
-        )
-
     # InfoNCE loss
     cos_sim = cos_sim / t
-
-    # Log final scaled matrix used for distillation loss
-    if logger is not None:
-        cos_sim_vis = cos_sim.clone()
-        cos_sim_vis[self_mask] = float("nan")
-        logger.log_similarity_matrix(
-            cos_sim_vis.detach().cpu(),
-            name="distill_final_logits",
-            description=f"Final logits for distillation (after temperature scaling t={t})",
-        )
 
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
