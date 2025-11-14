@@ -1,0 +1,16 @@
+__pycache__/
+# Experiment logs and outputs
+logs/
+*.log
+
+# Virtual environment
+.venv/
+venv/
+
+# Data
+data/
+
+# Checkpoints
+ckpt/
+*.pth
+*.pt
