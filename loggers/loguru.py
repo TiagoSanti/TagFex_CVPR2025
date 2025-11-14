@@ -1,9 +1,6 @@
 import os
 from pathlib import Path
 from loguru import logger
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 class LoguruLogger:
@@ -61,17 +58,6 @@ class LoguruLogger:
 
         self.logger.remove()
         self.logger.add(partial(tqdm.write, end=""), colorize=True, level=level)
-
-    def log_similarity_matrix(self, matrix, name="similarity", description=""):
-        """
-        Placeholder for similarity matrix logging (currently disabled).
-
-        Args:
-            matrix: torch.Tensor or np.ndarray - The similarity matrix to visualize
-            name: str - Name identifier for the matrix
-            description: str - Description of what the matrix represents
-        """
-        return
 
     def log_loss_components(
         self, components, prefix="", task=None, epoch=None, batch=None
