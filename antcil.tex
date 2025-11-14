@@ -1,0 +1,545 @@
+%File: anonymous-submission-latex-2026.tex
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai2026}  % DO NOT CHANGE THIS
+\usepackage{times}  % DO NOT CHANGE THIS
+\usepackage{helvet}  % DO NOT CHANGE THIS
+\usepackage{courier}  % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm}  % DO NOT CHANGE THIS
+\usepackage{natbib}  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{caption} % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\frenchspacing  % DO NOT CHANGE THIS
+\setlength{\pdfpagewidth}{8.5in} % DO NOT CHANGE THIS
+\setlength{\pdfpageheight}{11in} % DO NOT CHANGE THIS
+%
+
+% These are recommended to typeset algorithms but not required. See the subsubsection on algorithms. Remove them if you don't have algorithms in your paper.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%
+% These are are recommended to typeset listings but not required. See the subsubsection on listing. Remove this block if you don't have listings in your paper.
+\usepackage{newfloat}
+\usepackage{listings}
+\DeclareCaptionStyle{ruled}{labelfont=normalfont,labelsep=colon,strut=off} % DO NOT CHANGE THIS
+\lstset{%
+	basicstyle={\footnotesize\ttfamily},% footnotesize acceptable for monospace
+	numbers=left,numberstyle=\footnotesize,xleftmargin=2em,% show line numbers, remove this entire line if you don't want the numbers.
+	aboveskip=0pt,belowskip=0pt,%
+	showstringspaces=false,tabsize=2,breaklines=true}
+\floatstyle{ruled}
+\newfloat{listing}{tb}{lst}{}
+\floatname{listing}{Listing}
+%
+% Keep the \pdfinfo as shown here. There's no need
+% for you to add the /Title and /Author tags.
+\pdfinfo{
+/TemplateVersion (2026.1)
+}
+
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+% DISALLOWED PACKAGES
+% \usepackage{authblk} -- This package is specifically forbidden
+% \usepackage{balance} -- This package is specifically forbidden
+% \usepackage{color (if used in text)
+% \usepackage{CJK} -- This package is specifically forbidden
+% \usepackage{float} -- This package is specifically forbidden
+% \usepackage{flushend} -- This package is specifically forbidden
+% \usepackage{fontenc} -- This package is specifically forbidden
+% \usepackage{fullpage} -- This package is specifically forbidden
+% \usepackage{geometry} -- This package is specifically forbidden
+% \usepackage{grffile} -- This package is specifically forbidden
+% \usepackage{hyperref} -- This package is specifically forbidden
+% \usepackage{navigator} -- This package is specifically forbidden
+% (or any other package that embeds links such as navigator or hyperref)
+% \indentfirst} -- This package is specifically forbidden
+% \layout} -- This package is specifically forbidden
+% \multicol} -- This package is specifically forbidden
+% \nameref} -- This package is specifically forbidden
+% \usepackage{savetrees} -- This package is specifically forbidden
+% \usepackage{setspace} -- This package is specifically forbidden
+% \usepackage{stfloats} -- This package is specifically forbidden
+% \usepackage{tabu} -- This package is specifically forbidden
+% \usepackage{titlesec} -- This package is specifically forbidden
+% \usepackage{tocbibind} -- This package is specifically forbidden
+% \usepackage{ulem} -- This package is specifically forbidden
+% \usepackage{wrapfig} -- This package is specifically forbidden
+% DISALLOWED COMMANDS
+% \nocopyright -- Your paper will not be published if you use this command
+% \addtolength -- This command may not be used
+% \balance -- This command may not be used
+% \baselinestretch -- Your paper will not be published if you use this command
+% \clearpage -- No page breaks of any kind may be used for the final version of your paper
+% \columnsep -- This command may not be used
+% \newpage -- No page breaks of any kind may be used for the final version of your paper
+% \pagebreak -- No page breaks of any kind may be used for the final version of your paperr
+% \pagestyle -- This command may not be used
+% \tiny -- This is not an acceptable font size.
+% \vspace{- -- No negative value may be used in proximity of a caption, figure, table, section, subsection, subsubsection, or reference
+% \vskip{- -- No negative value may be used to alter spacing above or below a caption, figure, table, section, subsection, subsubsection, or reference
+
+\setcounter{secnumdepth}{0} %May be changed to 1 or 2 if section numbers are desired.
+
+% The file aaai2026.sty is the style file for AAAI Press
+% proceedings, working notes, and technical reports.
+%
+
+% Title
+
+% Your title must be in mixed case, not sentence case.
+% That means all verbs (including short verbs like be, is, using,and go),
+% nouns, adverbs, adjectives should be capitalized, including both words in hyphenated terms, while
+% articles, conjunctions, and prepositions are lower case unless they
+% directly follow a colon or long dash
+\title{ANT: Avoid Non-essential Tuning in Task Agnostic Class Incremental Learning }
+\author{
+    %Authors
+    % All authors must be in the same font size and format.
+    Written by AAAI Press Staff\textsuperscript{\rm 1}\thanks{With help from the AAAI Publications Committee.}\\
+    AAAI Style Contributions by Pater Patel Schneider,
+    Sunil Issar,\\
+    J. Scott Penberthy,
+    George Ferguson,
+    Hans Guesgen,
+    Francisco Cruz\equalcontrib,
+    Marc Pujol-Gonzalez\equalcontrib
+}
+\affiliations{
+    %Afiliations
+    \textsuperscript{\rm 1}Association for the Advancement of Artificial Intelligence\\
+    % If you have multiple authors and multiple affiliations
+    % use superscripts in text and roman font to identify them.
+    % For example,
+
+    % Sunil Issar\textsuperscript{\rm 2},
+    % J. Scott Penberthy\textsuperscript{\rm 3},
+    % George Ferguson\textsuperscript{\rm 4},
+    % Hans Guesgen\textsuperscript{\rm 5}
+    % Note that the comma should be placed after the superscript
+
+    1101 Pennsylvania Ave, NW Suite 300\\
+    Washington, DC 20004 USA\\
+    % email address must be in roman text type, not monospace or sans serif
+    proceedings-questions@aaai.org
+%
+% See more examples next
+}
+
+%Example, Single Author, ->> remove \iffalse,\fi and place them surrounding AAAI title to use it
+\iffalse
+\title{My Publication Title --- Single Author}
+\author {
+    Author Name
+}
+\affiliations{
+    Affiliation\\
+    Affiliation Line 2\\
+    name@example.com
+}
+\fi
+
+\iffalse
+%Example, Multiple Authors, ->> remove \iffalse,\fi and place them surrounding AAAI title to use it
+\title{My Publication Title --- Multiple Authors}
+\author {
+    % Authors
+    First Author Name\textsuperscript{\rm 1},
+    Second Author Name\textsuperscript{\rm 2},
+    Third Author Name\textsuperscript{\rm 1}
+}
+\affiliations {
+    % Affiliations
+    \textsuperscript{\rm 1}Affiliation 1\\
+    \textsuperscript{\rm 2}Affiliation 2\\
+    firstAuthor@affiliation1.com, secondAuthor@affilation2.com, thirdAuthor@affiliation1.com
+}
+\fi
+
+
+% REMOVE THIS: bibentry
+% This is only needed to show inline citations in the guidelines document. You should not need it and can safely delete it.
+\usepackage{bibentry}
+% END REMOVE bibentry
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Catastrophic forgetting remains a central challenge in Class-Incremental Learning (CIL), where models must acquire new knowledge without overwriting previously learned tasks. This phenomenon occurs when learning a new task alters existing tasks, causing the model to forget previously acquired knowledge. Recently, the use of task-agnostic strategies in CIL problems has been very successful in state-of-the-art methods. A common loss used in task-agnostic methods is Information Noise Contrastive Estimation Loss. When rewriting InfoNCE loss into shifted logexpsum, we can find an intriguing formulation that renders the loss update of non-essential parameters, thereby exacerbating catastrophic forgetting. To tackle this problem, this paper proposes ANT Loss, which focuses the parameter update on essential parameters indicated by the similarity of the embeddings. The primary goal of ANT is to Avoid Non-essential Tuning of parameters, which aligns with the method's name and the main idea of this study. The extensive experimental evaluation yields superior results compared to various CIL state-of-the-art models.
+\end{abstract}
+
+% Uncomment the following to link to your code, datasets, an extended version or similar.
+% You must keep this block between (not within) the abstract and the main body of the paper.
+% \begin{links}
+%     \link{Code}{https://aaai.org/example/code}
+%     \link{Datasets}{https://aaai.org/example/datasets}
+%     \link{Extended version}{https://aaai.org/example/extended-version}
+% \end{links}
+
+\section{Introduction}
+
+
+
+Catastrophic forgetting plays a major role in Class Incremental Learning (CIL). The goal of CIL is to learn new tasks sequentially~\cite{wang2024comprehensive,de2021continual}. The learning procedure updates weights using backpropagation, which overwrites previously acquired knowledge when learning from new samples. This issue becomes especially problematic when the decision boundaries between classes shift over time, leading to confusion among semantically related representations.
+
+A recent technology developed to address catastrophic forgetting is the use of task-agnostic Class-Incremental Learning methods~\cite{zheng2025task}. Among these methods, InfoNCE loss—a contrastive objective initially designed for self-supervised learning ˜\cite{han2020self,li2021self,jing2023contrastive}—has become an essential component in many state-of-the-art approaches. Although its effectiveness in contrastive settings, InfoNCE has a significant limitation when applied in class-incremental contexts: it minimizes a log-ratio that never reaches zero, even when the model can perfectly distinguish between positive and negative samples. This leads to unnecessary updates to parameters that do not meaningfully contribute to the representation, a phenomenon we refer to as non-essential tuning, which can accelerate the forgetting of previously learned knowledge.
+
+In this paper, we identify and formally analyze a limitation of InfoNCE when applied to task-agnostic continuous learning. By reformulating the InfoNCE loss into a more intuitive expression, we gain a better understanding of its impact on task-agnostic settings. We observe that negative gradients are applied even when the similarity scores are already well-separated. Unnecessary parameter updates increase the risk of catastrophic forgetting, potentially degrading representations of previously learned classes.
+
+The observation of this degrading behavior of InfoNCE loss leads us to our main contribution: ANT Loss (Avoid Non-essential Tuning), a novel training loss that minimizes unnecessary parameter updates. ANT utilizes similarity scores to update only the most relevant network parameters selectively. Specifically, it avoids tuning parameters whose gradients are unlikely to enhance discrimination and may introduce false positives in future iterations.
+
+We evaluate ANT using standard CIL benchmarks and protocols, comparing it against leading CIL methods such as DER~\cite{yan2021dynamically} and TagFex\cite{zheng2025task}. The experimental results show that the ANT Loss consistently outperforms state-of-the-art models in accuracy across benchmark datasets. This supports our hypothesis that selectively avoiding non-essential updates can enhance long-term retention and generalization.
+
+In summary, our key contributions are as follows:
+\begin{itemize}
+\item We identify a significant limitation in the use of InfoNCE for task-agnostic continual learning (CIL), demonstrating that it can lead to excessive updates.
+\item We introduce ANT Loss, a new loss function designed to minimize updates to parameters that are unlikely to enhance classification performance.
+\item We empirically validate the effectiveness of ANT across multiple datasets, showing it to have superior performance compared to recent state-of-the-art CIL models.
+\end{itemize}
+
+
+% mostrar figura que resume a proposta
+%Information Noise Contrastive Estimation ($\mathrm{InfoNCE} $) updates proportionally all the dissimilarities occurring between positive and negative pairs. However, when we look closer to better characterize these dissimilarities, the model performs a weight update considering all distances. Still, cross-entropies, after computing softmax, just consider the higher logits, and the lower logits tend to be ignored. When we shed light on what is fundamentally important to update, we can verify that the values that matter are the ones closest to the maximum. Therefore, the proposal filters out all values that are not close to the maximum to avoid non-essential tuning in the parameters. The update avoidance is beneficial, especially for classes that are already good. 
+
+
+\section{Related Works}
+\subsection{Class Incremental Learning}
+
+Incremental class learning aims to create strategies for incorporating examples of new classes, whether from the same domain or not. In this way, it is possible to develop machine learning algorithms capable of continuously learning new classes while retaining the knowledge learned from old classes \cite{Thrun_10.5555/2998828.2998919, Rebuffi:2007}. Traditional models require complete training using all available examples, as they cannot add new class learning to existing ones \cite{castro2018endtoend}. However, in recent years, there has been great interest in the development of incremental learning \cite{Chen8457525}, as there are many real-world applications that can benefit from the ability of models to learn continuously. Formally, \cite{Rosenfeld_8554156} present three properties that qualify an algorithm as class-incremental:
+(i) it must be trainable from a data stream in which examples of different classes are submitted to the model at different times;
+(ii) it must, at any given time, present a competitive multiclass classifier for the classes already processed;
+(iii) the demand for computational resources (such as auxiliary memory) must
+remain limited or grow very slowly relative to the number
+of classes already processed.
+
+Formally in CIL, a model observes a group of classes ${{Y}_{t}}$ and their respectives training dataset. Focusing on a particular task  ${t}$, the input data ${{D}_{t}}$ can be described as ${({x}_{i}^{t}, {y}_{i}^{t})}$, where:  ${{x}_{i}^{t}}$ is an input example and ${{y}_{i}^{t}}$ is its respective  \textit{label} inside a set  \textit{labels} ${{Y}_{t}}$. The labels space of model is formed by all categories ${\tilde{Y} = \bigcup_{i=1}^{t} {Y}_{i}}$. Therefore, the model must predict well in all classes ${{\tilde{Y}}_{t}}$.\
+
+
+\subsection{Catastrophic Forgetting}
+The biggest challenge in CIL is known as ``catastrophic forgetting'' \cite{catastrophic-forgetting}, which occurs when the model distorts current knowledge when adjusting the model's parameters to accommodate new classes. Then, a neural model, upon learning new information, inadvertently loses previously acquired knowledge. The balancing plasticity and adaptability in deep models are crucial for continuous learning. Models must be designed to incorporate new data without compromising the integrity previously learned information.
+Contemporary approaches to mitigating catastrophic forgetting can be broadly classified into three primary categories: data-centric, model-centric, and algorithm-centric ~\cite{survey}. Among these, model-centric and data-centric strategies—along with hybrid combinations thereof—have been extensively explored in the literature.
+
+\textit{Data-centric} methods emphasize the reuse of previously seen exemplars to reinforce past knowledge and reduce forgetting. One of the most prominent and straightforward techniques in this category is rehearsal, which involves storing and replaying a subset of prior data during training. This strategy has demonstrated effectiveness in numerous studies, including~\cite{Rebuffi:2007, tcil}. However, rehearsal-based methods face practical constraints, especially in privacy-sensitive or resource-constrained environments, where storing raw data is infeasible or undesirable. Moreover, as the number of tasks grows, maintaining a balanced memory buffer becomes increasingly challenging, potentially leading to class imbalance or memory saturation.
+
+\textit{Model-centric} methods focus on modifying the model architecture to preserve knowledge across tasks. The Dynamic Expansion Architecture (DEA) paradigm is particularly popular. For instance, DER~\cite{Yan:2021} proposes dynamically scaling the model's capacity by incrementally increasing the number of backbones as new tasks arrive. While effective, such expansion-based methods incur increased memory and computational costs over time, which may become unsustainable for long task sequences. FOSTER~\cite{foster} mitigates this by using a single backbone with a feature-boosting mechanism, although this may limit flexibility and learning capacity for highly dissimilar tasks. DyTox~\cite{Douillard:2022} introduces a transformer-based architecture with dedicated encoder-decoder modules, which adds architectural complexity and demands significant computational resources. Similarly, methods like L2P~\cite{l2p} and SimpleCIL~\cite{simplecil}, which rely on large pre-trained Vision Transformers (ViTs), inherit the substantial training and inference costs associated with these models, making them less suitable for real-time or low-power applications.
+
+\textit{Algorithm-centric} approaches aim to design learning algorithms that explicitly preserve the knowledge from previous tasks. Among these, knowledge distillation is the most widely adopted strategy. In this paradigm, the outputs of a previous model guide the training of the current model to maintain consistency with past behavior~\cite{Rebuffi:2007, tcil, ucir, podnet}. While conceptually elegant, distillation requires the storage of prior model checkpoints or their outputs, which can be memory-intensive and introduce approximation errors. Additionally, distillation tends to focus on preserving the outputs at the cost of internal representations, which may lead to suboptimal generalization to new tasks. Another algorithm-level approach, bias correction, attempts to recalibrate model outputs to address class imbalance by adding dedicated layers. However, such corrections are often heuristic and dataset-dependent, lacking theoretical guarantees of effectiveness across varied scenarios.
+
+It is important to note that these categories are not mutually exclusive; in fact, many state-of-the-art methods integrate components from multiple categories to balance their strengths and weaknesses.
+
+\subsection{Task Agnostic}
+Task-agnostic continual learning (CL) refers to scenarios where learning system is not provided with explicit task identity at inference time. Unlike task-aware approaches, which assume access to task labels or boundaries during training and evaluation, task-agnostic methods must generalize across tasks without knowing which task a sample belongs to ~\cite{farajtabar2020orthogonal}. This setting is closer to real-world applications, where data streams arrive without clear task demarcation and task boundaries may be ambiguous or entirely unknown. The task-agnostic setting increases the challenge of mitigating catastrophic forgetting.
+
+The task-agnostic setting presents several challenges, most notably in balancing stability and plasticity without task supervision. Without task labels, models cannot use task-specific classifiers or regularization schemes based on task identity (commonly used in task-aware CL) ~\cite{aljundi2019taskfree}. Furthermore, the model must decide autonomously whether a sample belongs to a known class or represents a new concept, complicating memory replay strategies and increasing the risk of class confusion. These constraints, such as dynamic representation learning and continual clustering methods, have motivated the development of more general and robust mechanisms for knowledge retention.
+
+Several approaches have been proposed to tackle the task-agnostic challenge. Meta-Experience Replay (MER), for instance,  combines experience replay with meta-learning to enable the model to learn to update itself in a task-agnostic way ~\cite{riemer2019learning}. Similarly, the Orthogonal Gradient Descent (OGD) method controlls gradient updates, avoiding interference with previously learned knowledge and without requiring task labels~\cite{farajtabar2020orthogonal}. Another promising direction involves task-free regularization schemes, which promote long-term retention of important parameters in a task-agnostic manner ~\cite{zenke2017continual}. These approaches aim to maintain good performance on previous tasks while acquiring new knowledge, even without predefined task boundaries.
+
+\section{Preliminaries}
+
+\subsection{Problem Formulation}
+
+Class Incremental Learning problem is a subgroup of problems in Continual Learning where the goal is learn a sequence of learning tasks $T_1, T_2, ..., T_t$ where each task $T_i$ is a disjoint class set  $C_t$, where $C_{t1}\cap C_{t2} = \emptyset$, $\forall t_1, t_2 \in T, t_1\neq t_2$. A class set $C_t = \{ y^{(t)}_1,...,y^{(t)}_i,...,y^{(t)}_{tcl}\}$ where $y^{(t)}_i$ is the $i$-th class label of the task $t$. The training set  $\mathcal{D}_t$ of the $t$-th task has samples $(x_i^{(t)}, y_i^{(t)}) \in \mathcal{D}_t$. $x_i^{(t)}$ is the input, $y_i^{(t)}$ is the class label. Different from traditional supervised learning, where the training set has access to all classes, in CIL, when training task $t$, the learning algorithm has access only to $\mathcal{D}_t$ of the task $t$. The exception is rehearsal-based CIL, where a small number of rehearsal samples $\mathcal{M}$ are stored for later tasks.
+
+Although the tasks are learned in sequence, at test time, the model doesn't know which task a sample came from. In that moment, each task model can compete with the others for classifying a sample. Therefore, the intra-class confusion needs to be addressed during training time by training the actual task and the previous task simultaneously. If the model updates previous models, this is the primary source for a problem known as catastrophic forgetting, which can corrupt the parameters of previous tasks during the training of the actual task.
+
+
+\subsection{Task agnostic models for class incremental learning}
+
+In this section, we introduce the main ideas of TagFex\cite{zheng2025task}, which is the basis of the task-agnostic models for class incremental learning.  We start with some basic intuitions, all the way to understanding the problems that we address in the study. 
+
+
+A naive way to perform CIL is to train one model for each task and concatenate the features extracted from each model. The Equation~\ref{eq:cls} shows the loss used in this scenario. 
+\begin{equation}\label{eq:cls}
+\mathcal{L}_{\text{cls}}(x, y) = \ell_{\text{CE}}\left( \left[ f_{\text{ts}}^{(0)}(x), \ldots, f_{\text{ts}}^{(t)}(x) \right], y; W_{\text{cls}}^{(t)} \right)
+\end{equation}
+
+In the equation  $ W_{\text{cls}}^{(t)}$ is the weight parameter of the classifier of the task $t$, $f_{\text{ts}}^{(t)}(x)$ is the task specific model which returns features. Previously learned models $f_{\text{ts}}^{(0)}(x) \sim f_{\text{ts}}^{(t-1)}(x)$ are frozen to avoid catastrophic forgetting, and their features are concatenated in the formula.  $\ell_{\text{CE}}$ is a cross entropy loss. The problem is the increment in memory for each added task. The actual state of the art uses a principle called dynamic expansion. Dynamically  Expandable Representation (DER) \cite{yan2021dynamically}  performs a channel-level mask-based pruning strategy where it looks at the previous task and masks (removes) possible redundancy from the actual task model.  
+
+On the other hand, the concatenation/aggregation of the task's features can make the model use more info from the previous task than the actual task. One way to counteract this effect is to design a model that focuses on the current task plus one additional class to represent the previous tasks. Equation~\ref{eq:other_classes} shows the loss to be learned in this case. The trick here is to use $y \in \{C_t, y_{\text{previous}}\}$ where $y_{\text{previous}}$ represents all previous class tasks and $W_{\text{actual\_previous}}^{(t)}$ represents the parameter weights of the model.
+
+\begin{equation}\label{eq:other_classes}
+\mathcal{L}_{\text{actual\_previous}}(x, y) = \ell_{\text{CE}}\left(f_{\text{ts}}^{(t)}(x), y; W_{\text{actual\_previous}}^{(t)}\right)
+\end{equation}
+
+Equations~\ref{eq:cls} and~\ref{eq:other_classes} are pretty standard on the CIL problem; the novelty of TagFex lies in the idea of unsupervised training, which is the task-agnostic model borrowed from continual semi-supervised learning. The main idea is to learn agnostic (independent) features regarding the task learned. 
+
+The task-agnostic model learns to distinguish a sample from all other samples from the same batch, considering the actual and immediate previous task using Information Noise Contrastive Estimation ($\mathrm{InfoNCE} $)\cite{chen2020simple}. Equation~\ref{eq:agnostic} shows the equation used to train the agnostic features. In this equation $B$ represents the batch size, $f_{ta}$ is a learnable task agnostic feature extractor, $x'_i$ represents an augmented version of $x_i$, $g$ a projection head and $f'_{\text{ta}}(x_i)$ is freezed model of the last task-agnostic model. 
+
+
+\begin{align} \label{eq:agnostic}
+\mathcal{L}_{\text{ta}}^{(t > 0)} =\ 
+& -\mathrm{InfoNCE} \left( \left\{ f_{\text{ta}}(x_i) \right\}_{i=1}^{B},\ \left\{ f_{\text{ta}}(x'_i) \right\}_{i=1}^{B} \right) \nonumber \\
+& -\mathrm{InfoNCE} \left( \left\{ g(f_{\text{ta}}(x_i)) \right\}_{i=1}^{B},\ \left\{g( f'_{\text{ta}}(x_i)) \right\}_{i=1}^{B} \right)
+\end{align}
+
+The first term of this equation learns to distinguish samples from the actual task, and the second term distinguishes samples from the actual and previous task. 
+
+In TagFex, $f_{\text{ta}}(x_i)$ and $f_{\text{ts}}(x_i)$ are attention-based models that allow for obtaining Query, Keys, and Values. This enables the creation of a merge-attention loss using Equations~\ref{eq:merge} and ~\ref{eq:mergeloss}, where GAP is a global average pooling.
+
+\begin{equation}\label{eq:merge}
+O^{(h)} = \mathrm{Softmax} \left( 
+\frac{Q^{(h)} \left[ K_{\text{ts}}^{(h)}, K_{\text{ta}}^{(h)} \right]^T}
+{\sqrt{d / h}} 
+\right)
+\left[ V_{\text{ts}}^{(h)}, V_{\text{ta}}^{(h)} \right]
+\end{equation}
+
+\begin{equation}\label{eq:mergeloss}
+\mathcal{L}_{\text{mcls}} = \ell_{\text{CE}}(\mathrm{GAP}(O), y)
+\end{equation}
+
+Equation~\ref{eq:mergeloss} enables the model to learn simultaneously task-specific and task-agnostic features.  The learned weights in this equation focused on the actual task. To force the model also to consider the previous task TagFex performs a transfer learning using the logits of the concatenates features of previous tasks and the actual (see Equation~\ref{eq:cls}) $p_m$ and the logits of $f_{\text{ts}}(x_i)$ $p_{ts}$, which defines the transfer learning using Kullback-Leiber Divergence using Equation~\ref{eq:trans}.
+
+\begin{equation}\label{eq:trans}
+\mathcal{L}_{\text{trans}} 
+= D_{\mathrm{KL}}\!\bigl(\operatorname{StopGradient}\bigl(p_m^{(i)}\bigr)\,\big\|\,p_{\text{ts}}^{(i)}\bigr)
+\end{equation}
+
+The loss trained using in TagFex is defined in Equation~\ref{eq:final}, where $\lambda_{\text{ta}}$ and $\lambda_{\text{mcls}}$ are hyperparameters.
+
+
+\begin{equation}\label{eq:final}
+\mathcal{L} = \lambda_{\text{ta}} \mathcal{L}_{\text{ta}} + \lambda_{\text{mcls}} \mathcal{L}_{\text{mcls}} + \mathcal{L}_{\text{cls}}+ \mathcal{L}_{\text{actua\_previous}}+ \mathcal{L}_{\text{trans}}
+\end{equation}
+
+
+\section{ANT: Avoid Non-Essential Tunning Loss}
+
+
+Task-agnostic models computes the similarity matrix $S$ using cosine similarity among the batch samples, $sim(z_i,z'_j)$ where $z_i = embedding(f_{ta}(x_i))$ and $z'_j = embedding(f_{ta}(x'_j))$. In ANT, we used only $z_i$ to compute the matrix; the $z'_j$ are not being used in our formulation. This will enable us to think about the main intuitions of InfoNCE in task-agnostic models. 
+
+
+\begin{equation}
+S = 
+\begin{bmatrix}
+\mathrm{sim}(z_1, z_1) & \mathrm{sim}(z_1, z_2) & \dots & \mathrm{sim}(z_1, z_N) \\
+\mathrm{sim}(z_2, z_1) & \mathrm{sim}(z_2, z_2) & \dots & \mathrm{sim}(z_2, z_N) \\
+\vdots & \vdots & \ddots & \vdots \\
+\mathrm{sim}(z_N, z_1) & \mathrm{sim}(z_N, z_2) & \dots & \mathrm{sim}(z_N, z_N)
+\end{bmatrix}
+\end{equation}
+
+As the similarity of equal embeddings is one, $sim(z_i,z_i)=1$, the matrix can be rewriten as
+
+\begin{equation}
+S = 
+\begin{bmatrix}
+1 & \mathrm{sim}(z_1, z_2) & \dots & \mathrm{sim}(z_1, z_N) \\
+\mathrm{sim}(z_2, z_1) & 1 & \dots & \mathrm{sim}(z_2, z_N) \\
+\vdots & \vdots & \ddots & \vdots \\
+\mathrm{sim}(z_N, z_1) & \mathrm{sim}(z_N, z_2) & \dots & 1
+\end{bmatrix}
+\end{equation}
+
+\subsection{InfoNCE}
+% mostrar matriz de similaridade 
+When we apply InfoNCE defined in Equation~\ref{eq:infonce}
+
+
+\begin{equation}\label{eq:infonce}
+\mathcal{L}_{\text{InfoNCE}} (z_i) = -\log \frac{ \exp(\text{sim}(z_i, z_i)/\tau) }{ \sum_{j=1}^{N} \exp(\text{sim}(z_i, z_j)/\tau) }
+\end{equation}
+
+
+which is equivalent to cross-entropy over similarity scores. For numerical stability, a well-known trick is to rewrite this equation as
+\begin{equation}\label{eq:implemented}
+\mathcal{L}_{\text{InfoNCE}}(z_i) = \log \sum_{j=1}^{N} \exp(\text{sim}(z_i, z_j)/\tau) - \frac{\text{sim}(z_i,z_i)}{\tau}
+\end{equation}
+
+
+Which allows us  to rewrite the equation as a shifted logsumexp
+
+\begin{equation}\label{eq:shifted}
+\mathcal{L}_{\text{InfoNCE}} (z_i) =  log \left( \sum_{j=1}^N e^{m_{ij}} \right) 
+\end{equation}
+
+where 
+\begin{equation}
+m_{ij}= (\text{sim}(z_i, z_j) - \text{sim}(z_i,z_i)) \frac{1}{\tau}
+\end{equation}
+
+and measures the difference in similarity of positive (reference sample) and negative (all other samples in the batch). 
+
+As $sim(z_i,z_i)$ measures the similarity of the same sample $sim(z_i,z_i)=1$  and is the maximum value possible in the $S$ matrix, $m_{ij}$ is always a negative number between -1 and 0 $(-1<m_{ij}<0)$. Note that $e^{-1} < e^0 $ and when the values of $m_{ij}$ get closer to zero, the bigger the loss becomes.  
+
+\subsection{Analysis in pathological cases}
+
+The perfect scenario in an ideal task agnostic is when the model can produce perfect embeddings that are completely uncorrelated to each other in the similarity matrix, therefore producing the following S matrix
+
+
+\begin{equation}
+S = 
+\begin{bmatrix}
+1 & 0 & \dots & 0 \\
+0 & 1 & \dots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \dots & 1
+\end{bmatrix}
+\end{equation}
+
+Note that even completly uncorrelated samples, $sim(z_i,z_j) = 0$, increases the loss due to the somation of $e^{0-1}=e^{-1}$. Assume, for instance, that ten uncorrelated samples are given in infoNCE in the matrix S. 
+
+
+\begin{equation}\label{eq:example}
+\mathcal{L}_{\text{InfoNCE}} (z_i) =  \log \left( \sum_{j=1}^{10} e^{0-1} \right) = 1.30358
+\end{equation}
+
+In this ideal situation, the loss should be zero. This brings the question of whether InfoNCE is the right loss for task-agnostic problems. 
+
+
+\subsection{ANT loss}
+
+
+The most influential samples in task agnostic models are the most similar to $z_i$, where $m \approx 0$; consequently, these samples are responsible for improving the model. When we look at these matrices, we can observe that a few samples are actually in this category. 
+
+To capture $m \approx 0$, we adapted $m_{ij}$ to $antm_{ij}$ as defined in Equation~\ref{eq:antm}.
+% fazer a redução da equaçao para o problema
+
+\begin{equation}\label{eq:antm}
+antm_{ij}  =  sim(z_i,z_j) - (\max_{j} \operatorname{sim}(z_i, z_j) - margin )
+\end{equation}
+
+The term $(\max_{j} \operatorname{sim}(z_i, z_j) - margin)$ substitutes the $sim(z_i,z_i)$, which represents the samples more similar to the positive samples. We adapted this term because in TagFex $sim(z_i,z'_i)$ measures the distance between the positive and the augmented positive sample. Therefore, this similarity is not guaranteed to be the highest value. The $margin$ defines a threshold of sample distances closer to the max that will be used to update in backpropagation.  
+
+The Equation~\ref{eq:ant} defines ANT Loss, where ${\mathds{1}_{antm_{ij} > 0}}$ is an indicator function that disables samples with low similarity and makes the loss act only on high similarity samples. Notice that the Equation~\ref{eq:example}, the indicator function disables all $sim(z_i,z_j)=0$.
+
+\begin{equation}\label{eq:ant}
+\mathcal{L}_{\text{ANT}} (z_i) =  \log \left( \sum_{j=1}^{N}  e^{m_{ij}} {\mathds{1}_{antm_{ij} > 0}} \right)
+\end{equation}
+
+
+
+\section{Experiments}
+\subsection{Experimental Setups}
+
+To allow a strictly comparable evaluation with TagFex and the results reported by \citet{zheng2025task}, our study reproduces exactly the same class-incremental learning protocol. 
+
+\subsubsection{Datasets and data splitting}
+In this sense, we benchmark on CIFAR-100 \cite{Krizhevsky09}, ImageNet-100, and ImageNet-1k \cite{Deng:2009}. CIFAR-100 provides 50000 training and 10000 test images (32 x 32), while ImageNet-100/1k follow the original ImageNet resolution with 1300/50 images per class, respectively. A fixed rehearsal buffer of 2000 examples is maintained for CIFAR-100 and ImageNet-100, and 20000 images for ImageNet-1K, using the harding sampling strategy. 
+
+For splitting the data into tasks, we adopt two standard splits introduced in \citet{zheng2025task}:
+\begin{itemize}
+    \item 10-10 (small-base): the base task contains 10 classes, and each subsequent task adds 10 new classes.
+    \item 50-10 (large-base): the base task contains 50 classes, followed by 10-class increments.
+\end{itemize}
+
+For ImageNet-1K we use the 100-100 split (100 classes per task).
+
+\subsubsection{Model training and evaluation}
+
+All models - both task-specific and task-agnostic branches - are built on ResNet-18 \cite{He:2016}. We kept the hyper-parameters of \citet{zheng2025task} as follows:
+
+% \begin{table}[ht]
+% \centering
+% \begin{tabular}{lccc}
+% \hline
+% Phase & Epochs & Batch & LR \\
+% \hline
+% Base task        & 200 & 128 & 0.1 \\
+% Incremental task & 170 & 128 & 0.1 \\
+% \hline
+% \end{tabular}
+% \caption{Optimisation hyper-parameters used throughout the experiments.}
+% \end{table}
+
+\begin{itemize}
+    \item Trainig schedule. The base task is trained for 200 epochs, whereas every incremental task runs for 170 epochs with mini batches of 128 images and an initial learning rate of 0.1.
+    \item Task-agnostic branch: Self-supervised pre-training follows the InfoNCE objective with temperature $\tau = 0.2$. The projection head is a two-layer MLP (hidden dimension of $2048$, embedding dimension of $1024$), followed by a linear predictor.
+    \item Merge attention and distillation: the feature-aggregation module uses 8 attention heads, and knowledge transfer employs a soft-distillation temperature of 2.
+\end{itemize}
+
+We report two metrics:
+\begin{itemize}
+    \item Last: overall accuracy on all classes after the final task is completed;
+    \item Avg: average accuracy recorded at the end of each incremental stage.
+\end{itemize}
+
+Each experiment is repeated five times, and we report the mean scores to mitigate stochastic variance.
+
+\subsection{Performance Results}
+
+
+\begin{table*}[!t]
+  \centering
+  \caption{Performance results.}
+  \label{tab:perf_results}
+  \setlength{\tabcolsep}{5pt}  % ajuste fino do espaçamento entre colunas
+  \begin{tabular}{l*{10}{c}}
+    \toprule
+    \multirow{3}{*}{\textbf{Methods}} &
+      \multicolumn{4}{c}{\textbf{CIFAR100}} &
+      \multicolumn{4}{c}{\textbf{ImageNet100}} &
+      \multicolumn{2}{c}{\textbf{ImageNet1000}} \\ \cmidrule(lr){2-5}\cmidrule(lr){6-9}\cmidrule(lr){10-11}
+    & \multicolumn{2}{c}{10-10} & \multicolumn{2}{c}{50-10}
+    & \multicolumn{2}{c}{10-10} & \multicolumn{2}{c}{50-10}
+    & \multicolumn{2}{c}{100-100} \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}
+    & Last & Avg & Last & Avg & Last & Avg & Last & Avg & Last & Avg \\
+    \midrule
+    iCaRL~\cite{Rebuffi:2007}   & 49.52 & 64.64 & 50.56 & 60.08 & 50.98 & 67.11 & 53.69 & 62.56 & 40.47 & 57.55 \\
+    BiC~\cite{Wu:2019}     & 50.79 & 65.38 & 43.82 & 57.04 & 42.40 & 65.13 & 49.90 & 66.36 & --    & --    \\
+    DyTox~\cite{Douillard:2022}   & 60.43 & 73.50 & --    & --    & 67.61 & 76.51 & --    & --    & 59.75 & 68.14 \\
+    BEEF~\cite{Wang:2023}    & 60.98 & 71.94 & 63.51 & 70.71 & 68.78 & 77.62 & 70.98 & 77.27 & 58.67 & 67.09 \\
+    DER~\cite{Yan:2021}     & 64.35 & 75.36 & 65.27 & 72.60 & 66.71 & 77.18 & 71.08 & 77.71 & 58.83 & 66.87 \\
+    TagFex \cite{zheng2025task}            & 68.23 & 78.45 & 70.33 & 75.87 & 70.84 & 79.27 & 75.54 & 80.64 & 61.45 & 68.32 \\
+    TagFex-P \cite{zheng2025task}          & 67.34 & 78.02 & 69.26 & 74.24 & 69.21 & 78.56 & 74.13 & 79.85 & 60.14 & 67.65 \\
+    \midrule
+    ANT & & & & & & & & & \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+
+\begin{figure*}[htbp]
+  \centering
+
+  \begin{subfigure}[b]{0.24\textwidth}
+    \includegraphics[width=\textwidth]{fig_a.png}
+    \caption{CIFAR100 10-10}
+    \label{fig:img1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.24\textwidth}
+    \includegraphics[width=\textwidth]{fig_b.png}
+    \caption{CIFAR100 50-10}
+    \label{fig:img2}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.24\textwidth}
+    \includegraphics[width=\textwidth]{fig_c.png}
+    \caption{ImageNet100 10-10}
+    \label{fig:img3}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.24\textwidth}
+    \includegraphics[width=\textwidth]{fig_d.png}
+    \caption{ImageNet100 50-10}
+    \label{fig:img4}
+  \end{subfigure}
+
+  \caption{Accuracy on different scenarios.}
+  \label{fig:quatro_lado_a_lado}
+\end{figure*}
+
+
+\subsection{Ablation study}
+\section{Conclusion}
+\section{Acknowledgments}
+
+\bibliography{aaai2026}
+
+% Check whether the conference requires a reproducibility checklist to be included in the paper.
+% If so, you can uncomment the following line and ajust the path to include it.
+% \input{../../ReproducibilityChecklist/LaTeX/ReproducibilityChecklist.tex}
+
+\end{document}
