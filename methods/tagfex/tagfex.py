@@ -394,6 +394,8 @@ class TagFex(HerdingIndicesLearner):
                     self.configs.get("ant_beta", 0.0),
                     self.configs.get("ant_margin", 0.1),
                     self.configs.get("ant_max_global", True),
+                    gap_target=self.configs.get("gap_target", 0.0),
+                    gap_beta=self.configs.get("gap_beta", 0.0),
                     logger=self.loguru_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
@@ -898,6 +900,8 @@ def infoNCE_distill_loss(
     ant_beta=0.0,
     ant_margin=0.1,
     max_global=True,
+    gap_target=0.0,
+    gap_beta=0.0,
     logger=None,
     task=None,
     epoch=None,
@@ -914,6 +918,9 @@ def infoNCE_distill_loss(
     mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=cos_sim.device)
     q1 = cos_sim_q1.masked_fill(mask_q1, 0.0)  # ignore self-similarity
 
+    # Compute positive similarities for gap calculation
+    pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
+
     if max_global:
         # Global maximum across all anchors
         mq1 = F.relu_(q1 - q1.max() + ant_margin)
@@ -924,6 +931,23 @@ def infoNCE_distill_loss(
 
     ant_loss = torch.logsumexp(mq1, dim=-1)
     ant_loss_mean = ant_loss.mean()
+
+    # Gap maximization loss
+    gap_loss = torch.tensor(0.0, device=p_feats.device)
+    current_gap = torch.tensor(0.0, device=p_feats.device)
+
+    if gap_beta > 0 and gap_target > 0:
+        # Calculate current gap (pos - neg)
+        pos_mean = pos_sims.mean()
+        neg_mean = q1[~mask_q1].mean()
+        current_gap = pos_mean - neg_mean
+
+        # Penalize if gap is below target
+        gap_deficit = F.relu(gap_target - current_gap)
+        gap_loss = gap_deficit
+
+    # Combined ANT loss (base + gap maximization)
+    total_ant_loss_mean = ant_loss_mean + gap_beta * gap_loss
 
     # Mask out cosine similarity to itself
     self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=cos_sim.device)
@@ -936,7 +960,7 @@ def infoNCE_distill_loss(
 
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
-    total_loss = nce_alpha * nll_mean + ant_beta * ant_loss_mean
+    total_loss = nce_alpha * nll_mean + ant_beta * total_ant_loss_mean
 
     # Log partial loss values
     if logger is not None:
@@ -944,8 +968,10 @@ def infoNCE_distill_loss(
             {
                 "distill_nll": nll_mean.item(),
                 "distill_ant_loss": ant_loss_mean.item(),
+                "distill_gap_loss": gap_loss.item(),
+                "distill_total_ant_loss": total_ant_loss_mean.item(),
                 "distill_nce_weighted": (nce_alpha * nll_mean).item(),
-                "distill_ant_weighted": (ant_beta * ant_loss_mean).item(),
+                "distill_ant_weighted": (ant_beta * total_ant_loss_mean).item(),
                 "distill_total": total_loss.item(),
             },
             prefix="kd",

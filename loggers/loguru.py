@@ -133,6 +133,10 @@ class LoguruLogger:
             f"margin: {stats['margin']:.4f}",
             f"violation_pct: {stats['violation_pct']:.2f}%",
             f"ant_loss: {stats['ant_loss']:.4f}",
+            f"gap_loss: {stats['gap_loss']:.4f}",
+            f"current_gap: {stats['current_gap']:.4f}",
+            f"gap_target: {stats['gap_target']:.4f}",
+            f"total_ant_loss: {stats['total_ant_loss']:.4f}",
         ]
 
         log_msg = " | ".join(log_parts)
