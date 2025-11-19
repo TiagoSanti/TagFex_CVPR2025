@@ -420,7 +420,7 @@ def main():
     parser.add_argument(
         "log_file",
         type=str,
-        help="Path to the matrix debug log file (e.g., exp_matrix_debug0.log)",
+        help="Path to the matrix debug log file (e.g., exp_debug0.log)",
     )
     parser.add_argument(
         "-o",

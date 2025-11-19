@@ -59,13 +59,13 @@ For more arguments, see [`argument.py`](utils/argument.py).
 ## Plot loss components
 
 ``` bash
-python plot_loss_components.py logs/<exp_name>/exp_matrix_debug0.log -t contrast
+python plot_loss_components.py logs/<exp_name>/exp_debug0.log -t contrast
 ```
 
 Example:
 
 ```bash
-python plot_loss_components.py logs/exp_cifar100_10-10_antB1_nceA1_antM0.1_antLocal/exp_matrix_debug0.log -t contrast
+python plot_loss_components.py logs/exp_cifar100_10-10_antB1_nceA1_antM0.1_antLocal/exp_debug0.log -t contrast
 ```
 
 ## Acknowledgements
