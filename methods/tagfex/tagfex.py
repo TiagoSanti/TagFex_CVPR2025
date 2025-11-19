@@ -864,8 +864,24 @@ def infoNCE_loss(
     # Find positive example -> batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
-    # InfoNCE loss
+    # InfoNCE loss with optional local anchor normalization
     cos_sim = cos_sim / t
+
+    # Apply local anchor normalization if ant_beta=0 but max_global=False
+    # This allows testing local anchor concept independently of ANT
+    if ant_beta == 0.0 and not max_global:
+        # Subtract per-anchor maximum from negative similarities (excluding positives)
+        # This implements local normalization without the ANT margin-based penalization
+
+        # For each anchor, find max negative similarity
+        cos_sim_neg = cos_sim.clone()
+        cos_sim_neg[pos_mask] = -float("inf")  # Mask out positives
+
+        # Get max per row (local anchor normalization)
+        max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
+
+        # Subtract max from all similarities (shift the distribution)
+        cos_sim = cos_sim - max_neg_per_anchor
 
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
@@ -955,8 +971,24 @@ def infoNCE_distill_loss(
     # Find positive example -> batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
-    # InfoNCE loss
+    # InfoNCE loss with optional local anchor normalization
     cos_sim = cos_sim / t
+
+    # Apply local anchor normalization if ant_beta=0 but max_global=False
+    # This allows testing local anchor concept independently of ANT
+    if ant_beta == 0.0 and not max_global:
+        # Subtract per-anchor maximum from negative similarities (excluding positives)
+        # This implements local normalization without the ANT margin-based penalization
+
+        # For each anchor, find max negative similarity
+        cos_sim_neg = cos_sim.clone()
+        cos_sim_neg[pos_mask] = -float("inf")  # Mask out positives
+
+        # Get max per row (local anchor normalization)
+        max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
+
+        # Subtract max from all similarities (shift the distribution)
+        cos_sim = cos_sim - max_neg_per_anchor
 
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
