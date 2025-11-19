@@ -38,10 +38,10 @@ class LoguruLogger:
                 debug_filename = f"{logfile_prefix}_debuglog{rank}.log"
                 self.logger.add(log_dir / debug_filename, level=0)
 
-            # Always create a matrix debug log for similarity matrices
-            matrix_debug_filename = f"{logfile_prefix}_matrix_debug{rank}.log"
+            # Always create a debug log for similarity matrices and loss components
+            debug_log_filename = f"{logfile_prefix}_debug{rank}.log"
             self.logger.add(
-                log_dir / matrix_debug_filename,
+                log_dir / debug_log_filename,
                 level="DEBUG",
                 filter=lambda record: "Matrix" in record["message"]
                 or "Loss components" in record["message"]
