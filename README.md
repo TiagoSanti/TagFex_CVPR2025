@@ -23,6 +23,17 @@
 
 ---
 
+## 🖥️ Ambientes de Execução
+
+| Máquina | GPU | VRAM | Config. na fila |
+|---------|-----|------|-----------------|
+| **quati** (atual) | NVIDIA RTX 4090 | 24 GB · 1 GPU | `MACHINE="quati"` — Tiny ImageNet, CIFAR-100 |
+| **fera** (anterior) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | `MACHINE="fera"` — ImageNet-100, CIFAR-100 |
+
+O script de fila [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).
+
+---
+
 ## 🎯 Visão Geral
 
 **TagFex** é um framework para Class-Incremental Learning que resolve o problema de **feature collision** através de:
@@ -324,7 +335,7 @@ Após 15 experimentos, a configuração ótima é:
 ```yaml
 # InfoNCE Base
 nce_alpha: 1.0
-infonce_temp: 0.07
+infonce_temp: 0.2
 
 # ANT Loss
 ant_beta: 0.5           # Moderate strength
@@ -426,100 +437,112 @@ pytorch torchvision torchmetrics loguru tqdm
 ```bash
 git clone https://github.com/bwnzheng/TagFex_CVPR2025.git
 cd TagFex_CVPR2025
+
+# Recomendado: usar uv (Python 3.12.11)
+uv venv .venv --python 3.12.11
+source .venv/bin/activate
+uv pip install -r requirements.txt
+
+# Alternativa: pip
 pip install -r requirements.txt
+```
+
+### Download de Datasets
+
+```bash
+# Tiny ImageNet (400 MB) — necessário para experimentos na quati
+python setup_tiny_imagenet.py  # salva em ~/data/datasets/tiny-imagenet-200/
+
+# CIFAR-100 e ImageNet-100 — download automático via torchvision
 ```
 
 ### Execução
 
-#### Single-GPU (datasets pequenos como CIFAR-100)
+#### Single-GPU (CIFAR-100, Tiny ImageNet — quati)
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python main.py train \
-  --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml \
-  --log-dir ./logs/exp_cifar100_10-10
+  --exp-configs configs/all_in_one/tiny_imagenet_20-20_baseline_local_resnet18.yaml
 ```
 
-#### Multi-GPU (datasets grandes como ImageNet)
+#### Multi-GPU (ImageNet-100 — fera)
 
 ```bash
 ./trainddp.sh 0,1 \
-  --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml \
-  --log-dir ./logs/exp_cifar100_10-10 \
-  --ckpt-dir ./logs/exp_cifar100_10-10/ckpt
+  --exp-configs configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml \
+  --log-dir ./logs/exp_imagenet100_10-10
 ```
 
 #### Auto-Lançamento com Fila de GPUs 🚀
 
-**Novo!** Sistema automático que monitora GPUs e dispara experimentos quando uma ficar disponível:
+Sistema automático que monitora GPUs e dispara experimentos quando uma ficar disponível. O script de fila tem **perfis por máquina** configurados (quati/fera), com auto-detecção pelo hostname:
 
 ```bash
-# Experimento único - aguarda GPU disponível automaticamente
-python3 auto_run_on_free_gpu.py \
-  --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-  --threshold 1.0 \
-  --interval 30
-
-# Se GPUs têm memória ocupada por processos idle (ex: 87% mem, 0% util)
-python3 auto_run_on_free_gpu.py \
-  --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-  --threshold 1.0 \
-  --memory-threshold 20.0
-
-# Verificar processos idle ocupando GPUs
-./check_gpu_processes.sh
-
 # Fila de múltiplos experimentos - RECOMENDADO para SSH (roda em screen)
 ./start_queue_monitor.sh  # Pode desconectar do SSH!
 
-# Ou executar diretamente (sem screen de monitoramento)
+# Ou diretamente (sem screen de monitoramento)
 ./run_experiments_queue.sh
 
-# Testar monitoramento antes de rodar experimentos
-./test_gpu_monitor.sh
+# Forçar perfil de máquina específico
+MACHINE=fera ./run_experiments_queue.sh
+
+# Experimento único - aguarda GPU disponível automaticamente
+python3 auto_run_on_free_gpu.py \
+  --command "python main.py train --exp-configs configs/all_in_one/tiny_imagenet_20-20_baseline_local_resnet18.yaml" \
+  --memory-threshold 10.0
+
+# Verificar processos idle ocupando GPUs
+./check_gpu_processes.sh
 ```
+
+**Perfis de máquina em [`run_experiments_queue.sh`](run_experiments_queue.sh):**
+
+| `MACHINE` | GPUs/exp | Threshold | Fila |
+|-----------|----------|-----------|------|
+| `quati` | 1 | 10% VRAM | Tiny ImageNet 20-20 |
+| `fera` | 2 (torchrun) | 5% VRAM | CIFAR-100 + ImageNet-100 |
 
 **Vantagens:**
 - ✅ Não precisa monitorar manualmente com `gpustat`
 - ✅ Dispara automaticamente ao detectar GPU livre
-- ✅ Suporta threshold de memória (detecta processos idle)
+- ✅ Perfis por máquina — sem precisar ajustar manualmente
 - ✅ Suporta fila de experimentos overnight
-- ✅ Logs automáticos e organizados
-- ✅ Funciona com múltiplas GPUs em paralelo
-- 📺 **Executa em sessões screen** nomeadas pelo YAML (pode desconectar do SSH)
+- ✅ Executa em sessões `screen` (pode desconectar do SSH)
 
 📖 **Documentação completa**: [AUTO_GPU_LAUNCHER.md](AUTO_GPU_LAUNCHER.md)  
 🧠 **GPU com memória ocupada mas 0% uso?** Veja: [GPU_MEMORY_GUIDE.md](GPU_MEMORY_GUIDE.md)
 
-**Gerenciar sessões screen:**
 ```bash
-# Listar sessões ativas
+# Monitorar experimento em execução
 screen -ls
-
-# Anexar a uma sessão (ver progresso em tempo real)
-screen -r cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18
-
-# Desanexar: Ctrl+A, depois D
+screen -r tagfex_queue         # fila de orquestração
+tail -f logs/exp_.../exp_stdlog0.log  # logs do treino
 ```
 
 ### Exemplos de Uso
 
 ```bash
-# Melhor configuração (ANT β=0.5, m=0.5, Local)
+# Tiny ImageNet — melhor config ANT (quati)
+python main.py train \
+  --exp-configs configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_local_resnet18.yaml
+
+# CIFAR-100 — melhor configuração (ANT β=0.5, m=0.5, Local)
 python main.py train \
   --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml
 
-# Baseline com Local Anchor
+# CIFAR-100 — Baseline com Local Anchor
 python main.py train \
   --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml
 
-# Baseline com Global Anchor
-python main.py train \
-  --exp-configs configs/all_in_one/cifar100_10-10_baseline_global_resnet18.yaml
-
-# Multi-GPU ImageNet-100
+# Multi-GPU ImageNet-100 (fera)
 ./trainddp.sh 0,1 \
-  --exp-configs configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml \
-  --log-dir ./logs/exp_imagenet100_10-10
+  --exp-configs configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml
+
+# Debug — validação rápida do pipeline (3/2 épocas)
+python main.py train \
+  --exp-configs configs/all_in_one/tiny_imagenet_20-20_debug_resnet18.yaml \
+  --disable-save-ckpt --terminal-only
 ```
 
 ### Visualização de Loss Components
@@ -566,6 +589,19 @@ python plot_loss_components.py \
 | Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 |
 |--------------|-----------|------------|-----------|
 | Baseline Local | **81.28%** | 72.84% | **77.36%** |
+
+### Tiny ImageNet 20-20 (10 tasks × 20 classes) 🆕
+
+200 classes, imagens 64×64. Executado na quati (RTX 4090 24GB, single GPU).
+
+| Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 | Status |
+|--------------|-----------|------------|-----------|--------|
+| Baseline Local | — | — | — | 🔄 Rodando |
+| Baseline Global | — | — | — | ⏳ Aguardando |
+| ANT β=0.5, m=0.5, Local | — | — | — | ⏳ Aguardando |
+| ANT β=0.5, m=0.5, Global | — | — | — | ⏳ Aguardando |
+
+> Os experimentos Global vs Local no mesmo β/margin permitem isolar o efeito da normalização de âncora.
 
 ---
 
@@ -752,14 +788,21 @@ TagFex_CVPR2025/
 ├── main.py                        # Entry point
 ├── trainddp.sh                    # Multi-GPU training
 ├── requirements.txt               # Dependências
+├── setup_tiny_imagenet.py         # Download e verificação do Tiny ImageNet 🆕
+├── run_experiments_queue.sh       # Fila de experimentos (perfis quati/fera)
+├── start_queue_monitor.sh         # Lança fila em sessão screen
+├── auto_run_on_free_gpu.py        # Monitor de GPU para disparo automático
 │
 ├── configs/                       # Configurações
-│   ├── all_in_one/               # Configs prontas
-│   │   ├── cifar100_10-10_tagfex_ant_resnet18.yaml       # Melhor config
-│   │   ├── cifar100_10-10_tagfex_baseline_resnet18.yaml  # Baseline
-│   │   └── ...
+│   ├── all_in_one/               # Configs prontas (all-in-one YAML)
+│   │   ├── cifar100_10-10_*                          # CIFAR-100 10-10 (6 configs)
+│   │   ├── cifar100_50-10_*                          # CIFAR-100 50-10 (3 configs)
+│   │   ├── imagenet100_10-10_*                       # ImageNet-100 10-10 (3 configs)
+│   │   ├── imagenet100_50-10_*                       # ImageNet-100 50-10 (3 configs)
+│   │   └── tiny_imagenet_20-20_*                     # Tiny ImageNet 20-20 (5 configs) 🆕
 │   ├── exps/                     # Configs experimentais
 │   └── scenarios/                # Cenários de datasets
+│       └── tiny_imagenet.yaml    # Cenário Tiny ImageNet 🆕
 │
 ├── methods/                       # Implementações de métodos
 │   └── tagfex/
@@ -769,17 +812,22 @@ TagFex_CVPR2025/
 ├── modules/                       # Componentes reutilizáveis
 │   ├── evaluation.py             # Métricas
 │   ├── metrics.py                # Cálculo de métricas
-│   ├── data/                     # Dataloaders
-│   └── networks/                 # Backbones
+│   ├── data/
+│   │   ├── dataset.py            # CIFAR-100, ImageNet-100, Tiny ImageNet, CUB, DomainNet
+│   │   ├── augmentation.py       # Transforms por dataset
+│   │   └── manager.py
+│   └── backbones/
+│       └── resnet.py             # ResNet18 com stem adaptável por dataset
 │
 ├── loggers/                       # Sistema de logging
 │   ├── loguru.py                 # Logger principal
 │   └── utils.py
 │
 ├── logs/                          # Experimentos executados
-│   ├── done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/  # Melhor
+│   ├── done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/  # ⭐ Melhor
 │   ├── done_exp_cifar100_10-10_baseline_tagfex_original/
-│   └── ... (15 experimentos)
+│   ├── exp_tiny_imagenet_20-20_antB0_nceA1_antLocal/  # 🔄 Em execução
+│   └── ... (15 concluídos)
 │
 ├── analysis/                      # Scripts de análise
 │   ├── scripts/
@@ -789,9 +837,9 @@ TagFex_CVPR2025/
 │   └── results/                  # Resultados de análises
 │
 └── docs/                          # Documentação técnica
-    ├── RESULTS_AND_METRICS.md    # ✅ Todos os resultados e métricas (Dez 2025)
-    ├── THEORY_LOCAL_ANCHOR.md    # ✅ Teoria e implementação de local anchor
-    └── DEBUGGING_GUIDE.md        # ✅ Guia de debugging e análise
+    ├── RESULTS_AND_METRICS.md    # Todos os resultados e métricas (Dez 2025)
+    ├── THEORY_LOCAL_ANCHOR.md    # Teoria e implementação de local anchor
+    └── DEBUGGING_GUIDE.md        # Guia de debugging e análise
 ```
 
 ---
