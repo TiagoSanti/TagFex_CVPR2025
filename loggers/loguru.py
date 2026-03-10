@@ -89,17 +89,53 @@ class LoguruLogger:
         log_msg = " | ".join([f"{prefix}{k}: {v:.4f}" for k, v in components.items()])
         self.logger.debug(f"{context}Loss components: {log_msg}")
 
-    def log_ant_distance_stats(self, stats, task=None, epoch=None, batch=None):
+    def log_contrastive_stats(self, stats, task=None, epoch=None, batch=None):
         """
-        Log detailed ANT distance statistics including positive/negative distances and gaps.
+        Log general contrastive learning statistics (applicable to all experiments).
 
         Args:
-            stats: dict - Dictionary containing distance statistics:
-                - pos_distances: tensor of positive pair distances
-                - neg_distances: tensor of negative pair distances
-                - gaps: tensor of gaps (pos - neg)
+            stats: dict - Dictionary containing basic similarity statistics:
+                - pos_mean, pos_std: Positive pair similarities
+                - neg_mean, neg_std: Negative pair similarities
+                - current_gap: Natural gap (pos_mean - neg_mean)
+            task: int - Current task number
+            epoch: int - Current epoch number
+            batch: int - Current batch number
+        """
+        # Build context string
+        context_parts = []
+        if task is not None:
+            context_parts.append(f"T{task}")
+        if epoch is not None:
+            context_parts.append(f"E{epoch}")
+        if batch is not None:
+            context_parts.append(f"B{batch}")
+
+        context = f"[{' '.join(context_parts)}] " if context_parts else ""
+
+        # Format basic statistics (always logged)
+        log_parts = [
+            f"pos_mean: {stats['pos_mean']:.4f}",
+            f"pos_std: {stats['pos_std']:.4f}",
+            f"neg_mean: {stats['neg_mean']:.4f}",
+            f"neg_std: {stats['neg_std']:.4f}",
+            f"current_gap: {stats['current_gap']:.4f}",
+        ]
+
+        log_msg = " | ".join(log_parts)
+        self.logger.debug(f"{context}Contrastive stats: {log_msg}")
+
+    def log_ant_distance_stats(self, stats, task=None, epoch=None, batch=None):
+        """
+        Log detailed ANT-specific statistics (only when ANT is active).
+
+        Args:
+            stats: dict - Dictionary containing ANT-specific statistics:
+                - pos_min, pos_max: Min/max positive similarities
+                - neg_min, neg_max: Min/max negative similarities
+                - gap_mean, gap_std, gap_min, gap_max: Gap statistics (distance from margin)
                 - margin: the margin value used
-                - violations: percentage of pairs violating margin
+                - violation_pct: percentage of pairs violating margin
                 - ant_loss: the computed ANT loss value
             task: int - Current task number
             epoch: int - Current epoch number
@@ -116,14 +152,10 @@ class LoguruLogger:
 
         context = f"[{' '.join(context_parts)}] " if context_parts else ""
 
-        # Format statistics
+        # Format ANT-specific statistics (only logged when ANT is active)
         log_parts = [
-            f"pos_mean: {stats['pos_mean']:.4f}",
-            f"pos_std: {stats['pos_std']:.4f}",
             f"pos_min: {stats['pos_min']:.4f}",
             f"pos_max: {stats['pos_max']:.4f}",
-            f"neg_mean: {stats['neg_mean']:.4f}",
-            f"neg_std: {stats['neg_std']:.4f}",
             f"neg_min: {stats['neg_min']:.4f}",
             f"neg_max: {stats['neg_max']:.4f}",
             f"gap_mean: {stats['gap_mean']:.4f}",
@@ -133,10 +165,6 @@ class LoguruLogger:
             f"margin: {stats['margin']:.4f}",
             f"violation_pct: {stats['violation_pct']:.2f}%",
             f"ant_loss: {stats['ant_loss']:.4f}",
-            f"gap_loss: {stats['gap_loss']:.4f}",
-            f"current_gap: {stats['current_gap']:.4f}",
-            f"gap_target: {stats['gap_target']:.4f}",
-            f"total_ant_loss: {stats['total_ant_loss']:.4f}",
         ]
 
         log_msg = " | ".join(log_parts)

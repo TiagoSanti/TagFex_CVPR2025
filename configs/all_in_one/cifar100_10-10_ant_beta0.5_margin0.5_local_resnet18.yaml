@@ -23,22 +23,15 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# ANT Loss Parameters - FULLY ENABLED
-# ANT (Adaptive Negative Thresholding) focuses on hard negatives
-nce_alpha: 1.0       # InfoNCE base weight
-ant_beta: 1.0        # ANT loss weight (equal contribution)
-ant_margin: 0.1      # Margin threshold for negative filtering
-ant_max_global: false  # Use local maximum per anchor (not global)
+# InfoNCE + ANT Loss (Best Configuration)
+nce_alpha: 1.0          # InfoNCE loss weight
+ant_beta: 0.5           # ANT loss weight (optimal balance)
+ant_margin: 0.5         # Margin threshold for hard negatives
+ant_max_global: false   # Local anchor normalization
 
-# Gap Maximization Parameters - FULLY ENABLED
-# Forces the model to increase separation between positives and negatives
-gap_target: 0.7      # Target gap (pos_mean - neg_mean) to achieve
-gap_beta: 0.5        # Weight for gap maximization loss
-
-# Expected behavior:
-# - ANT loss will focus on hard negatives (those close to positives)
-# - Gap maximization will push gap towards 0.7
-# - Combined effect should improve feature separation and reduce forgetting
+# Similarity Matrix Debugging
+debug_similarity: false
+debug_similarity_batch_size: 16
 
 backbone_configs: 
   name: resnet18

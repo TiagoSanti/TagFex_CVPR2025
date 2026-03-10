@@ -6,6 +6,11 @@ import torch.nn.functional as F
 import torch.utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
 
 from modules import HerdingIndicesLearner
 from .tagfexnet import TagFexNet
@@ -39,6 +44,7 @@ class TagFex(HerdingIndicesLearner):
 
         self._adjust_log_dir_with_loss_params()
         self._init_loggers()
+        self._init_similarity_debug_logger()
         self.print_logger.info(configs)
 
         self.print_logger.info(f"class order: {self.data_manager.class_order.tolist()}")
@@ -69,6 +75,14 @@ class TagFex(HerdingIndicesLearner):
             "world_size"
         ]
         torch.distributed.barrier()
+
+    def _should_use_debug_batch(self):
+        """Check if we should use reduced batch size for similarity debug."""
+        return self.configs.get("debug_similarity", False)
+
+    def _get_debug_batch_size(self):
+        """Get batch size for similarity debugging (creates 16x16 matrices)."""
+        return self.configs.get("debug_similarity_batch_size", 16)
 
     def _model_to_ddp(self):
         self.network = nn.parallel.DistributedDataParallel(
@@ -179,6 +193,15 @@ class TagFex(HerdingIndicesLearner):
             new_indices = np.concatenate((task_train.indices, memory_indices))
             task_train.indices = new_indices
 
+            # Adjust batch size for similarity debugging if enabled
+            trainloader_params = self.configs["trainloader_params"].copy()
+            if self._should_use_debug_batch():
+                debug_batch_size = self._get_debug_batch_size()
+                self.print_logger.info(
+                    f"Debug mode: Using reduced batch size {debug_batch_size} for similarity analysis"
+                )
+                trainloader_params["batch_size"] = debug_batch_size
+
             # get dataloaders
             if self.configs["ffcv"]:
                 from modules.data.ffcv.loader import get_ffcv_loaders
@@ -186,7 +209,7 @@ class TagFex(HerdingIndicesLearner):
                 train_loader, test_loader = get_ffcv_loaders(
                     task_train,
                     task_test,
-                    self.configs["trainloader_params"],
+                    trainloader_params,
                     self.configs["testloader_params"],
                     self.device,
                     self.configs,
@@ -196,7 +219,7 @@ class TagFex(HerdingIndicesLearner):
                 train_loader, test_loader = get_loaders(
                     task_train,
                     task_test,
-                    self.configs["trainloader_params"],
+                    trainloader_params,
                     self.configs["testloader_params"],
                     self.distributed,
                 )
@@ -361,6 +384,11 @@ class TagFex(HerdingIndicesLearner):
             # self.print_logger.debug(f'rank {self.distributed["rank"]}, batch {batch}, cls_loss: {cls_loss}')
 
             embedding = out["embedding"]
+            
+            # Get debug parameters if similarity debugging is enabled
+            debug_logger = getattr(self, 'similarity_debug_logger', None) if self.configs.get("debug_similarity", False) else None
+            heatmap_dir = getattr(self, 'heatmap_dir', None) if self.configs.get("debug_similarity", False) else None
+            
             infonce_loss = infoNCE_loss(
                 embedding,
                 self.configs["infonce_temp"],
@@ -368,12 +396,12 @@ class TagFex(HerdingIndicesLearner):
                 self.configs.get("ant_beta", 0.0),
                 self.configs.get("ant_margin", 0.1),
                 self.configs.get("ant_max_global", True),
-                gap_target=self.configs.get("gap_target", 0.0),
-                gap_beta=self.configs.get("gap_beta", 0.0),
                 logger=self.loguru_logger,
                 task=self.state["cur_task"],
                 epoch=self.state["cur_epoch"],
                 batch=batch + 1,
+                debug_logger=debug_logger,
+                heatmap_dir=heatmap_dir,
             )
 
             if (aux_logits := out.get("aux_logits")) is not None:
@@ -394,12 +422,12 @@ class TagFex(HerdingIndicesLearner):
                     self.configs.get("ant_beta", 0.0),
                     self.configs.get("ant_margin", 0.1),
                     self.configs.get("ant_max_global", True),
-                    gap_target=self.configs.get("gap_target", 0.0),
-                    gap_beta=self.configs.get("gap_beta", 0.0),
                     logger=self.loguru_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
                     batch=batch + 1,
+                    debug_logger=debug_logger,
+                    heatmap_dir=heatmap_dir,
                 )
 
                 trans_logits = out["trans_logits"]
@@ -584,6 +612,32 @@ class TagFex(HerdingIndicesLearner):
         s = "\n├> ".join(componets)
         return "\n└>".join(s.rsplit("\n├>", 1))
 
+    def _init_similarity_debug_logger(self):
+        """Initialize separate logger for similarity matrix debugging."""
+        if not self.configs.get("debug_similarity", False):
+            return
+        
+        from loguru import logger
+        
+        log_dir = Path(self.configs.get("log_dir"))
+        debug_log_path = log_dir / "similarity_debug.log"
+        
+        # Add new handler for similarity debugging and store the handler ID
+        self.similarity_debug_handler_id = logger.add(
+            debug_log_path,
+            level="DEBUG",
+            format="{time:YYYY-MM-DD HH:mm:ss} | {message}",
+            enqueue=True,
+        )
+        
+        self.similarity_debug_logger = logger
+        self.print_logger.info(f"Similarity debug logging to: {debug_log_path}")
+        
+        # Create directory for heatmaps
+        self.heatmap_dir = log_dir / "similarity_heatmaps"
+        self.heatmap_dir.mkdir(parents=True, exist_ok=True)
+        self.print_logger.info(f"Similarity heatmaps will be saved to: {self.heatmap_dir}")
+
     def _adjust_log_dir_with_loss_params(self):
         """Adjust log directory name based on loss parameters (ANT, contrast factors, etc.)"""
         log_dir = self.configs.get("log_dir")
@@ -604,8 +658,10 @@ class TagFex(HerdingIndicesLearner):
         nce_alpha = self.configs.get("nce_alpha", 1.0)
         suffix_parts.append(f"nceA{nce_alpha:.3f}".rstrip("0").rstrip("."))
 
-        ant_margin = self.configs.get("ant_margin", 0.1)
-        suffix_parts.append(f"antM{ant_margin:.3f}".rstrip("0").rstrip("."))
+        # Only include ant_margin if ant_beta > 0 (ANT is active)
+        if ant_beta > 0:
+            ant_margin = self.configs.get("ant_margin", 0.1)
+            suffix_parts.append(f"antM{ant_margin:.3f}".rstrip("0").rstrip("."))
 
         ant_max_global = self.configs.get("ant_max_global", True)
 
@@ -613,13 +669,6 @@ class TagFex(HerdingIndicesLearner):
             suffix_parts.append("antGlobal")
         else:
             suffix_parts.append("antLocal")
-
-        # Gap maximization parameters
-        gap_beta = self.configs.get("gap_beta", 0.0)
-        if gap_beta > 0:
-            gap_target = self.configs.get("gap_target", 0.0)
-            suffix_parts.append(f"gapT{gap_target:.3f}".rstrip("0").rstrip("."))
-            suffix_parts.append(f"gapB{gap_beta:.3f}".rstrip("0").rstrip("."))
 
         # Contrast factors (optional - you can enable these if needed)
         if self.configs.get("include_contrast_in_logdir", False):
@@ -752,32 +801,71 @@ class TagFex(HerdingIndicesLearner):
         self.load_state_dict(ckpt)
 
 
-def infoNCE_loss(
-    feats,
+def _compute_contrastive_loss_base(
+    cos_sim,
     t,
     nce_alpha=1.0,
     ant_beta=0.0,
     ant_margin=0.1,
     max_global=True,
-    gap_target=0.0,
-    gap_beta=0.0,
     logger=None,
+    log_prefix="contrast",
     task=None,
     epoch=None,
     batch=None,
+    debug_logger=None,
+    heatmap_dir=None,
 ):
-    cos_sim = F.cosine_similarity(feats[:, None, :], feats[None, :, :], dim=-1)
+    """
+    Base function for computing contrastive loss with ANT.
+    Used by both infoNCE_loss and infoNCE_distill_loss to avoid code duplication.
+
+    Args:
+        cos_sim: Pre-computed cosine similarity matrix [N, N] where N = 2 * batch_size
+        t: Temperature parameter for InfoNCE loss
+        nce_alpha: Weight for InfoNCE loss component
+        ant_beta: Weight for ANT (Adaptive Negative Thresholding) loss component
+        ant_margin: Margin threshold for ANT loss
+        max_global: If True, use global maximum across all anchors; if False, use per-anchor maximum
+        logger: Logger instance for recording statistics
+        log_prefix: Prefix for log messages ("contrast" or "kd")
+        task: Current task number for logging
+        epoch: Current epoch number for logging
+        batch: Current batch number for logging
+        debug_logger: Separate logger for detailed similarity matrix debugging
+        heatmap_dir: Directory to save heatmap visualizations
+
+    Returns:
+        total_loss: Combined loss value (InfoNCE + ANT)
+    """
+    device = cos_sim.device
+
+    # Debug similarity matrices if enabled
+    if debug_logger is not None and heatmap_dir is not None:
+        _debug_similarity_matrices(
+            cos_sim=cos_sim,
+            ant_margin=ant_margin,
+            max_global=max_global,
+            debug_logger=debug_logger,
+            heatmap_dir=heatmap_dir,
+            task=task,
+            epoch=epoch,
+            batch=batch,
+            log_prefix=log_prefix,
+        )
 
     # ANT (Adaptive Negative Thresholding) logic
+    # Split into first half (anchors) for computing negative statistics
     pos_start = cos_sim.shape[0] // 2
     cos_sim_q1 = cos_sim[:pos_start, :pos_start]
 
-    mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=cos_sim.device)
+    mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=device)
     q1 = cos_sim_q1.masked_fill(mask_q1, 0.0)  # ignore self-similarity
 
     # Compute positive similarities for gap calculation and logging
     pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
 
+    # Compute ANT loss based on max_global strategy
     if max_global:
         # Global maximum across all anchors
         q1_max = q1.max()
@@ -790,34 +878,30 @@ def infoNCE_loss(
     # Compute base ANT loss
     ant_loss = torch.logsumexp(mq1, dim=-1).mean()
 
-    # Gap maximization loss
-    gap_loss = torch.tensor(0.0, device=feats.device)
-    current_gap = torch.tensor(0.0, device=feats.device)
+    # Get non-zero q1 values (excluding masked diagonal) for statistics
+    q1_nonzero = q1[~mask_q1]
+    neg_sims = q1_nonzero
 
-    if gap_beta > 0 and gap_target > 0:
-        # Calculate current gap (pos - neg)
-        pos_mean = pos_sims.mean()
-        neg_mean = q1[~mask_q1].mean()
-        current_gap = pos_mean - neg_mean
-
-        # Penalize if gap is below target
-        gap_deficit = F.relu(gap_target - current_gap)
-        gap_loss = gap_deficit
-
-    # Combined ANT loss (base + gap maximization)
-    total_ant_loss = ant_loss + gap_beta * gap_loss
-
-    # Log detailed distance statistics
+    # Always log basic contrastive statistics for monitoring
     if logger is not None:
-        # Get non-zero q1 values (excluding masked diagonal)
-        q1_nonzero = q1[~mask_q1]
+        # Calculate current gap (pos_mean - neg_mean)
+        pos_mean = pos_sims.mean()
+        neg_mean = neg_sims.mean()
+        current_gap_computed = pos_mean - neg_mean
 
-        # Positive similarities (already computed earlier for gap calculation)
-        # pos_sims is defined earlier in the function
+        # Prepare basic statistics
+        basic_stats = {
+            "pos_mean": pos_mean.item(),
+            "pos_std": pos_sims.std().item(),
+            "neg_mean": neg_mean.item(),
+            "neg_std": neg_sims.std().item(),
+            "current_gap": current_gap_computed.item(),
+        }
 
-        # Negative similarities are the q1 values
-        neg_sims = q1_nonzero
+        logger.log_contrastive_stats(basic_stats, task=task, epoch=epoch, batch=batch)
 
+    # Log detailed ANT-specific statistics when ANT is active
+    if logger is not None and ant_beta > 0:
         # Compute gaps: distance from max negative to margin threshold
         if max_global:
             gaps = q1_nonzero - q1_max
@@ -827,19 +911,14 @@ def infoNCE_loss(
             gaps = (q1 - q1_max_expanded)[~mask_q1]
 
         # Count margin violations (mq1 > 0 means margin was violated)
-        # Both max_global and local have same shape [batch_size, batch_size]
         mq1_nonzero = mq1[~mask_q1]
         violations = (mq1_nonzero > 0).float()
         violation_pct = violations.mean().item() * 100
 
-        # Prepare statistics dictionary
-        stats = {
-            "pos_mean": pos_sims.mean().item(),
-            "pos_std": pos_sims.std().item(),
+        # Prepare detailed ANT statistics (only logged when ANT is active)
+        ant_stats = {
             "pos_min": pos_sims.min().item(),
             "pos_max": pos_sims.max().item(),
-            "neg_mean": neg_sims.mean().item(),
-            "neg_std": neg_sims.std().item(),
             "neg_min": neg_sims.min().item(),
             "neg_max": neg_sims.max().item(),
             "gap_mean": gaps.mean().item(),
@@ -849,63 +928,110 @@ def infoNCE_loss(
             "margin": ant_margin,
             "violation_pct": violation_pct,
             "ant_loss": ant_loss.item(),
-            "gap_loss": gap_loss.item(),
-            "current_gap": current_gap.item(),
-            "gap_target": gap_target,
-            "total_ant_loss": total_ant_loss.item(),
         }
 
-        # Log the distance statistics
-        logger.log_ant_distance_stats(stats, task=task, epoch=epoch, batch=batch)
+        # Log detailed ANT statistics
+        logger.log_ant_distance_stats(ant_stats, task=task, epoch=epoch, batch=batch)
 
     # Mask out cosine similarity to itself
-    self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=cos_sim.device)
+    self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=device)
     cos_sim.masked_fill_(self_mask, -9e15)
+
     # Find positive example -> batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
     # InfoNCE loss with optional local anchor normalization
     cos_sim = cos_sim / t
 
-    # Apply local anchor normalization if ant_beta=0 but max_global=False
-    # This allows testing local anchor concept independently of ANT
+    # Apply local anchor normalization when ANT is disabled but max_global=False
+    # Each anchor is normalized by its own maximum negative similarity
     if ant_beta == 0.0 and not max_global:
-        # Subtract per-anchor maximum from negative similarities (excluding positives)
-        # This implements local normalization without the ANT margin-based penalization
-
-        # For each anchor, find max negative similarity
+        # Find max negative similarity per anchor (excluding positives)
         cos_sim_neg = cos_sim.clone()
-        cos_sim_neg[pos_mask] = -float("inf")  # Mask out positives
+        cos_sim_neg[pos_mask] = -float("inf")
 
-        # Get max per row (local anchor normalization)
+        # Normalize by per-anchor maximum
         max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
-
-        # Subtract max from all similarities (shift the distribution)
         cos_sim = cos_sim - max_neg_per_anchor
 
+    # Compute InfoNCE loss
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
-    total_loss = nce_alpha * nll_mean + ant_beta * total_ant_loss
+    total_loss = nce_alpha * nll_mean + ant_beta * ant_loss
 
     # Log partial loss values
     if logger is not None:
+        loss_components = {
+            "nll": nll_mean.item(),
+            "ant_loss": ant_loss.item(),
+            "nce_weighted": (nce_alpha * nll_mean).item(),
+            "ant_weighted": (ant_beta * ant_loss).item(),
+            "total": total_loss.item(),
+        }
         logger.log_loss_components(
-            {
-                "infoNCE_nll": nll_mean.item(),
-                "infoNCE_ant_loss": ant_loss.item(),
-                "infoNCE_gap_loss": gap_loss.item(),
-                "infoNCE_total_ant_loss": total_ant_loss.item(),
-                "infoNCE_nce_weighted": (nce_alpha * nll_mean).item(),
-                "infoNCE_ant_weighted": (ant_beta * total_ant_loss).item(),
-                "infoNCE_total": total_loss.item(),
-            },
-            prefix="contrast",
+            loss_components,
+            prefix=log_prefix,
             task=task,
             epoch=epoch,
             batch=batch,
         )
 
     return total_loss
+
+
+def infoNCE_loss(
+    feats,
+    t,
+    nce_alpha=1.0,
+    ant_beta=0.0,
+    ant_margin=0.1,
+    max_global=True,
+    logger=None,
+    task=None,
+    epoch=None,
+    batch=None,
+    debug_logger=None,
+    heatmap_dir=None,
+):
+    """
+    InfoNCE contrastive loss with optional ANT.
+
+    Args:
+        feats: Feature embeddings [2*batch_size, feature_dim]
+        t: Temperature parameter
+        nce_alpha: Weight for InfoNCE loss
+        ant_beta: Weight for ANT loss
+        ant_margin: Margin threshold for ANT
+        max_global: If True, use global max; if False, use per-anchor max
+        logger: Logger instance
+        task: Current task number
+        epoch: Current epoch number
+        batch: Current batch number
+        debug_logger: Separate logger for detailed similarity matrix debugging
+        heatmap_dir: Directory to save heatmap visualizations
+
+    Returns:
+        total_loss: Combined contrastive loss
+    """
+    # Compute cosine similarity matrix
+    cos_sim = F.cosine_similarity(feats[:, None, :], feats[None, :, :], dim=-1)
+
+    # Use base function to compute loss
+    return _compute_contrastive_loss_base(
+        cos_sim=cos_sim,
+        t=t,
+        nce_alpha=nce_alpha,
+        ant_beta=ant_beta,
+        ant_margin=ant_margin,
+        max_global=max_global,
+        logger=logger,
+        log_prefix="contrast",
+        task=task,
+        epoch=epoch,
+        batch=batch,
+        debug_logger=debug_logger,
+        heatmap_dir=heatmap_dir,
+    )
 
 
 def infoNCE_distill_loss(
@@ -916,100 +1042,347 @@ def infoNCE_distill_loss(
     ant_beta=0.0,
     ant_margin=0.1,
     max_global=True,
-    gap_target=0.0,
-    gap_beta=0.0,
     logger=None,
     task=None,
     epoch=None,
     batch=None,
+    debug_logger=None,
+    heatmap_dir=None,
 ):
-    # p_feats: predicted feature, z_feats: old ta feature
-    # print(p_feats.shape, z_feats.shape)
+    """
+    InfoNCE distillation loss with optional ANT.
+    Used for knowledge distillation between predicted and old features.
+
+    Args:
+        p_feats: Predicted feature embeddings [2*batch_size, feature_dim]
+        z_feats: Old (teacher) feature embeddings [2*batch_size, feature_dim]
+        t: Temperature parameter
+        nce_alpha: Weight for InfoNCE loss
+        ant_beta: Weight for ANT loss
+        ant_margin: Margin threshold for ANT
+        max_global: If True, use global max; if False, use per-anchor max
+        logger: Logger instance
+        task: Current task number
+        epoch: Current epoch number
+        batch: Current batch number
+        debug_logger: Separate logger for detailed similarity matrix debugging
+        heatmap_dir: Directory to save heatmap visualizations
+
+    Returns:
+        total_loss: Combined distillation loss
+    """
+    # Compute cosine similarity matrix between predicted and old features
     cos_sim = F.cosine_similarity(p_feats[:, None, :], z_feats[None, :, :], dim=-1)
 
-    # ANT (Adaptive Negative Thresholding) logic
-    pos_start = cos_sim.shape[0] // 2
-    cos_sim_q1 = cos_sim[:pos_start, :pos_start]
+    # Use base function to compute loss
+    return _compute_contrastive_loss_base(
+        cos_sim=cos_sim,
+        t=t,
+        nce_alpha=nce_alpha,
+        ant_beta=ant_beta,
+        ant_margin=ant_margin,
+        max_global=max_global,
+        logger=logger,
+        log_prefix="kd",
+        task=task,
+        epoch=epoch,
+        batch=batch,
+        debug_logger=debug_logger,
+        heatmap_dir=heatmap_dir,
+    )
 
-    mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=cos_sim.device)
-    q1 = cos_sim_q1.masked_fill(mask_q1, 0.0)  # ignore self-similarity
 
-    # Compute positive similarities for gap calculation
-    pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
-
+def _debug_similarity_matrices(
+    cos_sim,
+    ant_margin,
+    max_global,
+    debug_logger,
+    heatmap_dir,
+    task,
+    epoch,
+    batch,
+    log_prefix="contrast",
+):
+    """
+    Debug and visualize similarity matrices with detailed analysis.
+    
+    This function creates:
+    1. Text logs with matrix values, highlighting anchors and margin violations
+    2. Heatmap visualizations showing similarity patterns
+    3. Statistical summaries
+    
+    Args:
+        cos_sim: Cosine similarity matrix [N, N]
+        ant_margin: Margin threshold for ANT
+        max_global: Whether using global or local max
+        debug_logger: Logger instance for debug output
+        heatmap_dir: Directory to save heatmap images
+        task: Current task number
+        epoch: Current epoch
+        batch: Current batch
+        log_prefix: Prefix for file naming
+    """
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    
+    # Convert to numpy for easier manipulation
+    cos_sim_np = cos_sim.detach().cpu().numpy()
+    N = cos_sim_np.shape[0]
+    batch_size = N // 2
+    
+    # Context string for logging
+    context = f"T{task}_E{epoch}_B{batch}_{log_prefix}"
+    
+    debug_logger.info(f"\n{'='*80}")
+    debug_logger.info(f"SIMILARITY MATRIX DEBUG - {context}")
+    debug_logger.info(f"Matrix shape: {cos_sim_np.shape}")
+    debug_logger.info(f"ANT margin: {ant_margin}, Max strategy: {'Global' if max_global else 'Local'}")
+    debug_logger.info(f"{'='*80}\n")
+    
+    # Split into first half (anchors) for analysis
+    cos_sim_anchors = cos_sim_np[:batch_size, :batch_size]
+    
+    # Mask diagonal (self-similarity)
+    mask_diag = np.eye(batch_size, dtype=bool)
+    
+    # Compute max for each anchor (or global)
     if max_global:
-        # Global maximum across all anchors
-        mq1 = F.relu_(q1 - q1.max() + ant_margin)
+        global_max = np.max(cos_sim_anchors[~mask_diag])
+        threshold = global_max - ant_margin
+        debug_logger.info(f"Global max: {global_max:.4f}")
+        debug_logger.info(f"Threshold (max - margin): {threshold:.4f}\n")
     else:
-        # Maximum per anchor (per row)
-        q1_max = q1.max(dim=-1, keepdim=True).values
-        mq1 = F.relu_(q1 - q1_max + ant_margin)
+        local_maxs = np.max(np.where(mask_diag, -np.inf, cos_sim_anchors), axis=1)
+        debug_logger.info(f"Local max per anchor: min={local_maxs.min():.4f}, "
+                         f"max={local_maxs.max():.4f}, mean={local_maxs.mean():.4f}\n")
+    
+    # Analyze each anchor (show first 8 for readability)
+    num_show = min(8, batch_size)
+    for anchor_idx in range(num_show):
+        debug_logger.info(f"--- Anchor {anchor_idx} ---")
+        
+        # Get similarities for this anchor (excluding self)
+        sims = cos_sim_anchors[anchor_idx].copy()
+        sims[anchor_idx] = np.nan  # Mark self-similarity as NaN
+        
+        # Compute threshold for this anchor
+        if max_global:
+            anchor_threshold = threshold
+            anchor_max = global_max
+        else:
+            anchor_max = local_maxs[anchor_idx]
+            anchor_threshold = anchor_max - ant_margin
+        
+        # Find positive pair (should be at batch_size + anchor_idx)
+        pos_sim = cos_sim_np[anchor_idx, batch_size + anchor_idx]
+        
+        # Categorize values
+        above_threshold = []
+        below_threshold = []
+        
+        for neg_idx in range(batch_size):
+            if neg_idx == anchor_idx:
+                continue
+            sim_val = sims[neg_idx]
+            if sim_val >= anchor_threshold:
+                above_threshold.append((neg_idx, sim_val))
+            else:
+                below_threshold.append((neg_idx, sim_val))
+        
+        # Log anchor info
+        debug_logger.info(f"  Positive pair (idx {batch_size + anchor_idx}): {pos_sim:.4f}")
+        debug_logger.info(f"  Anchor max: {anchor_max:.4f}, Threshold: {anchor_threshold:.4f}")
+        debug_logger.info(f"  Above threshold: {len(above_threshold)}, Below threshold: {len(below_threshold)}")
+        
+        # Show values above threshold (potential margin violations)
+        if above_threshold:
+            above_threshold.sort(key=lambda x: x[1], reverse=True)
+            debug_logger.info(f"  Values ABOVE threshold:")
+            for neg_idx, sim_val in above_threshold[:5]:  # Show top 5
+                gap = sim_val - anchor_threshold
+                debug_logger.info(f"    idx {neg_idx}: {sim_val:.4f} (gap: +{gap:.4f})")
+        
+        # Show some values below threshold
+        if below_threshold and len(below_threshold) > 0:
+            below_threshold.sort(key=lambda x: x[1], reverse=True)
+            debug_logger.info(f"  Top values BELOW threshold:")
+            for neg_idx, sim_val in below_threshold[:3]:  # Show top 3
+                gap = anchor_threshold - sim_val
+                debug_logger.info(f"    idx {neg_idx}: {sim_val:.4f} (gap: -{gap:.4f})")
+        
+        debug_logger.info("")
+    
+    # Overall statistics
+    all_neg_sims = cos_sim_anchors[~mask_diag].flatten()
+    pos_sims = np.array([cos_sim_np[i, batch_size + i] for i in range(batch_size)])
+    
+    debug_logger.info(f"--- Overall Statistics ---")
+    debug_logger.info(f"Positive pairs: min={pos_sims.min():.4f}, max={pos_sims.max():.4f}, "
+                     f"mean={pos_sims.mean():.4f}, std={pos_sims.std():.4f}")
+    debug_logger.info(f"Negative pairs: min={all_neg_sims.min():.4f}, max={all_neg_sims.max():.4f}, "
+                     f"mean={all_neg_sims.mean():.4f}, std={all_neg_sims.std():.4f}")
+    debug_logger.info(f"Gap (pos_mean - neg_mean): {pos_sims.mean() - all_neg_sims.mean():.4f}")
+    
+    if max_global:
+        violations = (all_neg_sims >= threshold).sum()
+        debug_logger.info(f"Margin violations: {violations} / {len(all_neg_sims)} "
+                         f"({100 * violations / len(all_neg_sims):.2f}%)")
+    
+    debug_logger.info(f"\n{'='*80}\n")
+    
+    # Log the complete similarity matrix in text format
+    _log_similarity_matrix(
+        cos_sim_np=cos_sim_np,
+        debug_logger=debug_logger,
+        context=context,
+        ant_margin=ant_margin,
+        max_global=max_global,
+        local_maxs=local_maxs if not max_global else None,
+        threshold=threshold if max_global else None,
+    )
+    
+    # Create and save heatmap
+    # _save_similarity_heatmap(
+    #     cos_sim_np=cos_sim_np,
+    #     heatmap_dir=heatmap_dir,
+    #     context=context,
+    #     ant_margin=ant_margin,
+    #     max_global=max_global,
+    # )
 
-    ant_loss = torch.logsumexp(mq1, dim=-1)
-    ant_loss_mean = ant_loss.mean()
+def _log_similarity_matrix(
+    cos_sim_np,
+    debug_logger,
+    context,
+    ant_margin,
+    max_global,
+    local_maxs=None,
+    threshold=None,
+):
+    """
+    Log the complete similarity matrix in a formatted text representation.
+    
+    Args:
+        cos_sim_np: Similarity matrix as numpy array
+        debug_logger: Logger instance
+        context: Context string for identification
+        ant_margin: Margin value
+        max_global: Whether using global or local max
+        local_maxs: Per-anchor maximum values (for local strategy)
+        threshold: Global threshold (for global strategy)
+    """
+    N = cos_sim_np.shape[0]
+    batch_size = N // 2
+    
+    debug_logger.info(f"\n{'='*80}")
+    debug_logger.info(f"COMPLETE SIMILARITY MATRIX - {context}")
+    debug_logger.info(f"{'='*80}\n")
+    
+    # Create header row
+    header = "     |"
+    for j in range(N):
+        header += f"  {j:2d}  |"
+    debug_logger.info(header)
+    debug_logger.info("-" * len(header))
+    
+    # Log each row with highlighting
+    for i in range(N):
+        row_str = f" {i:2d}  |"
+        
+        # Determine if this is an anchor row (first half)
+        is_anchor = i < batch_size
+        
+        # Get threshold for this anchor
+        if is_anchor:
+            if max_global:
+                anchor_threshold = threshold
+            else:
+                anchor_threshold = local_maxs[i] - ant_margin
+        
+        for j in range(N):
+            val = cos_sim_np[i, j]
+            
+            # Determine highlighting
+            marker = ""
+            if i == j:
+                # Self-similarity (diagonal)
+                marker = "*"
+            elif is_anchor and j == i + batch_size:
+                # Positive pair for anchor i
+                marker = "+"
+            elif is_anchor and j < batch_size and j != i:
+                # Negative within batch - check if above threshold
+                if val >= anchor_threshold:
+                    marker = "!"  # Violation
+            
+            row_str += f" {val:5.2f}{marker}|"
+        
+        debug_logger.info(row_str)
+    
+    # Add legend
+    debug_logger.info("\nLegend:")
+    debug_logger.info("  * = Self-similarity (diagonal, always 1.0)")
+    debug_logger.info("  + = Positive pair (augmentation)")
+    debug_logger.info("  ! = Margin violation (negative above threshold)")
+    debug_logger.info(f"\n{'='*80}\n")
 
-    # Gap maximization loss
-    gap_loss = torch.tensor(0.0, device=p_feats.device)
-    current_gap = torch.tensor(0.0, device=p_feats.device)
 
-    if gap_beta > 0 and gap_target > 0:
-        # Calculate current gap (pos - neg)
-        pos_mean = pos_sims.mean()
-        neg_mean = q1[~mask_q1].mean()
-        current_gap = pos_mean - neg_mean
+def _save_similarity_heatmap(
+    cos_sim_np,
+    heatmap_dir,
+    context,
+    ant_margin,
+    max_global,
+):
+    """
+    Create and save heatmap visualization of similarity matrix.
+    
+    Args:
+        cos_sim_np: Similarity matrix as numpy array
+        heatmap_dir: Directory to save heatmap
+        context: Context string for filename
+        ant_margin: Margin value for title
+        max_global: Whether using global or local max
+    """
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    
+    fig, ax = plt.subplots(figsize=(12, 10))
+    
+    # Create heatmap
+    sns.heatmap(
+        cos_sim_np,
+        annot=True,
+        fmt=".2f",
+        cmap="RdYlGn",
+        center=0.0,
+        vmin=-1.0,
+        vmax=1.0,
+        square=True,
+        linewidths=0.5,
+        cbar_kws={"label": "Cosine Similarity"},
+        ax=ax,
+    )
+    
+    # Add title with parameters
+    max_strategy = "Global" if max_global else "Local"
+    ax.set_title(f"Similarity Matrix - {context}\nMargin: {ant_margin}, Max: {max_strategy}", 
+                 fontsize=12, pad=20)
+    ax.set_xlabel("Sample Index", fontsize=10)
+    ax.set_ylabel("Sample Index (Anchor)", fontsize=10)
+    
+    # Highlight diagonal
+    N = cos_sim_np.shape[0]
+    batch_size = N // 2
+    
+    # Draw lines to separate augmented pairs
+    ax.axhline(y=batch_size, color='blue', linewidth=2, linestyle='--', alpha=0.7)
+    ax.axvline(x=batch_size, color='blue', linewidth=2, linestyle='--', alpha=0.7)
+    
+    # Save figure
+    filename = f"sim_heatmap_{context}.png"
+    filepath = Path(heatmap_dir) / filename
+    plt.tight_layout()
+    plt.savefig(filepath, dpi=150, bbox_inches='tight')
+    plt.close(fig)
 
-        # Penalize if gap is below target
-        gap_deficit = F.relu(gap_target - current_gap)
-        gap_loss = gap_deficit
-
-    # Combined ANT loss (base + gap maximization)
-    total_ant_loss_mean = ant_loss_mean + gap_beta * gap_loss
-
-    # Mask out cosine similarity to itself
-    self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=cos_sim.device)
-    cos_sim.masked_fill_(self_mask, -9e15)
-    # Find positive example -> batch_size//2 away from the original example
-    pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
-
-    # InfoNCE loss with optional local anchor normalization
-    cos_sim = cos_sim / t
-
-    # Apply local anchor normalization if ant_beta=0 but max_global=False
-    # This allows testing local anchor concept independently of ANT
-    if ant_beta == 0.0 and not max_global:
-        # Subtract per-anchor maximum from negative similarities (excluding positives)
-        # This implements local normalization without the ANT margin-based penalization
-
-        # For each anchor, find max negative similarity
-        cos_sim_neg = cos_sim.clone()
-        cos_sim_neg[pos_mask] = -float("inf")  # Mask out positives
-
-        # Get max per row (local anchor normalization)
-        max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
-
-        # Subtract max from all similarities (shift the distribution)
-        cos_sim = cos_sim - max_neg_per_anchor
-
-    nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
-    nll_mean = nll.mean()
-    total_loss = nce_alpha * nll_mean + ant_beta * total_ant_loss_mean
-
-    # Log partial loss values
-    if logger is not None:
-        logger.log_loss_components(
-            {
-                "distill_nll": nll_mean.item(),
-                "distill_ant_loss": ant_loss_mean.item(),
-                "distill_gap_loss": gap_loss.item(),
-                "distill_total_ant_loss": total_ant_loss_mean.item(),
-                "distill_nce_weighted": (nce_alpha * nll_mean).item(),
-                "distill_ant_weighted": (ant_beta * total_ant_loss_mean).item(),
-                "distill_total": total_loss.item(),
-            },
-            prefix="kd",
-            task=task,
-            epoch=epoch,
-            batch=batch,
-        )
-
-    return total_loss

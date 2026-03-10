@@ -7,8 +7,8 @@ class_order: [68, 56, 78, 8, 23, 84, 90, 65, 74, 76, 40, 89, 3, 92, 55, 9, 26, 8
 
 method: tagfex
 
-init_epochs: 15 # 200
-inc_epochs: 10 # 170
+init_epochs: 200 # 200
+inc_epochs: 170 # 170
 eval_interval: 5
 
 
@@ -23,15 +23,15 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# ANT Loss Parameters
+# InfoNCE Loss Parameters (Baseline - Local Anchor)
 nce_alpha: 1.0
-ant_beta: 1.0
-ant_margin: 0.1
-ant_max_global: false
+ant_beta: 0.0           # ANT disabled (InfoNCE only)
+ant_margin: 0.1         # Not used when ant_beta=0
+ant_max_global: false   # Uses local (per-anchor) maximum for normalization
 
-# Gap Maximization Parameters
-gap_target: 0.7   # Target gap between positive and negative similarities (0.0 disables)
-gap_beta: 0.5     # Weight for gap maximization loss (0.0 disables)
+# Similarity Matrix Debugging
+debug_similarity: false
+debug_similarity_batch_size: 16
 
 backbone_configs: 
   name: resnet18

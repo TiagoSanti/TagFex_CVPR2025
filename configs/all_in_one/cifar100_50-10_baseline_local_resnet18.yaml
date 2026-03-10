@@ -23,21 +23,17 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# ANT Loss Parameters - DISABLED for baseline reproduction
-# Setting ant_beta=0.0 disables ANT loss (only InfoNCE is used)
+# InfoNCE Loss Parameters (Baseline - Local Anchor)
 nce_alpha: 1.0
-ant_beta: 0.0      # DISABLED: No ANT loss contribution
-ant_margin: 0.0    # Not used when ant_beta=0 (only affects logging/experiment name)
-ant_max_global: false  # LOCAL anchor normalization in InfoNCE
+ant_beta: 0.0           # ANT disabled (InfoNCE only)
+ant_margin: 0.1         # Not used when ant_beta=0
+ant_max_global: false   # Uses local (per-anchor) maximum for normalization
 
-# Gap Maximization Parameters - DISABLED for baseline
-gap_target: 0.0    # DISABLED: No gap maximization
-gap_beta: 0.0      # DISABLED: No gap loss contribution
+# Similarity Matrix Debugging
+debug_similarity: false
+debug_similarity_batch_size: 16
 
-# Note: Even with ANT disabled, the distance stats will still be logged
-# This allows us to track gap evolution without ANT influencing training
-
-backbone_configs: 
+backbone_configs:
   name: resnet18
 
 network_configs:

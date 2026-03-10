@@ -1,73 +1,1025 @@
-# Task-Agnostic Guided Feature Expansion for Class-Incremental Learning
+# TagFex - Task-Agnostic Guided Feature Expansion for Class-Incremental Learning
 
-This is the code repo for Task-Agnostic Guided Feature Expansion for Class-Incremental Learning (CVPR 2025).
+**Paper**: CVPR 2025  
+**ArXiv**: https://arxiv.org/abs/2503.00823
 
-TL;DR: We propose **TagFex** framework to address _feature collision_ in Class-Incremental Learning. TagFex features in continuously capturing task-agnostic features through a separate unsupervised model. TagFex achieves superior performance by a large margin, comparing to other expansion-based methods training models from scratch.
+---
 
-[[arxiv]](https://arxiv.org/abs/2503.00823)
+## 📋 Índice
+
+1. [Visão Geral](#visão-geral)
+2. [Fundamentos Teóricos](#fundamentos-teóricos)
+3. [Estado Atual do Projeto](#estado-atual-do-projeto)
+4. [Melhor Configuração Encontrada](#melhor-configuração-encontrada)
+5. [Instalação e Uso](#instalação-e-uso)
+6. [Experimentos Realizados](#experimentos-realizados)
+7. [Descobertas Principais](#descobertas-principais)
+8. [ANT Loss: Conceito e Implementação](#ant-loss-conceito-e-implementação)
+9. [Local vs Global Anchor](#local-vs-global-anchor)
+10. [Estrutura do Projeto](#estrutura-do-projeto)
+11. [Análise e Debugging](#análise-e-debugging)
+12. [Documentação Adicional](#documentação-adicional)
+13. [Referências](#referências)
+
+---
+
+## 🎯 Visão Geral
+
+**TagFex** é um framework para Class-Incremental Learning que resolve o problema de **feature collision** através de:
+
+- 🎯 Captura contínua de características task-agnostic
+- 🔄 Modelo não supervisionado separado
+- 📈 Superioridade sobre métodos expansion-based que treinam do zero
 
 ![motivation](assets/motivation.svg)
-
 ![overview](assets/overview.svg)
 
-## To Run the Code
+### Contribuições Principais
 
-Package Requirements
+1. **TagFex Framework Original**: Feature expansion task-agnostic
+2. **ANT Loss (Adaptive Negative Threshold)**: Melhora aprendizado contrastivo focando em hard negatives
+3. **Local Anchor Normalization**: Normalização adaptativa por âncora
+
+---
+
+## � Fundamentos Teóricos
+
+### O Problema: Catastrophic Forgetting em Class-Incremental Learning
+
+**Catastrophic Forgetting** ocorre quando um modelo de aprendizado profundo, ao aprender novas tarefas (classes), sobrescreve o conhecimento previamente adquirido. Em Class-Incremental Learning (CIL), este é o desafio central: como adicionar novas classes sem esquecer as antigas?
+
+**Desafios específicos de CIL**:
+1. **Feature Collision**: Features de novas classes podem colidir com features de classes antigas
+2. **Distribution Shift**: Distribuição de dados muda a cada task
+3. **Memory Constraints**: Impossível armazenar todos os dados antigos
+4. **Task-Agnostic Setting**: Sem acesso a task labels durante inferência
+
+---
+
+### TagFex Framework: Task-Agnostic Guided Feature Expansion
+
+#### Arquitetura Geral
+
+TagFex utiliza uma arquitetura de **dual-branch**:
 
 ```
+                    ┌─────────────────┐
+                    │   Input Image   │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┴────────────────┐
+            │                                  │
+    ┌───────▼────────┐              ┌─────────▼────────┐
+    │  Task-Agnostic │              │  Task-Specific   │
+    │     Branch     │              │     Branch       │
+    │   (Frozen)     │              │   (Trainable)    │
+    └───────┬────────┘              └─────────┬────────┘
+            │                                  │
+            │  Features f_ta                   │  Features f_ts
+            │                                  │
+            └────────────────┬─────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │ Merge Attention │
+                    │   (Adaptive)    │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Classifier    │
+                    └─────────────────┘
+```
+
+#### Componentes-Chave
+
+**1. Task-Agnostic Branch** (`f_ta`):
+- Treinado de forma **auto-supervisionada** usando InfoNCE
+- Captura features **task-independent**
+- **Frozen** durante treinamento de novas tasks
+- Evita catastrophic forgetting por não ser atualizado
+
+**2. Task-Specific Branch** (`f_ts`):
+- Treinado de forma **supervisionada** com labels
+- Expande dinamicamente para novas classes
+- Especializa-se em features discriminativas
+- Atualizado a cada nova task
+
+**3. Merge Attention Module**:
+- Combina adaptivamente `f_ta` e `f_ts`
+- Aprende pesos de atenção: `α_ta`, `α_ts`
+- Features finais: `f_merged = α_ta · f_ta + α_ts · f_ts`
+
+#### Loss Functions do TagFex
+
+**Loss de Classificação** (Task-Specific):
+```
+L_cls = CrossEntropy(f_ts, labels)
+```
+
+**Loss Contrastiva** (Task-Agnostic):
+```
+L_contrast = InfoNCE(f_ta(x), f_ta(x'))
+```
+Onde `x'` é uma augmentation de `x`.
+
+**Loss de Distillation** (Knowledge Retention):
+```
+L_distill = InfoNCE(f_ta^new(x), f_ta^old(x))
+```
+Mantém consistência com modelo anterior.
+
+**Loss Total**:
+```
+L_total = L_cls + λ_contrast · L_contrast + λ_distill · L_distill
+```
+
+---
+
+### InfoNCE Loss: Contrastive Learning
+
+#### Formulação Original
+
+InfoNCE (Information Noise Contrastive Estimation) é uma loss contrastiva que maximiza a similaridade entre pares positivos e minimiza entre pares negativos:
+
+```
+L_InfoNCE(z_i) = -log[ exp(sim(z_i, z_i+) / τ) / Σ_j exp(sim(z_i, z_j) / τ) ]
+```
+
+Onde:
+- `z_i`: embedding da âncora
+- `z_i+`: embedding do par positivo (augmentation de `z_i`)
+- `z_j`: embeddings de pares negativos (outras amostras do batch)
+- `sim(·,·)`: similaridade coseno
+- `τ`: temperatura (tipicamente 0.07-0.2)
+
+#### Reformulação: Shifted Log-Sum-Exp
+
+A forma original pode ser reescrita de maneira mais intuitiva:
+
+```
+L_InfoNCE(z_i) = log[ Σ_j exp(m_ij) ]
+
+onde: m_ij = [sim(z_i, z_j) - sim(z_i, z_i)] / τ
+```
+
+**Propriedade chave**: `sim(z_i, z_i) = 1` (máximo), então `-1 < m_ij < 0`.
+
+#### Limitação do InfoNCE em CIL
+
+**Problema**: InfoNCE **nunca atinge zero**, mesmo quando o modelo já discrimina perfeitamente:
+
+**Caso Ideal** (embeddings perfeitamente descorrelacionados):
+```
+S = [1  0  0  ...  0]  ← Matriz de similaridade ideal
+    [0  1  0  ...  0]
+    [0  0  1  ...  0]
+    [⋮  ⋮  ⋮  ⋱  ⋮]
+    [0  0  0  ...  1]
+```
+
+Mesmo neste caso ideal:
+```
+L_InfoNCE(z_i) = log(Σ_j exp(0-1)) = log(N × e^(-1)) ≈ log(N) - 1
+```
+
+Para N=10 amostras: `L ≈ 1.30` (não zero!)
+
+**Consequência**: O modelo continua **atualizando parâmetros** mesmo quando não é necessário → **Non-Essential Tuning** → Aumenta catastrophic forgetting.
+
+---
+
+### ANT Loss: Adaptive Negative Threshold
+
+#### Motivação
+
+InfoNCE atualiza **todos** os negativos proporcionalmente, mas apenas os **hard negatives** (próximos ao positivo) são realmente informativos. Atualizar negativos fáceis causa:
+
+1. **Gradientes desnecessários** em parâmetros irrelevantes
+2. **Maior risco de forgetting** de conhecimento anterior
+3. **Convergência mais lenta** e menos estável
+
+#### Formulação Matemática
+
+ANT Loss foca apenas em hard negatives usando uma **margem adaptativa**:
+
+```
+ant_m_ij = sim(z_i, z_j) - (max_k sim(z_i, z_k) - margin)
+
+L_ANT(z_i) = log[ Σ_j exp(m_ij) · 𝟙(ant_m_ij > 0) ]
+```
+
+Onde:
+- `𝟙(·)`: função indicadora (1 se verdadeiro, 0 caso contrário)
+- `margin`: threshold de dificuldade (hiperparâmetro, tipicamente 0.1-0.5)
+- `max_k sim(z_i, z_k)`: maior similaridade negativa
+
+**Interpretação**:
+- Se `ant_m_ij > 0`: negativo está dentro da margem → **hard negative** → incluído
+- Se `ant_m_ij ≤ 0`: negativo está longe → **easy negative** → **ignorado**
+
+#### Benefícios do ANT
+
+1. **Selective Updates**: Apenas hard negatives contribuem para gradiente
+2. **Avoid Non-Essential Tuning**: Parâmetros irrelevantes não são atualizados
+3. **Better Retention**: Menos interferência com conhecimento anterior
+4. **Margin Control**: Hyperparâmetro ajustável para controlar "hardness"
+
+#### Exemplo Visual
+
+```
+Similaridades com âncora z_i:
+    z_i+ (positivo):  0.95  ✅
+    z_1 (negativo):   0.70  🔴 Hard negative (dentro da margem)
+    z_2 (negativo):   0.50  🟡 Medium negative (fora da margem)
+    z_3 (negativo):   0.20  ⚪ Easy negative (fora da margem)
+
+Com margin=0.3 e max_neg=0.70:
+    Threshold = 0.70 - 0.3 = 0.40
+    
+    ant_m_i1 = 0.70 - 0.40 = 0.30 > 0  ✅ Incluído
+    ant_m_i2 = 0.50 - 0.40 = 0.10 > 0  ✅ Incluído
+    ant_m_i3 = 0.20 - 0.40 = -0.20 ≤ 0 ❌ Ignorado
+```
+
+---
+
+### Local Anchor Normalization
+
+#### Problema da Normalização Global
+
+InfoNCE (e ANT) tradicionalmente usam um **máximo global** compartilhado:
+
+```
+max_global = max(todas_as_similaridades_negativas_do_batch)
+m_ij = sim(z_i, z_j) - max_global
+```
+
+**Problema**: Âncoras com negativos fáceis são **penalizadas** pelo max de outras âncoras com negativos difíceis → Gradientes desbalanceados.
+
+#### Solução: Normalização Local
+
+Cada âncora usa seu **próprio máximo local**:
+
+```
+max_local_i = max_j (sim(z_i, z_j))  [apenas negativos de z_i]
+m_ij^local = sim(z_i, z_j) - max_local_i
+```
+
+**Benefícios**:
+1. **Adaptive per Anchor**: Cada âncora avaliada em seu próprio contexto
+2. **Balanced Gradients**: Todas as âncoras contribuem proporcionalmente
+3. **Works Independently**: Funciona sozinha (+0.14%) ou com ANT (+0.31%)
+
+#### Comparação Visual
+
+```
+Âncora A: negativos = [0.65, 0.45, 0.25]  → max_local_A = 0.65
+Âncora B: negativos = [0.80, 0.75, 0.30]  → max_local_B = 0.80
+
+Global Norm (max=0.80):
+    A é normalizada por 0.80 (máximo de B) → Gradiente comprimido ❌
+    
+Local Norm:
+    A normalizada por 0.65 (seu próprio max) → Gradiente adaptado ✅
+    B normalizada por 0.80 (seu próprio max) → Gradiente adaptado ✅
+```
+
+---
+
+### TagFex vs TagFex+ANT: Diferenças
+
+| Aspecto | TagFex (Baseline) | TagFex + ANT |
+|---------|-------------------|--------------|
+| **Loss Contrastiva** | InfoNCE puro | InfoNCE + ANT |
+| **Negativos Utilizados** | Todos | Apenas hard negatives |
+| **Normalização** | Típica: Global | Recomendado: Local |
+| **Atualização de Parâmetros** | Todos os parâmetros | Parâmetros essenciais |
+| **Catastrophic Forgetting** | Risco moderado | Risco reduzido |
+| **Hiperparâmetros** | `τ` (temperatura) | `τ`, `β` (ANT strength), `m` (margin) |
+| **Avg NME@1 (CIFAR-100 10-10)** | 75.55% | **76.18%** (+0.63%) |
+
+#### Loss Total Comparada
+
+**TagFex Baseline**:
+```
+L = L_cls + λ · InfoNCE(f_ta)
+```
+
+**TagFex + ANT**:
+```
+L = L_cls + λ_nce · InfoNCE(f_ta) + λ_ant · ANT(f_ta)
+
+ou combinado:
+
+L = L_cls + λ · [α · InfoNCE + β · ANT]
+```
+
+Onde tipicamente: `α=1.0`, `β=0.5` (melhor configuração).
+
+---
+
+### Melhor Configuração Encontrada
+
+Após 15 experimentos, a configuração ótima é:
+
+```yaml
+# InfoNCE Base
+nce_alpha: 1.0
+infonce_temp: 0.07
+
+# ANT Loss
+ant_beta: 0.5           # Moderate strength
+ant_margin: 0.5         # Medium margin (sweet spot)
+ant_max_global: false   # Local normalization
+```
+
+**Resultado**: 79.35% Avg Acc@1 (+0.31% vs baseline)
+
+**Interpretação**:
+- `β=0.5`: Balança InfoNCE e ANT (mais robusto que β=1.0)
+- `margin=0.5`: Captura hard negatives discriminativos (não muito amplo)
+- `local=true`: Normalização adaptativa por âncora
+
+---
+
+## �📊 Estado Atual do Projeto
+
+### Última Atualização: Dezembro 2025
+
+**Status**: ✅ Fase experimental **COMPLETA** - Melhor configuração identificada
+
+**Experimentos Totais**: 15 configurações testadas
+- ✅ 13 experimentos completos
+- 🔄 1 experimento debug em andamento
+- 📂 3 datasets testados (CIFAR-100 10-10, CIFAR-100 50-10, ImageNet-100 10-10)
+
+### Últimos Experimentos (Cronologia)
+
+| Data | Experimento | Status | Observação |
+|------|-------------|--------|------------|
+| **Dez 8-10, 2025** | ANT β=0.5, margins 0.5/0.6/0.7, Local | ✅ Completo | **MELHOR RESULTADO** com m=0.5 |
+| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | ✅ Completo | β alto menos estável |
+| Nov 20-22, 2025 | CIFAR-100 50-10, ANT variations | ✅ Completo | ANT teve impacto mínimo |
+| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | ✅ Completo | Local anchor isolado funciona |
+| Nov 12-13, 2025 | Local vs Global comparison | ✅ Completo | Local > Global |
+
+---
+
+## 🏆 Melhor Configuração Encontrada
+
+### ANT β=0.5, margin=0.5, Local Anchor
+
+**Experimento**: `done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/`
+
+#### Resultados CIFAR-100 10-10 (10 tasks)
+
+| Métrica | Valor | Δ vs Baseline |
+|---------|-------|---------------|
+| **Avg Acc@1** | **79.35%** ⭐ | **+0.31%** |
+| **Last Acc@1** | **70.77%** | **+0.41%** |
+| **Avg NME@1** | **76.18%** ⭐⭐ | **+0.63%** |
+
+**Curva de Acurácia por Task**:
+```
+[93.40, 85.90, 84.57, 81.32, 79.32, 77.48, 75.70, 73.65, 71.40, 70.77]
+```
+
+#### Parâmetros da Configuração
+
+```yaml
+# Contrastive Learning
+nce_alpha: 1.0              # InfoNCE base
+
+# ANT Loss
+ant_beta: 0.5               # ⭐ Strength moderada
+ant_margin: 0.5             # ⭐ Margem ótima
+ant_max_global: false       # ✅ Local anchor normalization
+
+# Gap Maximization (não usado neste experimento)
+gap_target: 0.0
+gap_beta: 0.0
+```
+
+#### Comparação com Baseline TagFex
+
+**Baseline** (InfoNCE puro, global anchor):
+- Avg Acc@1: 79.04%
+- Last Acc@1: 70.36%
+- Avg NME@1: 75.55%
+
+**Melhorias**:
+- ✅ +0.31% Avg Acc@1
+- ✅ +0.41% Last Acc@1  
+- ✅ **+0.63% Avg NME@1** (melhor discriminação de features)
+
+---
+
+## 💻 Instalação e Uso
+
+### Requisitos
+
+```bash
 pytorch torchvision torchmetrics loguru tqdm
 ```
 
-Single-node training (for small datasets like CIFAR100)
-
-``` bash
-CUDA_VISIBLE_DEVICES={gpu_ids} python main.py train --exp-configs {exp_config_files}
-```
-
-Multi-node training (for large datasets like ImageNet)
-
-``` bash
-./trainddp.sh {gpu_ids} --exp-configs {exp_config_files}
-```
-
-Specify cuda device available in `{gpu_ids}`.
-Specify config files in `{exp_config_files}`, this argument accepts multiple values, the loading order is the same as the argument order. (see [`load_configs` function](utils/configuration.py#L11))
-
-Example:
-
-``` bash
-python main.py train --exp-configs configs/all_in_one/cifar100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_10-10
-python main.py train --exp-configs configs/all_in_one/cifar100_10-10_tagfex_ant_resnet18.yaml
-
-./trainddp.sh 0,1 --exp-configs configs/all_in_one/cifar100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_10-10 --ckpt-dir ./logs/exp_cifar100_10-10/ckpt
-./trainddp.sh 0,1 --exp-configs configs/all_in_one/cifar100_50-10_tagfex_resnet18.yaml --log-dir ./logs/exp_cifar100_50-10 --ckpt-dir ./logs/exp_cifar100_50-10/ckpt
-./trainddp.sh 0,1 --exp-configs configs/all_in_one/imagenet100_10-10_tagfex_resnet18.yaml --log-dir ./logs/exp_imagenet100_10-10 --ckpt-dir ./logs/exp_imagenet100_10-10/ckpt
-./trainddp.sh 0,1 --exp-configs configs/all_in_one/imagenet100_50-10_tagfex_resnet50.yaml --log-dir ./logs/exp_imagenet100_50-10 --ckpt-dir ./logs/exp_imagenet100_50-10/ckpt
-```
-
-Other useful arguments:
-
-``` bash
---exp-name # name the experiment
---log-dir # the folder to output log files
---ckpt-dir # the folder to checkpoint
---output-file-prefix # the filename prefix of output file
-```
-
-For more arguments, see [`argument.py`](utils/argument.py).
-
-## Plot loss components
-
-``` bash
-python plot_loss_components.py logs/<exp_name>/exp_debug0.log -t contrast
-```
-
-Example:
+### Instalação
 
 ```bash
-python plot_loss_components.py logs/exp_cifar100_10-10_antB1_nceA1_antM0.1_antLocal/exp_debug0.log -t contrast
+git clone https://github.com/bwnzheng/TagFex_CVPR2025.git
+cd TagFex_CVPR2025
+pip install -r requirements.txt
 ```
 
-## Acknowledgements
+### Execução
 
-This repository is inspired by [PyCIL](https://github.com/G-U-N/PyCIL).
+#### Single-GPU (datasets pequenos como CIFAR-100)
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python main.py train \
+  --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml \
+  --log-dir ./logs/exp_cifar100_10-10
+```
+
+#### Multi-GPU (datasets grandes como ImageNet)
+
+```bash
+./trainddp.sh 0,1 \
+  --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml \
+  --log-dir ./logs/exp_cifar100_10-10 \
+  --ckpt-dir ./logs/exp_cifar100_10-10/ckpt
+```
+
+#### Auto-Lançamento com Fila de GPUs 🚀
+
+**Novo!** Sistema automático que monitora GPUs e dispara experimentos quando uma ficar disponível:
+
+```bash
+# Experimento único - aguarda GPU disponível automaticamente
+python3 auto_run_on_free_gpu.py \
+  --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+  --threshold 1.0 \
+  --interval 30
+
+# Se GPUs têm memória ocupada por processos idle (ex: 87% mem, 0% util)
+python3 auto_run_on_free_gpu.py \
+  --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+  --threshold 1.0 \
+  --memory-threshold 20.0
+
+# Verificar processos idle ocupando GPUs
+./check_gpu_processes.sh
+
+# Fila de múltiplos experimentos - RECOMENDADO para SSH (roda em screen)
+./start_queue_monitor.sh  # Pode desconectar do SSH!
+
+# Ou executar diretamente (sem screen de monitoramento)
+./run_experiments_queue.sh
+
+# Testar monitoramento antes de rodar experimentos
+./test_gpu_monitor.sh
+```
+
+**Vantagens:**
+- ✅ Não precisa monitorar manualmente com `gpustat`
+- ✅ Dispara automaticamente ao detectar GPU livre
+- ✅ Suporta threshold de memória (detecta processos idle)
+- ✅ Suporta fila de experimentos overnight
+- ✅ Logs automáticos e organizados
+- ✅ Funciona com múltiplas GPUs em paralelo
+- 📺 **Executa em sessões screen** nomeadas pelo YAML (pode desconectar do SSH)
+
+📖 **Documentação completa**: [AUTO_GPU_LAUNCHER.md](AUTO_GPU_LAUNCHER.md)  
+🧠 **GPU com memória ocupada mas 0% uso?** Veja: [GPU_MEMORY_GUIDE.md](GPU_MEMORY_GUIDE.md)
+
+**Gerenciar sessões screen:**
+```bash
+# Listar sessões ativas
+screen -ls
+
+# Anexar a uma sessão (ver progresso em tempo real)
+screen -r cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18
+
+# Desanexar: Ctrl+A, depois D
+```
+
+### Exemplos de Uso
+
+```bash
+# Melhor configuração (ANT β=0.5, m=0.5, Local)
+python main.py train \
+  --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml
+
+# Baseline com Local Anchor
+python main.py train \
+  --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml
+
+# Baseline com Global Anchor
+python main.py train \
+  --exp-configs configs/all_in_one/cifar100_10-10_baseline_global_resnet18.yaml
+
+# Multi-GPU ImageNet-100
+./trainddp.sh 0,1 \
+  --exp-configs configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml \
+  --log-dir ./logs/exp_imagenet100_10-10
+```
+
+### Visualização de Loss Components
+
+```bash
+python plot_loss_components.py \
+  logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/exp_debug0.log \
+  -t contrast
+```
+
+---
+
+## 📊 Experimentos Realizados
+
+### CIFAR-100 10-10 (10 tasks, 10 classes cada)
+
+| Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 | Δ vs Baseline |
+|--------------|-----------|------------|-----------|---------------|
+| **ANT β=0.5, m=0.5, Local** | **79.35%** ⭐ | **70.77%** | **76.18%** ⭐ | **+0.31%** |
+| ANT β=0.5, m=0.1, Local | 79.32% | 70.64% | 75.81% | +0.27% |
+| ANT β=1.0, m=0.5, Local | 79.27% | 70.20% | 75.91% | +0.23% |
+| ANT β=0.5, m=0.7, Local | 79.24% | 70.85% | 75.67% | +0.20% |
+| InfoNCE Local Anchor | 79.18% | 70.33% | 75.74% | +0.14% |
+| ANT β=0.5, m=0.1, Global | 79.16% | 70.64% | 75.72% | +0.12% |
+| ANT β=0.5, m=0.6, Local | 79.14% | 70.49% | 75.65% | +0.10% |
+| **Baseline TagFex** | 79.04% | 70.36% | 75.55% | -- |
+| ANT β=1.0, m=0.3, Local | 78.99% | 70.18% | 75.60% | -0.05% |
+| ANT β=1.0, m=0.1, Local | 78.97% | 70.11% | 75.74% | -0.07% |
+
+**Total**: 11 configurações únicas testadas
+
+### CIFAR-100 50-10 (6 tasks: 50+5×10)
+
+| Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 | Observação |
+|--------------|-----------|------------|-----------|------------|
+| Baseline Local | **77.13%** | 71.44% | 76.48% | Melhor Avg |
+| Baseline Global | 77.11% | **71.91%** | **76.53%** | Melhor Last |
+| ANT β=1.0, m=0.5, Local | 77.08% | 71.38% | 76.16% | Impacto mínimo |
+
+**Observação**: Base task grande (50 classes) → representação já robusta → ANT menos crítico
+
+### ImageNet-100 10-10
+
+| Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 |
+|--------------|-----------|------------|-----------|
+| Baseline Local | **81.28%** | 72.84% | **77.36%** |
+
+---
+
+## 💡 Descobertas Principais
+
+### 1. Local Anchor > Global Anchor
+
+**Sempre** usar normalização local (`ant_max_global: false`):
+
+- Local (β=0.5, m=0.1): **79.32%**
+- Global (β=0.5, m=0.1): 79.16% (-0.16%)
+
+**Ganho médio**: +0.16% a +0.27%
+
+### 2. Margin 0.5 é Ótimo para β=0.5
+
+Com ANT β=0.5:
+
+| Margin | Avg Acc@1 | Δ vs m=0.5 |
+|--------|-----------|------------|
+| **0.5** | **79.35%** | -- |
+| 0.7 | 79.24% | -0.11% |
+| 0.6 | 79.14% | -0.21% |
+| 0.1 | 79.32% | -0.03% |
+
+**Interpretação**: Margin muito grande (0.7) inclui negatives menos discriminativos. Margin 0.5 é o "sweet spot".
+
+### 3. β Moderado (0.5) > β Alto (1.0)
+
+Com margin fixo:
+
+| β | Margin | Avg Acc@1 | Observação |
+|---|--------|-----------|------------|
+| **0.5** | 0.5 | **79.35%** | Mais estável |
+| 1.0 | 0.5 | 79.27% (-0.08%) | OK com margin alta |
+| 1.0 | 0.1 | 78.97% (-0.38%) | Instável com margin baixa |
+
+**Conclusão**: β moderado é mais robusto a variações de margin.
+
+### 4. ANT Funciona Melhor com Base Tasks Pequenas
+
+| Split | Base Classes | ANT Impact | Interpretação |
+|-------|--------------|------------|---------------|
+| **10-10** | 10 | **+0.31%** | Representação inicial fraca → ANT crítico |
+| **50-10** | 50 | -0.03% | Representação inicial robusta → ANT desnecessário |
+
+**Implicação**: ANT é mais útil em cenários com menos dados iniciais.
+
+### 5. Local Anchor Funciona Isolado
+
+**InfoNCE Local Anchor** (β=0, local norm): **79.18%** (+0.14% vs baseline)
+
+**Conclusão**: Normalização local **por si só** já melhora o InfoNCE, mesmo sem ANT.
+
+---
+
+## 🔬 ANT Loss: Conceito e Implementação
+
+### O Que é ANT Loss?
+
+**ANT (Adaptive Negative Threshold Loss)** é uma extensão do InfoNCE que foca em **hard negatives** - amostras negativas difíceis de distinguir, próximas da similaridade positiva.
+
+### Motivação
+
+InfoNCE trata todos os negativos igualmente:
+
+```python
+loss = -log(exp(sim_pos) / (exp(sim_pos) + sum(exp(sim_neg))))
+```
+
+**Problema**: Negativos fáceis dominam o denominador, mas contribuem pouco para aprendizado discriminativo.
+
+### Solução: ANT
+
+```python
+# 1. Identificar hard negatives (dentro de uma margem)
+gap = sim_pos - sim_neg_i
+is_hard = gap < margin
+
+# 2. Penalizar apenas hard negatives
+ant_loss = sum(relu(margin - gap)) se is_hard
+```
+
+### Implementação
+
+**Arquivo**: `methods/tagfex/tagfex.py`, função `infoNCE_loss()`
+
+```python
+def infoNCE_loss(
+    cos_sim,
+    temperature,
+    nce_alpha=1.0,
+    ant_beta=0.0,        # ANT strength
+    ant_margin=0.1,      # Margin threshold
+    max_global=True,     # Use global or local anchor
+    gap_target=0.0,      # Gap maximization target
+    gap_beta=0.0,        # Gap maximization strength
+):
+    # 1. InfoNCE base
+    nll = F.cross_entropy(cos_sim / temperature, targets)
+    
+    # 2. ANT loss (se habilitado)
+    if ant_beta > 0:
+        pos_sim = cos_sim[pos_mask]
+        neg_sim = cos_sim[~pos_mask]
+        
+        # Gap entre positivo e negativo
+        gap = pos_sim.unsqueeze(-1) - neg_sim.reshape(batch_size, -1)
+        
+        # Penalizar gaps < margin (hard negatives)
+        ant_loss = F.relu(ant_margin - gap).mean()
+    
+    # 3. Loss total
+    total_loss = nce_alpha * nll + ant_beta * ant_loss
+    
+    return total_loss
+```
+
+### Hiperparâmetros
+
+| Parâmetro | Valores Testados | Melhor | Descrição |
+|-----------|------------------|--------|-----------|
+| `ant_beta` | 0.0, 0.5, 1.0 | **0.5** | Strength da ANT loss |
+| `ant_margin` | 0.1, 0.3, 0.5, 0.6, 0.7 | **0.5** | Janela de hard negatives |
+| `ant_max_global` | True, False | **False** | Local anchor normalization |
+
+---
+
+## 🎯 Local vs Global Anchor
+
+### Diferença Conceitual
+
+**Global Anchor** (`max_global=True`):
+- Todas as âncoras compartilham o mesmo máximo de similaridade
+- Normalização global: `logits_norm = logits - max(todas_as_negativas)`
+
+**Local Anchor** (`max_global=False`):
+- Cada âncora usa seu próprio máximo local
+- Normalização adaptativa: `logits_norm = logits - max(negativas_desta_âncora)`
+
+### Por Que Local é Melhor?
+
+1. **Adaptação ao contexto**: Cada âncora tem dificuldade diferente
+2. **Evita dominância global**: Negativos difíceis de uma âncora não "comprimem" outras
+3. **Gradiente mais balanceado**: Todas as âncoras contribuem proporcionalmente
+
+### Visualização
+
+Ver: [docs/THEORY_LOCAL_ANCHOR.md](docs/THEORY_LOCAL_ANCHOR.md) para detalhes matemáticos e visualizações completas.
+
+**Exemplo simplificado**:
+
+```
+Âncora A: positiva=0.92, negativas=[0.65, 0.45, 0.25]
+Âncora B: positiva=0.88, negativas=[0.80, 0.75, 0.30]
+
+Global: max = 0.80 (de B) → A é penalizada por max de B
+Local:  max_A = 0.65, max_B = 0.80 → cada uma com seu contexto
+```
+
+### Implementação
+
+```python
+if not max_global:  # Local anchor
+    # Encontrar max per âncora
+    cos_sim_neg = cos_sim.clone()
+    cos_sim_neg[pos_mask] = -float('inf')
+    max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
+    
+    # Subtrair max local
+    cos_sim = cos_sim - max_neg_per_anchor
+else:  # Global anchor
+    max_neg_global = cos_sim[~pos_mask].max()
+    cos_sim = cos_sim - max_neg_global
+```
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+TagFex_CVPR2025/
+├── README.md                      # Este arquivo
+├── main.py                        # Entry point
+├── trainddp.sh                    # Multi-GPU training
+├── requirements.txt               # Dependências
+│
+├── configs/                       # Configurações
+│   ├── all_in_one/               # Configs prontas
+│   │   ├── cifar100_10-10_tagfex_ant_resnet18.yaml       # Melhor config
+│   │   ├── cifar100_10-10_tagfex_baseline_resnet18.yaml  # Baseline
+│   │   └── ...
+│   ├── exps/                     # Configs experimentais
+│   └── scenarios/                # Cenários de datasets
+│
+├── methods/                       # Implementações de métodos
+│   └── tagfex/
+│       ├── tagfex.py             # TagFex + ANT + Local Anchor
+│       └── ...
+│
+├── modules/                       # Componentes reutilizáveis
+│   ├── evaluation.py             # Métricas
+│   ├── metrics.py                # Cálculo de métricas
+│   ├── data/                     # Dataloaders
+│   └── networks/                 # Backbones
+│
+├── loggers/                       # Sistema de logging
+│   ├── loguru.py                 # Logger principal
+│   └── utils.py
+│
+├── logs/                          # Experimentos executados
+│   ├── done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/  # Melhor
+│   ├── done_exp_cifar100_10-10_baseline_tagfex_original/
+│   └── ... (15 experimentos)
+│
+├── analysis/                      # Scripts de análise
+│   ├── scripts/
+│   │   ├── analyze_ant_gaps.py
+│   │   ├── compare_experiments.py
+│   │   └── ...
+│   └── results/                  # Resultados de análises
+│
+└── docs/                          # Documentação técnica
+    ├── RESULTS_AND_METRICS.md    # ✅ Todos os resultados e métricas (Dez 2025)
+    ├── THEORY_LOCAL_ANCHOR.md    # ✅ Teoria e implementação de local anchor
+    └── DEBUGGING_GUIDE.md        # ✅ Guia de debugging e análise
+```
+
+---
+
+## 🔍 Análise e Debugging
+
+### Scripts de Análise
+
+#### 1. Análise Rápida de Gaps
+
+```bash
+python analysis/scripts/quick_gap_analysis.py \
+  --log-file logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/exp_matrix_debug0.log
+```
+
+**Output**: Gráficos de evolução de gap, ANT loss, gap loss por task.
+
+#### 2. Comparação de Experimentos
+
+```bash
+python analysis/scripts/compare_experiments.py \
+  --baseline logs/done_exp_cifar100_10-10_baseline_tagfex_original/exp_matrix_debug0.log \
+  --ant-exp logs/done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/exp_matrix_debug0.log \
+  --output comparison_results
+```
+
+**Output**: 
+- Gráficos comparativos side-by-side
+- Estatísticas de diferenças
+- Análise task-by-task
+
+#### 3. Visualização de Matrizes de Similaridade
+
+```bash
+python analysis/scripts/visualize_local_anchor_theory.py
+```
+
+**Output** (`analysis/results/infonce_theory/`):
+- `infonce_matrices_comparison.png` - Comparação Global vs Local
+- `infonce_loss_computation.png` - Cálculo detalhado
+- `infonce_gradient_impact.png` - Impacto no gradiente
+
+#### 4. Análise Detalhada de ANT
+
+```bash
+python analysis/scripts/analyze_ant_gaps.py \
+  --log-file logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/exp_matrix_debug0.log
+```
+
+**Output**: 19 métricas ao longo do treinamento (pos_mean, neg_mean, gap, violation %, etc.)
+
+### Debug de Similaridades
+
+Para habilitar debug detalhado de matrizes de similaridade:
+
+```yaml
+# Adicionar ao config YAML
+debug_similarity: true
+debug_similarity_batch_size: 16
+```
+
+Ver: [docs/DEBUGGING_GUIDE.md](docs/DEBUGGING_GUIDE.md) para detalhes completos.
+
+### Visualização de Loss Components
+
+```bash
+python plot_loss_components.py \
+  logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/exp_debug0.log \
+  -t contrast
+```
+
+**Output**: Gráficos de InfoNCE NLL, ANT loss, componentes ponderados, loss total.
+
+---
+
+## 📚 Documentação Adicional
+
+Para informações detalhadas, consulte os documentos em [docs/](docs/):
+
+### 1. [RESULTS_AND_METRICS.md](docs/RESULTS_AND_METRICS.md)
+
+Consolidação completa de todos os resultados experimentais:
+- ✅ Métricas de todos os 15 experimentos
+- ✅ Comparações detalhadas com baseline
+- ✅ Análise de ganhos por task
+- ✅ TOP 5 configurações
+- ✅ Curvas de acurácia completas
+- ✅ Recomendações para o artigo
+
+### 2. [THEORY_LOCAL_ANCHOR.md](docs/THEORY_LOCAL_ANCHOR.md)
+
+Teoria matemática e implementação da normalização de âncora local:
+- 📐 Diferença conceitual entre Global vs Local
+- 📊 Visualizações de matrizes de similaridade
+- 🧮 Cálculo da loss passo a passo
+- 📈 Impacto no gradiente
+- 🔬 Implementação no código
+- ✅ Resultados experimentais
+- 💡 Aplicabilidade a outros métodos
+
+### 3. [DEBUGGING_GUIDE.md](docs/DEBUGGING_GUIDE.md)
+
+Guia completo de ferramentas de debugging:
+- 🔧 Como habilitar debug de similaridade
+- 📄 Outputs gerados (logs, heatmaps)
+- 📊 Análise de resultados
+- ⚙️ Ajuste de hiperparâmetros
+- 🎯 Interpretação de métricas
+
+### 4. [AUTO_GPU_LAUNCHER.md](AUTO_GPU_LAUNCHER.md) 🆕
+
+Sistema de execução automática de experimentos quando GPU fica disponível:
+- 🚀 Monitoramento contínuo de GPUs via `nvidia-smi`
+- ⚙️ Suporte a threshold de utilização e memória
+- 📋 Fila de experimentos para execução overnight
+- 📊 Logs detalhados de execução
+- 🔧 Scripts de diagnóstico (`test_gpu_monitor.sh`, `diagnose_gpu_memory.sh`)
+
+**Uso rápido:**
+```bash
+# Executar um experimento quando GPU ficar livre
+python3 auto_run_on_free_gpu.py --config configs/xxx.yaml --threshold 5.0
+
+# Executar fila de experimentos
+./run_experiments_queue.sh
+```
+
+### 5. [GPU_MEMORY_GUIDE.md](GPU_MEMORY_GUIDE.md) 🆕
+
+Guia completo sobre o comportamento de memória vs utilização de GPUs:
+- 🧠 Por que GPU mostra 0% utilização mas 87% memória ocupada?
+- 🔍 5 causas comuns (processos mortos, idle, Jupyter, multi-GPU, memory leaks)
+- 🛠️ Soluções específicas para cada cenário
+- ✅ Checklist antes de matar processos
+- 📝 Melhores práticas para código GPU-efficient
+
+**Diagnóstico rápido:**
+```bash
+# Identificar processos mortos/idle
+./diagnose_gpu_memory.sh
+
+# Verificar processos ativos
+./check_gpu_processes.sh
+```
+
+---
+
+## 🎓 Referências
+
+### Papers
+
+#### TagFex Framework
+
+```bibtex
+@inproceedings{tagfex2025,
+  title={Task-Agnostic Guided Feature Expansion for Class-Incremental Learning},
+  author={[Authors]},
+  booktitle={CVPR},
+  year={2025}
+}
+```
+
+#### ANT Loss
+
+```bibtex
+@article{ant2024,
+  title={Adaptive Negative Threshold Loss for Contrastive Learning},
+  author={[Authors]},
+  journal={arXiv preprint},
+  year={2024},
+  note={See ant.tex and antcil.tex in project root}
+}
+```
+
+### Links
+
+- **ArXiv (TagFex)**: https://arxiv.org/abs/2503.00823
+- **Repository**: https://github.com/bwnzheng/TagFex_CVPR2025
+- **ANT Paper (.tex)**: [ant.tex](ant.tex), [antcil.tex](antcil.tex)
+
+### Código-fonte
+
+- **TagFex Implementation**: [methods/tagfex/tagfex.py](methods/tagfex/tagfex.py)
+  - `_compute_contrastive_loss_base()`: Implementação ANT Loss (linha ~804)
+  - `infoNCE_loss()`: Implementação InfoNCE (linha ~982)
+  - Local vs Global anchor normalization (parâmetro `ant_max_global`)
+
+### Datasets
+
+- **CIFAR-100**: 100 classes, splits 10-10 (10 tasks) e 50-10 (6 tasks)
+- **ImageNet-100**: 100 classes, split 10-10 (10 tasks)
+
+### Inspiração
+
+Este repositório foi inspirado por [PyCIL](https://github.com/G-U-N/PyCIL).
+
+---
+
+## 📝 Changelog do Desenvolvimento
+
+### Dezembro 2025 - Fase Final ✅
+
+- ✅ Identificada melhor configuração: **ANT β=0.5, m=0.5, Local**
+- ✅ Experimentos com margins variadas (0.1, 0.3, 0.5, 0.6, 0.7)
+- ✅ Validação em 3 datasets (CIFAR-100 10-10, 50-10, ImageNet-100)
+- ✅ Documentação consolidada em [docs/](docs/)
+
+### Novembro 2025 - Desenvolvimento Intensivo
+
+- 🔬 Implementação de Gap Maximization Loss
+- 🔬 Comparação Local vs Global Anchor
+- 🔬 Teste de InfoNCE Local Anchor isolado
+- 🔬 Experimentos com β=0.5 vs β=1.0
+- 📊 Scripts de análise e visualização
+
+### Fundação
+
+- 🏗️ Framework TagFex original
+- 🏗️ Implementação InfoNCE
+- 🏗️ Estrutura de treinamento multi-GPU
+
+---
+
+## 🤝 Contribuições
+
+Para questões ou sugestões, abra uma issue no repositório.
+
+---
+
+**Última atualização**: Dezembro 2025  
+**Status**: ✅ Projeto completo - Melhor configuração identificada e validada

@@ -1,8 +1,8 @@
-scenario: cil 10-10
-dataset_name: cifar100
-dataset_root: ~/data/datasets/cifar100/
-train_transform: cifar100_train_2
-test_transform: cifar100_test_1
+scenario: cil 50-10
+dataset_name: imagenet100
+dataset_root: ~/data/datasets/imagenet100/
+train_transform: imagenet_train_2
+test_transform: imagenet_test_1
 class_order: [68, 56, 78, 8, 23, 84, 90, 65, 74, 76, 40, 89, 3, 92, 55, 9, 26, 80, 43, 38, 58, 70, 77, 1, 85, 19, 17, 50, 28, 53, 13, 81, 45, 82, 6, 59, 83, 16, 15, 44, 91, 41, 72, 60, 79, 52, 20, 10, 31, 54, 37, 95, 14, 71, 96, 98, 97, 2, 64, 66, 42, 22, 35, 86, 24, 34, 87, 21, 99, 0, 88, 27, 18, 94, 11, 12, 47, 25, 30, 46, 62, 69, 36, 61, 7, 63, 75, 5, 32, 4, 51, 48, 73, 93, 39, 67, 29, 49, 57, 33]
 
 method: tagfex
@@ -23,19 +23,15 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# ANT Loss Parameters - DISABLED for baseline reproduction
-# Setting ant_beta=0.0 disables ANT loss (only InfoNCE is used)
-nce_alpha: 1.0
-ant_beta: 0.0      # DISABLED: No ANT loss contribution
-ant_margin: 0.0    # Not used when ant_beta=0 (only affects logging/experiment name)
-ant_max_global: false  # ENABLED: Use LOCAL anchor normalization in InfoNCE
+# InfoNCE + ANT Loss (Best Configuration)
+nce_alpha: 1.0          # InfoNCE loss weight
+ant_beta: 0.5           # ANT loss weight (optimal balance)
+ant_margin: 0.5         # Margin threshold for hard negatives
+ant_max_global: false   # Local anchor normalization
 
-# Gap Maximization Parameters - DISABLED for baseline
-gap_target: 0.0    # DISABLED: No gap maximization
-gap_beta: 0.0      # DISABLED: No gap loss contribution
-
-# Note: Even with ANT disabled, the distance stats will still be logged
-# This allows us to track gap evolution without ANT influencing training
+# Similarity Matrix Debugging
+debug_similarity: false
+debug_similarity_batch_size: 16
 
 backbone_configs: 
   name: resnet18

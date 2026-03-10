@@ -1,4 +1,4 @@
-scenario: cil 10-10
+scenario: cil 50-10
 dataset_name: imagenet100
 dataset_root: ~/data/datasets/imagenet100/
 train_transform: imagenet_train_2
@@ -22,6 +22,16 @@ infonce_temp: 0.2
 infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
+
+# InfoNCE Loss Parameters (Baseline - Local Anchor)
+nce_alpha: 1.0
+ant_beta: 0.0           # ANT disabled (InfoNCE only)
+ant_margin: 0.1         # Not used when ant_beta=0
+ant_max_global: false   # Uses local (per-anchor) maximum for normalization
+
+# Similarity Matrix Debugging
+debug_similarity: false
+debug_similarity_batch_size: 16
 
 backbone_configs: 
   name: resnet18
