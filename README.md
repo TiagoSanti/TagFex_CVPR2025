@@ -42,8 +42,8 @@ O script de fila [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta 
 - 🔄 Modelo não supervisionado separado
 - 📈 Superioridade sobre métodos expansion-based que treinam do zero
 
-![motivation](assets/motivation.svg)
-![overview](assets/overview.svg)
+![motivation](papers/tagfex/assets/motivation.svg)
+![overview](papers/tagfex/assets/overview.svg)
 
 ### Contribuições Principais
 
@@ -750,7 +750,7 @@ def infoNCE_loss(
 
 ### Visualização
 
-Ver: [docs/THEORY_LOCAL_ANCHOR.md](docs/THEORY_LOCAL_ANCHOR.md) para detalhes matemáticos e visualizações completas.
+Ver: [papers/ant/THEORY_LOCAL_ANCHOR.md](papers/ant/THEORY_LOCAL_ANCHOR.md) para detalhes matemáticos e visualizações completas.
 
 **Exemplo simplificado**:
 
@@ -836,10 +836,19 @@ TagFex_CVPR2025/
 │   │   └── ...
 │   └── results/                  # Resultados de análises
 │
-└── docs/                          # Documentação técnica
-    ├── RESULTS_AND_METRICS.md    # Todos os resultados e métricas (Dez 2025)
-    ├── THEORY_LOCAL_ANCHOR.md    # Teoria e implementação de local anchor
-    └── DEBUGGING_GUIDE.md        # Guia de debugging e análise
+├── docs/                          # Documentação técnica
+│   ├── RESULTS_AND_METRICS.md    # Todos os resultados e métricas (Dez 2025)
+│   └── DEBUGGING_GUIDE.md        # Guia de debugging e análise
+│
+└── papers/                        # Artigos e material de pesquisa
+    ├── tagfex/                    # TagFex CVPR 2025
+    │   ├── Task-Agnostic...pdf
+    │   └── assets/                # Figuras do artigo
+    ├── ant/                       # ANT Loss (AAAI 2026)
+    │   ├── ant.tex
+    │   ├── antcil.tex
+    │   └── THEORY_LOCAL_ANCHOR.md
+    └── c3box/                     # C3Box (arXiv 2601.20852)
 ```
 
 ---
@@ -929,7 +938,7 @@ Consolidação completa de todos os resultados experimentais:
 - ✅ Curvas de acurácia completas
 - ✅ Recomendações para o artigo
 
-### 2. [THEORY_LOCAL_ANCHOR.md](docs/THEORY_LOCAL_ANCHOR.md)
+### 2. [THEORY_LOCAL_ANCHOR.md](papers/ant/THEORY_LOCAL_ANCHOR.md)
 
 Teoria matemática e implementação da normalização de âncora local:
 - 📐 Diferença conceitual entre Global vs Local
