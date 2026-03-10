@@ -59,7 +59,7 @@ configure_machine() {
             MACHINE_LABEL="fera (2× ~49GB · 2 GPUs)"
             ;;
         *)
-            echo -e "${RED}❌ Perfil de máquina desconhecido: '$machine'. Use 'quati' ou 'fera'.${NC}"
+            echo -e "${RED}[ERRO] Perfil de máquina desconhecido: '$machine'. Use 'quati' ou 'fera'.${NC}"
             exit 1
             ;;
     esac
@@ -73,7 +73,7 @@ if [ "$MACHINE" = "auto" ]; then
     elif [[ "$HOSTNAME_LOWER" == *"fera"* ]]; then
         MACHINE="fera"
     else
-        echo -e "\033[0;31m❌ Hostname '$(hostname)' não reconhecido. Defina MACHINE='quati' ou 'fera' no topo do script.\033[0m"
+        echo -e "\033[0;31m[ERRO] Hostname '$(hostname)' não reconhecido. Defina MACHINE='quati' ou 'fera' no topo do script.\033[0m"
         exit 1
     fi
 fi
@@ -109,13 +109,13 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}    TagFex Auto Experiment Queue${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
-echo -e "${BLUE}🖥️  Máquina:${NC} $MACHINE_LABEL"
-echo -e "${BLUE}⚙️  GPUs/exp:${NC} $GPUS   ${BLUE}Threshold:${NC} ${MEMORY_THRESHOLD#--memory-threshold }% ocupada\n"
+echo -e "${BLUE}  Máquina:${NC} $MACHINE_LABEL"
+echo -e "${BLUE}  GPUs/exp:${NC} $GPUS   ${BLUE}Threshold:${NC} ${MEMORY_THRESHOLD#--memory-threshold }% ocupada\n"
 
-log_progress "🚀 Iniciando fila de experimentos"
-log_progress "🖥️  Máquina: $MACHINE_LABEL  (GPUs/exp: $GPUS)"
-log_progress "📁 Logs salvos em: $LOG_DIR"
-log_progress "📊 Log de progresso: $PROGRESS_LOG"
+log_progress ">> Iniciando fila de experimentos"
+log_progress "  Máquina: $MACHINE_LABEL  (GPUs/exp: $GPUS)"
+log_progress " Logs salvos em: $LOG_DIR"
+log_progress " Log de progresso: $PROGRESS_LOG"
 
 # Contador global de posição na fila
 EXP_COUNTER=0
@@ -132,11 +132,11 @@ queue_experiment() {
     EXP_COUNTER=$((EXP_COUNTER + 1))
     local pos="[$EXP_COUNTER/$EXP_TOTAL]"
 
-    log_progress "🔄 $pos Iniciando: $description  [seed=$seed]"
+    log_progress ">> $pos Iniciando: $description  [seed=$seed]"
     log_progress "   Config: $config_file"
     log_progress "   GPUs necessárias: $GPUS"
 
-    echo -e "${YELLOW}🔄 $pos Iniciando:${NC} $description  [seed=$seed]"
+    echo -e "${YELLOW}>> $pos Iniciando:${NC} $description  [seed=$seed]"
     echo -e "   Config: $config_file"
     echo -e "   GPUs necessárias: $GPUS"
     echo -e "   Aguardando GPU(s) disponíveis...\n"
@@ -157,11 +157,11 @@ queue_experiment() {
         --no-screen
 
     if [ $? -eq 0 ]; then
-        log_progress "✅ $pos Concluído: $description  [seed=$seed]"
-        echo -e "${GREEN}✅ $pos Concluído com sucesso! (${EXP_COUNTER}/${EXP_TOTAL} feitos)${NC}\n"
+        log_progress "[OK] $pos Concluído: $description  [seed=$seed]"
+        echo -e "${GREEN}[OK] $pos Concluído com sucesso! (${EXP_COUNTER}/${EXP_TOTAL} feitos)${NC}\n"
     else
-        log_progress "❌ $pos ERRO: $description  [seed=$seed]"
-        echo -e "${RED}❌ $pos Erro no experimento${NC}\n"
+        log_progress "[ERRO] $pos ERRO: $description  [seed=$seed]"
+        echo -e "${RED}[ERRO] $pos Erro no experimento${NC}\n"
         return 1
     fi
     
@@ -205,8 +205,8 @@ if [ "$MACHINE" = "quati" ]; then
     # + 5   CIFAR-100 50-10 ANT (seeds 1993-1997) = 5
     # Total: 4 + 8 + 4 + 5 = 21
     EXP_TOTAL=21
-    log_progress "📋 Total de experimentos nesta fila: $EXP_TOTAL"
-    echo -e "${BLUE}📋 Total de experimentos: ${EXP_TOTAL}${NC}\n"
+    log_progress " Total de experimentos nesta fila: $EXP_TOTAL"
+    echo -e "${BLUE} Total de experimentos: ${EXP_TOTAL}${NC}\n"
     echo -e "${BLUE}Ordem de execução:${NC}"
     echo -e "   1-4  : Tiny ImageNet 20-20 (baseline local/global + ANT local/global) — seed 1993"
     echo -e "   5-8  : CIFAR-100 10-10 Baseline Local — seeds 1994, 1995, 1996, 1997"
@@ -267,8 +267,8 @@ elif [ "$MACHINE" = "fera" ]; then
     # 2 CIFAR-100 global anchor (seed 1993) + 6 ImageNet-100 (seed 1993) = 8
     # ─────────────────────────────────────────────────────
     EXP_TOTAL=8
-    log_progress "📋 Total de experimentos nesta fila: $EXP_TOTAL"
-    echo -e "${BLUE}📋 Total de experimentos: ${EXP_TOTAL}${NC}\n"
+    log_progress " Total de experimentos nesta fila: $EXP_TOTAL"
+    echo -e "${BLUE} Total de experimentos: ${EXP_TOTAL}${NC}\n"
 
     # ── CIFAR-100 — seed 1993 (exploratory / global anchor) ──
     echo -e "${YELLOW}═══ CIFAR-100 Experiments (fera) ═══${NC}\n"
@@ -310,14 +310,14 @@ elif [ "$MACHINE" = "fera" ]; then
 
 fi
 
-log_progress "✅ Todos os experimentos enfileirados!"
-log_progress "📺 $(screen -ls | grep -c Detached) sessões screen ativas"
+log_progress "[OK] Todos os experimentos enfileirados!"
+log_progress " $(screen -ls | grep -c Detached) sessões screen ativas"
 
 echo -e "\n${GREEN}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}✅ Todos os experimentos enfileirados!${NC}"
+echo -e "${GREEN}[OK] Todos os experimentos enfileirados!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
 
-echo "📊 Para monitorar os experimentos:"
+echo " Para monitorar os experimentos:"
 echo "   - GPUs: gpustat --watch"
 echo "   - Progresso: tail -f $PROGRESS_LOG"
 echo "   - Logs: tail -f $LOG_DIR/*.log"
@@ -325,10 +325,10 @@ echo "   - Sessões: screen -ls"
 echo "   - Processos: ps aux | grep 'main.py train'"
 echo ""
 
-log_progress "🏁 Script de enfileiramento concluído"
+log_progress "[FIM] Script de enfileiramento concluído"
 
 } # Fim da função main
 
 # Executar main e capturar toda saída em arquivo de log
-echo "📝 Log completo será salvo em: $CONSOLE_LOG"
+echo " Log completo será salvo em: $CONSOLE_LOG"
 main 2>&1 | tee -a "$CONSOLE_LOG"

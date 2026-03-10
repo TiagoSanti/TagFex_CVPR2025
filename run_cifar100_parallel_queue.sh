@@ -64,8 +64,8 @@ queue_experiment() {
     EXP_COUNTER=$((EXP_COUNTER + 1))
     local pos="[$EXP_COUNTER/$EXP_TOTAL]"
 
-    log_progress "🔄 $pos Iniciando: $description  [seed=$seed]"
-    echo -e "${YELLOW}🔄 $pos Iniciando:${NC} $description  [seed=$seed]"
+    log_progress ">> $pos Iniciando: $description  [seed=$seed]"
+    echo -e "${YELLOW}>> $pos Iniciando:${NC} $description  [seed=$seed]"
     echo -e "   Config: $config_file"
     echo -e "   Aguardando >= ${MIN_FREE_MB} MB livres na GPU...\n"
 
@@ -80,11 +80,11 @@ queue_experiment() {
         --no-screen
 
     if [ $? -eq 0 ]; then
-        log_progress "✅ $pos Concluído: $description  [seed=$seed]"
-        echo -e "${GREEN}✅ $pos Concluído! (${EXP_COUNTER}/${EXP_TOTAL} feitos)${NC}\n"
+        log_progress "[OK] $pos Concluído: $description  [seed=$seed]"
+        echo -e "${GREEN}[OK] $pos Concluído! (${EXP_COUNTER}/${EXP_TOTAL} feitos)${NC}\n"
     else
-        log_progress "❌ $pos ERRO: $description  [seed=$seed]"
-        echo -e "${RED}❌ $pos Erro no experimento${NC}\n"
+        log_progress "[ERRO] $pos ERRO: $description  [seed=$seed]"
+        echo -e "${RED}[ERRO] $pos Erro no experimento${NC}\n"
         return 1
     fi
 
@@ -111,15 +111,15 @@ queue_experiment_5seeds() {
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}    CIFAR-100 Parallel Queue (quati · paralelo com TinyImageNet)${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
-echo -e "${BLUE}📋 Total: ${EXP_TOTAL} experimentos${NC}"
-echo -e "${BLUE}🔒 Requisito: >= ${MIN_FREE_MB} MB livres na GPU antes de cada run${NC}\n"
+echo -e "${BLUE} Total: ${EXP_TOTAL} experimentos${NC}"
+echo -e "${BLUE} Requisito: >= ${MIN_FREE_MB} MB livres na GPU antes de cada run${NC}\n"
 echo -e "${BLUE}Ordem de execução:${NC}"
 echo -e "   1-4  : CIFAR-100 10-10 Baseline Local  — seeds 1994, 1995, 1996, 1997"
 echo -e "   5-8  : CIFAR-100 10-10 ANT β=0.5 m=0.5 — seeds 1994, 1995, 1996, 1997"
 echo -e "   9-12 : CIFAR-100 50-10 Baseline Local  — seeds 1994, 1995, 1996, 1997"
 echo -e "   13-17: CIFAR-100 50-10 ANT β=0.5 m=0.5 — seeds 1993, 1994, 1995, 1996, 1997"
 echo -e ""
-log_progress "🚀 Iniciando fila CIFAR-100 paralela  (total: $EXP_TOTAL)"
+log_progress ">> Iniciando fila CIFAR-100 paralela  (total: $EXP_TOTAL)"
 
 # ── CIFAR-100 10-10 ── seed 1993 já executado → apenas 1994-1997
 echo -e "${YELLOW}═══ CIFAR-100 10-10 (seeds 1994-1997) ═══${NC}\n"
@@ -145,8 +145,8 @@ queue_experiment_5seeds \
     "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local"
 
 # ═══════════════════════════════════════════════════════════
-log_progress "✅ Fila CIFAR-100 concluída! ($EXP_TOTAL/$EXP_TOTAL)"
+log_progress "[OK] Fila CIFAR-100 concluída! ($EXP_TOTAL/$EXP_TOTAL)"
 echo -e "\n${GREEN}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}✅ Todos os ${EXP_TOTAL} experimentos CIFAR-100 concluídos!${NC}"
+echo -e "${GREEN}[OK] Todos os ${EXP_TOTAL} experimentos CIFAR-100 concluídos!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
-echo -e "📊 Log de progresso: ${PROGRESS_LOG}"
+echo -e " Log de progresso: ${PROGRESS_LOG}"
