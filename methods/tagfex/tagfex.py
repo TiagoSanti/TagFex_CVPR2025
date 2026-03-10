@@ -670,6 +670,11 @@ class TagFex(HerdingIndicesLearner):
         else:
             suffix_parts.append("antLocal")
 
+        # Append seed when non-default so multi-seed runs get distinct directories
+        seed = self.configs.get("seed", 1993)
+        if seed != 1993:
+            suffix_parts.append(f"s{seed}")
+
         # Contrast factors (optional - you can enable these if needed)
         if self.configs.get("include_contrast_in_logdir", False):
             contrast_factor = self.configs.get("contrast_factor", 1.0)

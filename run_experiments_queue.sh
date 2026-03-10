@@ -118,26 +118,27 @@ log_progress "📁 Logs salvos em: $LOG_DIR"
 log_progress "📊 Log de progresso: $PROGRESS_LOG"
 
 # Função para enfileirar experimento
-# Arguments: 1=config_file  2=description
+# Arguments: 1=config_file  2=description  3=seed (opcional, padrão=1993)
 # Usa variável global GPUS para escolher entre single- ou multi-gpu (torchrun)
 queue_experiment() {
     local config_file=$1
     local description=$2
-    
-    log_progress "📋 Enfileirando: $description"
+    local seed=${3:-1993}
+
+    log_progress "📋 Enfileirando: $description  [seed=$seed]"
     log_progress "   Config: $config_file"
     log_progress "   GPUs necessárias: $GPUS"
-    
-    echo -e "${YELLOW}📋 Enfileirando:${NC} $description"
+
+    echo -e "${YELLOW}📋 Enfileirando:${NC} $description  [seed=$seed]"
     echo -e "   Config: $config_file"
     echo -e "   GPUs necessárias: $GPUS"
     echo -e "   Aguardando GPU(s) disponíveis...\n"
-    
+
     # montar comando de treino; suporta multi-gpu com torchrun
     if [ "$GPUS" -gt 1 ]; then
-        train_cmd="torchrun --nproc_per_node=$GPUS python3 main.py train --exp-configs $config_file"
+        train_cmd="torchrun --nproc_per_node=$GPUS python3 main.py train --exp-configs $config_file --seed $seed"
     else
-        train_cmd="python3 main.py train --exp-configs $config_file"
+        train_cmd="python3 main.py train --exp-configs $config_file --seed $seed"
     fi
 
     python3 "$AUTO_LAUNCHER" \
@@ -164,6 +165,16 @@ queue_experiment() {
     
     # Pequeno delay entre disparos
     sleep 5
+}
+
+# Atalho: roda 5 seeds (1993-1997) para uma config — para resultados do paper
+# Arguments: 1=config_file  2=description_base
+queue_experiment_5seeds() {
+    local config_file=$1
+    local description=$2
+    for seed in 1993 1994 1995 1996 1997; do
+        queue_experiment "$config_file" "$description" "$seed"
+    done
 }
 
 # ═══════════════════════════════════════════════════════════
@@ -251,6 +262,31 @@ elif [ "$MACHINE" = "fera" ]; then
     queue_experiment \
         "configs/all_in_one/imagenet100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
         "ImageNet-100 50-10 ANT (β=0.5, margin=0.5, Local)"
+
+    # ─────────────────────────────────────────────────────
+    # fera · Reproducibilidade do paper — 5 seeds (1993-1997)
+    # Apenas as 4 configs que entram na Tabela 1 do ant.tex:
+    #   · baseline CIFAR-100 10-10 e 50-10 (TagFex reproduzido)
+    #   · melhor ANT CIFAR-100 10-10 e 50-10 (β=0.5, m=0.5, Local)
+    # Seed 1993 já foi executados acima; seeds 1994-1997 serão novos.
+    # ─────────────────────────────────────────────────────
+    echo -e "${YELLOW}═══ CIFAR-100 Paper Reproducibility — 5 seeds ═══${NC}\n"
+
+    queue_experiment_5seeds \
+        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline (Local) — paper 5-seed"
+
+    queue_experiment_5seeds \
+        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local — paper 5-seed"
+
+    queue_experiment_5seeds \
+        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline (Local) — paper 5-seed"
+
+    queue_experiment_5seeds \
+        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — paper 5-seed"
 
 fi
 
