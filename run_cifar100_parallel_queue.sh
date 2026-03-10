@@ -34,6 +34,7 @@ THRESHOLD=100.0
 # ── Logs ──
 LOG_DIR="$SCRIPT_DIR/logs/auto_experiments"
 PROGRESS_LOG="$LOG_DIR/cifar100_queue_progress.log"
+CONSOLE_LOG="$LOG_DIR/cifar100_queue_console_$(date +%Y%m%d_%H%M%S).log"
 mkdir -p "$LOG_DIR"
 
 # Cores
@@ -108,6 +109,7 @@ queue_experiment_5seeds() {
 }
 
 # ═══════════════════════════════════════════════════════════
+main() {
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}    CIFAR-100 Parallel Queue (quati · paralelo com TinyImageNet)${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
@@ -149,4 +151,10 @@ log_progress "[OK] Fila CIFAR-100 concluída! ($EXP_TOTAL/$EXP_TOTAL)"
 echo -e "\n${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}[OK] Todos os ${EXP_TOTAL} experimentos CIFAR-100 concluídos!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
-echo -e " Log de progresso: ${PROGRESS_LOG}"
+echo -e " Log de progresso : ${PROGRESS_LOG}"
+echo -e " Log completo     : ${CONSOLE_LOG}"
+} # Fim da função main
+
+# Executar main e capturar toda saída em arquivo de log
+echo " Log completo será salvo em: $CONSOLE_LOG"
+main 2>&1 | tee -a "$CONSOLE_LOG"
