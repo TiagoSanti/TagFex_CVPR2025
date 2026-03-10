@@ -153,6 +153,14 @@ class ResNet(nn.Module):
                 nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False),                       
                 nn.BatchNorm2d(self.inplanes), 
                 nn.ReLU(inplace=True))
+        elif dataset_name == 'tiny_imagenet':
+            # 64x64 input: single stride-2 conv keeps spatial resolution manageable
+            # (64 -> 32 before ResNet stages, producing 2x2 maps at layer4 before avgpool)
+            self.conv1 = nn.Sequential(
+                nn.Conv2d(3, self.inplanes, kernel_size=3, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.inplanes),
+                nn.ReLU(inplace=True),
+            )
         else:
             if small_base:
                 self.conv1 = nn.Sequential(

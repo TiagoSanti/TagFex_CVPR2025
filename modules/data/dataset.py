@@ -145,6 +145,82 @@ class DomainNetCILOOD(BaseDomainNet):
         
         self.targets = np.array(self.targets)
 
+class TinyImageNet(VisionDataset):
+    """Tiny ImageNet dataset (200 classes, 64x64 images).
+
+    Download from http://cs231n.stanford.edu/tiny-imagenet-200.zip and extract
+    so that ``root`` points to the ``tiny-imagenet-200/`` directory.
+
+    Expected layout::
+
+        root/
+        ├── train/
+        │   └── {wnid}/
+        │       └── images/
+        │           └── *.JPEG
+        └── val/
+            ├── images/
+            │   └── val_*.JPEG
+            └── val_annotations.txt
+
+    Args:
+        root: Path to the ``tiny-imagenet-200`` directory.
+        split: ``'train'`` or ``'test'`` (reads from the ``val/`` split).
+    """
+
+    def __init__(self, root: str, split: str = 'train',
+                 transforms=None, transform=None, target_transform=None):
+        super().__init__(root, transforms=transforms,
+                         transform=transform,
+                         target_transform=target_transform)
+        self.root = os.path.expanduser(root)
+        self.split = split
+
+        train_dir = os.path.join(self.root, 'train')
+        self.classes = sorted(os.listdir(train_dir))
+        self.class_to_idx = {cls: i for i, cls in enumerate(self.classes)}
+
+        self.samples: list[tuple[str, int]] = []
+        self.targets: list[int] = []
+
+        if split == 'train':
+            for wnid in self.classes:
+                img_dir = os.path.join(train_dir, wnid, 'images')
+                for fname in sorted(os.listdir(img_dir)):
+                    if fname.lower().endswith(('.jpeg', '.jpg', '.png')):
+                        self.samples.append(
+                            (os.path.join(img_dir, fname),
+                             self.class_to_idx[wnid])
+                        )
+                        self.targets.append(self.class_to_idx[wnid])
+        else:
+            val_dir = os.path.join(self.root, 'val')
+            ann_path = os.path.join(val_dir, 'val_annotations.txt')
+            with open(ann_path) as f:
+                for line in f:
+                    parts = line.strip().split('\t')
+                    fname, wnid = parts[0], parts[1]
+                    label = self.class_to_idx[wnid]
+                    self.samples.append(
+                        (os.path.join(val_dir, 'images', fname), label)
+                    )
+                    self.targets.append(label)
+
+        self.targets = np.array(self.targets)
+
+    def __getitem__(self, index: int):
+        path, target = self.samples[index]
+        sample = pil_loader(path)
+        if self.transform is not None:
+            sample = self.transform(sample)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+        return sample, target
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+
 class MultipleAugmentationDataset(Dataset):
     def __init__(self, base_dataset, num_aug=2) -> None:
         super().__init__()
@@ -173,6 +249,7 @@ dataset_name_map = {
     'imagenet1000': ImageNet,
     'imagenet100': ImageNet100,
     'cub200': CUB200,
+    'tiny_imagenet': TinyImageNet,
     'domainnet_dil': DomainNetDIL,
     'domainnet_cilood': DomainNetCILOOD,
 }
@@ -187,6 +264,8 @@ def get_dataset(name: str, split, transform, num_aug=1, **dataset_args):
         dataset: VisionDataset = DS(train=is_train, transform=transform_dispatch(transform), **dataset_args)
     elif name.startswith('imagenet'):
         split = 'val' if split == 'test' else split
+        dataset: VisionDataset = DS(split=split, transform=transform_dispatch(transform), **dataset_args)
+    elif name == 'tiny_imagenet':
         dataset: VisionDataset = DS(split=split, transform=transform_dispatch(transform), **dataset_args)
     
     if split == 'train' and num_aug > 1:

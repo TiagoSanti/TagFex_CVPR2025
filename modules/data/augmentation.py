@@ -32,6 +32,9 @@ cifar100_test_1 = transforms.Compose([
 imagenet_mean = (0.485, 0.456, 0.406)
 imagenet_std = (0.229, 0.224, 0.225)
 
+tiny_imagenet_mean = (0.480, 0.448, 0.398)
+tiny_imagenet_std = (0.277, 0.269, 0.282)
+
 imagenet_train_1 = transforms.Compose([
     transforms.RandomResizedCrop(224),
     transforms.RandomHorizontalFlip(),
@@ -56,6 +59,29 @@ imagenet_test_1 = transforms.Compose([
     transforms.Normalize(mean=imagenet_mean, std=imagenet_std),
 ])
 
+tiny_imagenet_train_1 = transforms.Compose([
+    transforms.RandomCrop(64, padding=8),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.ColorJitter(brightness=63 / 255),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=tiny_imagenet_mean, std=tiny_imagenet_std),
+])
+
+tiny_imagenet_train_2 = transforms.Compose([
+    transforms.RandomCrop(64, padding=8),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.ColorJitter(brightness=63 / 255),
+    CIFAR10Policy(),
+    transforms.ToTensor(),
+    Cutout(n_holes=1, length=32),
+    transforms.Normalize(mean=tiny_imagenet_mean, std=tiny_imagenet_std),
+])
+
+tiny_imagenet_test_1 = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=tiny_imagenet_mean, std=tiny_imagenet_std),
+])
+
 pil_none224 = transforms.Compose([
     transforms.Resize(224),
 ])
@@ -74,6 +100,9 @@ transform_dict = {
     'imagenet_train_1': imagenet_train_1,
     'imagenet_train_2': imagenet_train_2,
     'imagenet_test_1': imagenet_test_1,
+    'tiny_imagenet_train_1': tiny_imagenet_train_1,
+    'tiny_imagenet_train_2': tiny_imagenet_train_2,
+    'tiny_imagenet_test_1': tiny_imagenet_test_1,
 }
 
 default_transform_dict = {
@@ -82,6 +111,7 @@ default_transform_dict = {
     'cub': ('imagenet_train_1', 'imagenet_test_1'),
     'domainnet_dil': ('imagenet_train_1', 'imagenet_test_1'),
     'domainnet_cilood': ('imagenet_train_1', 'imagenet_test_1'),
+    'tiny_imagenet': ('tiny_imagenet_train_1', 'tiny_imagenet_test_1'),
 }
 
 def transform_dispatch(query: str):
