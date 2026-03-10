@@ -1,0 +1,90 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    ANÁLISE TAGFEX - ESTRUTURA ORGANIZADA                   ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+�� ESTRUTURA DE DIRETÓRIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+analysis/
+├── 📄 README.md                         # Documentação principal
+├── 📄 REORGANIZATION_SUMMARY.md         # Sumário da reorganização
+├── 🔧 run_analysis.sh                   # Script auxiliar (executável)
+│
+├── 📂 scripts/                          # 14 scripts Python + 3 docs
+│   ├── compare_baseline_vs_local.py     # ⭐ Principal: compara baseline vs local
+│   ├── visualize_local_anchor_theory.py # ⭐ Visualizações teóricas
+│   ├── compare_tagfex_ant_experiments.py
+│   ├── compare_experiments.py
+│   ├── plot_all_nme1_curves.py
+│   ├── analyze_baseline_distances.py
+│   ├── analyze_local_vs_global.py
+│   ├── analyze_ant_gaps.py
+│   ├── analyze_ant_gaps_simple.py
+│   ├── quick_gap_analysis.py
+│   ├── reference_enhanced_ant_loss.py
+│   ├── README.md
+│   ├── COMPARE_EXPERIMENTS_GUIDE.md
+│   └── STATUS.md
+│
+└── 📂 results/                          # 20 resultados organizados
+    ├── baseline_vs_local/               # 2 arquivos
+    │   ├── baseline_vs_local_comparison.png
+    │   └── comparison_report.md
+    │
+    ├── infonce_theory/                  # 4 arquivos
+    │   ├── infonce_matrices_comparison.png
+    │   ├── infonce_loss_computation.png
+    │   ├── infonce_gradient_impact.png
+    │   └── infonce_conceptual_diagram.png
+    │
+    ├── experiments_comparison/          # 5 arquivos
+    │   ├── accuracy_curves_comparison.png
+    │   ├── gap_evolution_comparison.png
+    │   ├── loss_evolution_comparison.png
+    │   ├── pos_neg_means_comparison.png
+    │   └── README.md
+    │
+    ├── baseline_metrics/                # 6 arquivos
+    │   ├── distance_evolution_all_tasks.png
+    │   ├── distribution_comparison_across_tasks.png
+    │   ├── gap_progression_start_vs_end.png
+    │   ├── loss_evolution_all_tasks.png
+    │   ├── summary_statistics.png
+    │   └── README_APRESENTACAO.md
+    │
+    └── nme1_curves/                     # 3 arquivos
+        ├── nme1_curves_comparison.png
+        ├── nme1_curves_detailed.png
+        └── README.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 USO RÁPIDO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Método 1: Script auxiliar (recomendado)
+./analysis/run_analysis.sh compare_baseline_vs_local
+
+# Método 2: Manual
+source .venv/bin/activate
+cd analysis/scripts
+python compare_baseline_vs_local.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Estrutura reorganizada
+✓ Caminhos atualizados (3 scripts principais)
+✓ Script auxiliar criado
+✓ Documentação completa
+✓ Testado e funcional
+
+⚠ Scripts com caminhos hardcoded ainda não revisados:
+  - analyze_ant_gaps.py
+  - analyze_ant_gaps_simple.py
+  - quick_gap_analysis.py
+  - compare_experiments.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

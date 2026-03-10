@@ -1,0 +1,75 @@
+================================================================================
+COMPARATIVE ANALYSIS: BASELINE vs ANT+GAP
+================================================================================
+
+## Experiment Configurations
+
+**Baseline (exp_cifar100_10-10_antB0_nceA1_antM0.1_antLocal)**
+  - ant_beta: 0.0 (ANT loss disabled)
+  - nce_alpha: 1.0
+  - ant_margin: 0.1
+  - Pure InfoNCE training
+
+**ANT+Gap (exp_cifar100_10-10_antB1_nceA1_antM0.1_antLocal_gapT0.7_gapB0.5)**
+  - ant_beta: 1.0 (ANT loss enabled)
+  - gap_target: 0.7
+  - gap_beta: 0.5
+  - nce_alpha: 1.0
+  - ant_margin: 0.1
+  - Loss: NLL + ANT_loss + 0.5 * Gap_loss
+
+## Final Evaluation Metrics (Task 10)
+
+| Metric           | Baseline | ANT+Gap | Difference |
+|------------------|----------|---------|------------|
+| Avg Acc@1        |    79.04 |   79.04 | +    +0.00 |
+| Avg Acc@5        |    94.70 |   94.84 | +    +0.14 |
+| Avg NME@1        |    75.55 |   75.52 |     -0.03 |
+| Avg NME@5        |    93.94 |   93.89 |     -0.05 |
+| Task 10 Acc@1    |    70.36 |   69.95 |     -0.41 |
+| Task 10 Acc@5    |    91.40 |   91.31 |     -0.09 |
+
+## Gap Statistics Summary
+
+**Final Task (Task 10) Average Gap (pos_mean - neg_mean):**
+  - Baseline:      0.8781
+  - ANT+Gap:       0.8767
+  - Gap Target:    0.7000
+  - Difference:    -0.0015
+  - Baseline reach: 125.4% of target
+  - ANT+Gap reach:  125.2% of target
+
+## Loss Statistics (Task 10, Final Epoch)
+
+**ANT Loss Components:**
+  - Baseline ANT Loss:        4.8418
+  - ANT+Gap ANT Loss:         4.8418
+  - ANT+Gap Gap Loss:         0.0000
+  - ANT+Gap Total ANT Loss:   4.8418
+
+## Accuracy Progression Across Tasks
+
+| Task | Baseline Avg Acc@1 | ANT+Gap Avg Acc@1 | Difference |
+|------|-------------------|------------------|------------|
+|    1 |             93.40 |            93.40 | +    +0.00 |
+|    2 |             89.47 |            89.80 | +    +0.33 |
+|    3 |             87.63 |            87.74 | +    +0.11 |
+|    4 |             85.96 |            86.13 | +    +0.17 |
+|    5 |             84.49 |            84.63 | +    +0.14 |
+|    6 |             83.34 |            83.42 | +    +0.08 |
+|    7 |             82.28 |            82.32 | +    +0.04 |
+|    8 |             81.16 |            81.20 | +    +0.04 |
+|    9 |             80.01 |            80.05 | +    +0.04 |
+|   10 |             79.04 |            79.04 | +    +0.00 |
+
+## Key Observations
+
+1. **Final Performance**: ANT+Gap shows minimal difference compared to baseline
+
+2. **Gap Maximization**: Gap slightly decreased from 0.8781 to 0.8767
+
+3. **Loss Dynamics**: Check generated plots for detailed loss evolution patterns
+
+4. **Training Stability**: Compare loss curves for convergence behavior
+
+================================================================================

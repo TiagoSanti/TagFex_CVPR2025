@@ -1,0 +1,214 @@
+================================================================================
+ANÁLISE DE DISTÂNCIAS: TAGFEX BASELINE (InfoNCE Puro)
+================================================================================
+
+## RESUMO GERAL
+
+**Positive Mean (final):**
+  - Média: 0.8804
+  - Std: 0.0373
+  - Min: 0.7841 (Task 1)
+  - Max: 0.9140 (Task 10)
+
+**Negative Mean (final):**
+  - Média: -0.0048
+  - Std: 0.0018
+  - Min: -0.0103 (Task 1)
+  - Max: -0.0039 (Task 8)
+
+**Gap (pos - neg, final):**
+  - Média: 0.8852
+  - Std: 0.0357
+  - Min: 0.7944 (Task 1)
+  - Max: 0.9185 (Task 10)
+  - Target (0.7): 126.5% atingido
+
+**Violations (gap < margin=0.1, final):**
+  - Média: 1.90%
+  - Std: 0.50%
+  - Min: 1.66% (Task 5)
+  - Max: 3.38% (Task 1)
+
+## DETALHAMENTO POR TASK
+
+### Task 1
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8034 ± 0.1356
+  - Neg Mean: 0.6823 ± 0.1517
+  - Gap: 0.1212
+  - Violations: 36.10%
+
+**Fim (Epoch 200):**
+  - Pos Mean: 0.7841 ± 0.1933
+  - Neg Mean: -0.0103 ± 0.1735
+  - Gap: 0.7944
+  - Violations: 3.38%
+
+**Progresso:**
+  - Δ Gap: +0.6732
+  - Δ Violations: +32.72%
+
+### Task 2
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.7026 ± 0.2298
+  - Neg Mean: 0.0031 ± 0.2002
+  - Gap: 0.6995
+  - Violations: 2.01%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.8451 ± 0.1522
+  - Neg Mean: -0.0044 ± 0.1429
+  - Gap: 0.8495
+  - Violations: 1.88%
+
+**Progresso:**
+  - Δ Gap: +0.1500
+  - Δ Violations: +0.13%
+
+### Task 3
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.7844 ± 0.1883
+  - Neg Mean: 0.0021 ± 0.1582
+  - Gap: 0.7823
+  - Violations: 1.88%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.8754 ± 0.1449
+  - Neg Mean: -0.0042 ± 0.1296
+  - Gap: 0.8797
+  - Violations: 1.70%
+
+**Progresso:**
+  - Δ Gap: +0.0973
+  - Δ Violations: +0.17%
+
+### Task 4
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8058 ± 0.1660
+  - Neg Mean: 0.0035 ± 0.1467
+  - Gap: 0.8024
+  - Violations: 1.84%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.8822 ± 0.1367
+  - Neg Mean: -0.0043 ± 0.1234
+  - Gap: 0.8865
+  - Violations: 1.70%
+
+**Progresso:**
+  - Δ Gap: +0.0841
+  - Δ Violations: +0.14%
+
+### Task 5
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8132 ± 0.1688
+  - Neg Mean: 0.0051 ± 0.1444
+  - Gap: 0.8081
+  - Violations: 1.93%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.8936 ± 0.1339
+  - Neg Mean: -0.0040 ± 0.1203
+  - Gap: 0.8976
+  - Violations: 1.66%
+
+**Progresso:**
+  - Δ Gap: +0.0894
+  - Δ Violations: +0.27%
+
+### Task 6
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8036 ± 0.1726
+  - Neg Mean: 0.0064 ± 0.1455
+  - Gap: 0.7972
+  - Violations: 1.94%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.8923 ± 0.1295
+  - Neg Mean: -0.0043 ± 0.1198
+  - Gap: 0.8965
+  - Violations: 1.77%
+
+**Progresso:**
+  - Δ Gap: +0.0993
+  - Δ Violations: +0.17%
+
+### Task 7
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8132 ± 0.1693
+  - Neg Mean: 0.0065 ± 0.1464
+  - Gap: 0.8067
+  - Violations: 1.94%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.9049 ± 0.1160
+  - Neg Mean: -0.0041 ± 0.1196
+  - Gap: 0.9090
+  - Violations: 1.72%
+
+**Progresso:**
+  - Δ Gap: +0.1023
+  - Δ Violations: +0.22%
+
+### Task 8
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8180 ± 0.1665
+  - Neg Mean: 0.0076 ± 0.1392
+  - Gap: 0.8104
+  - Violations: 1.97%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.9049 ± 0.1217
+  - Neg Mean: -0.0039 ± 0.1175
+  - Gap: 0.9088
+  - Violations: 1.70%
+
+**Progresso:**
+  - Δ Gap: +0.0984
+  - Δ Violations: +0.26%
+
+### Task 9
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8219 ± 0.1664
+  - Neg Mean: 0.0104 ± 0.1413
+  - Gap: 0.8115
+  - Violations: 1.90%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.9077 ± 0.1216
+  - Neg Mean: -0.0042 ± 0.1168
+  - Gap: 0.9119
+  - Violations: 1.74%
+
+**Progresso:**
+  - Δ Gap: +0.1004
+  - Δ Violations: +0.16%
+
+### Task 10
+
+**Início (Epoch 1):**
+  - Pos Mean: 0.8218 ± 0.1656
+  - Neg Mean: 0.0100 ± 0.1382
+  - Gap: 0.8118
+  - Violations: 1.90%
+
+**Fim (Epoch 170):**
+  - Pos Mean: 0.9140 ± 0.1120
+  - Neg Mean: -0.0044 ± 0.1169
+  - Gap: 0.9185
+  - Violations: 1.75%
+
+**Progresso:**
+  - Δ Gap: +0.1066
+  - Δ Violations: +0.15%
+
+================================================================================
