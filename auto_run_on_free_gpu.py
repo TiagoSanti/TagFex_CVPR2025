@@ -24,17 +24,20 @@ import re
 
 class GPUMonitor:
     def __init__(
-        self, threshold=95.0, memory_threshold=None, interval=30, verbose=True
+        self, threshold=95.0, memory_threshold=None, min_free_mb=None, interval=30, verbose=True
     ):
         """
         Args:
             threshold: Threshold de utilização GPU (%) para considerar livre
             memory_threshold: Threshold de memória ocupada (%) para considerar livre (None = ignorar)
+            min_free_mb: Mínimo de memória livre (MB) exigido para iniciar; permite execução
+                         paralela sem depender do estado "idle" da GPU (None = ignorar)
             interval: Intervalo entre checagens (segundos)
             verbose: Se True, mostra mensagens detalhadas
         """
         self.threshold = threshold
         self.memory_threshold = memory_threshold
+        self.min_free_mb = min_free_mb
         self.interval = interval
         self.verbose = verbose
         self.running = True
@@ -91,7 +94,7 @@ class GPUMonitor:
                 # 2. Memória < memory_threshold (se especificado)
                 # Se threshold >= 100, ignora utilização (monitora apenas memória)
                 if self.threshold >= 100:
-                    # Modo: só memória
+                    # Modo: só memória percentual
                     if self.memory_threshold is not None:
                         is_free = mem_percent < self.memory_threshold
                     else:
@@ -102,6 +105,13 @@ class GPUMonitor:
                     is_free = util < self.threshold
                     if self.memory_threshold is not None:
                         is_free = is_free and (mem_percent < self.memory_threshold)
+
+                # Critério de memória livre absoluta (para paralelismo seguro)
+                # Sobrepõe os critérios acima: GPU só é considerada livre se
+                # houver pelo menos min_free_mb MB disponíveis.
+                if self.min_free_mb is not None:
+                    mem_free = mem_total - mem_used
+                    is_free = is_free and (mem_free >= self.min_free_mb)
 
                 gpus.append(
                     {
@@ -455,6 +465,17 @@ Exemplos:
     )
 
     parser.add_argument(
+        "--min-free-mb",
+        type=float,
+        default=None,
+        help=(
+            "Mínimo de memória livre (MB) para considerar GPU disponível. "
+            "Útil para execução paralela: GPU com outro job ainda passa se "
+            "houver memória suficiente para o novo experimento (default: None = ignorar)"
+        ),
+    )
+
+    parser.add_argument(
         "--interval",
         "-i",
         type=int,
@@ -501,6 +522,7 @@ Exemplos:
     monitor = GPUMonitor(
         threshold=args.threshold,
         memory_threshold=args.memory_threshold,
+        min_free_mb=args.min_free_mb,
         interval=args.interval,
         verbose=not args.quiet,
     )
