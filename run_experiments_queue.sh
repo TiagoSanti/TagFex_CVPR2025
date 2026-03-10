@@ -10,6 +10,17 @@
 # Ou manualmente:
 #   screen -dmS tagfex_queue ./run_experiments_queue.sh
 #   screen -r tagfex_queue  # para anexar
+#
+# ═══════════════════════════════════════════════════════════
+# SELEÇÃO DE MÁQUINA
+# ═══════════════════════════════════════════════════════════
+# Defina MACHINE abaixo ou deixe em "auto" para detecção automática
+# pelo hostname. Valores válidos: "quati" | "fera" | "auto"
+#
+#   quati — RTX 4090 24GB, single GPU  (hostname: quaTII)
+#   fera  — 2× GPU ~49GB cada, multi-GPU (hostname: fera*)
+#
+MACHINE="auto"
 
 # Diretório base
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,22 +29,62 @@ AUTO_LAUNCHER="$SCRIPT_DIR/auto_run_on_free_gpu.py"
 # Ativar ambiente virtual se existir
 if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
     source "$SCRIPT_DIR/.venv/bin/activate"
-    echo -e "${GREEN}✅ Ambiente virtual .venv ativado${NC}\n"
 fi
+
+# ───────────────────────────────────────────────────────────
+# Perfis de máquina
+# Cada perfil define:
+#   GPUS               — nº de GPUs por experimento
+#   MEMORY_THRESHOLD   — flag --memory-threshold (% de VRAM ocupada)
+#   INTERVAL           — intervalo entre checagens de disponibilidade (s)
+# ───────────────────────────────────────────────────────────
+configure_machine() {
+    local machine=$1
+
+    case "$machine" in
+        quati)
+            # RTX 4090 · 24 GB · 1 GPU
+            # VRAM idle ~43 MiB (~0.2%); threshold 10% ≈ 2.4 GB de folga
+            GPUS=1
+            MEMORY_THRESHOLD="--memory-threshold 10.0"
+            INTERVAL=30
+            MACHINE_LABEL="quati (RTX 4090 24GB · 1 GPU)"
+            ;;
+        fera)
+            # 2× GPU ~49 GB cada · multi-GPU via torchrun
+            # VRAM idle ~200 MiB (~0.4%); threshold 5% ≈ 2.4 GB de folga por GPU
+            GPUS=2
+            MEMORY_THRESHOLD="--memory-threshold 5.0"
+            INTERVAL=30
+            MACHINE_LABEL="fera (2× ~49GB · 2 GPUs)"
+            ;;
+        *)
+            echo -e "${RED}❌ Perfil de máquina desconhecido: '$machine'. Use 'quati' ou 'fera'.${NC}"
+            exit 1
+            ;;
+    esac
+}
+
+# Auto-detecção por hostname
+if [ "$MACHINE" = "auto" ]; then
+    HOSTNAME_LOWER=$(hostname | tr '[:upper:]' '[:lower:]')
+    if [[ "$HOSTNAME_LOWER" == *"qua"* ]]; then
+        MACHINE="quati"
+    elif [[ "$HOSTNAME_LOWER" == *"fera"* ]]; then
+        MACHINE="fera"
+    else
+        echo -e "\033[0;31m❌ Hostname '$(hostname)' não reconhecido. Defina MACHINE='quati' ou 'fera' no topo do script.\033[0m"
+        exit 1
+    fi
+fi
+
+configure_machine "$MACHINE"
 
 # Configurações globais
 THRESHOLD=100.0      # Desabilitado (só verifica memória)
-MEMORY_THRESHOLD="--memory-threshold 5.0"  # GPU com < 5% memória é considerada livre
-INTERVAL=30          # Checar a cada 30 segundos
 LOG_DIR="./logs/auto_experiments"
 PROGRESS_LOG="$LOG_DIR/queue_progress.log"
 CONSOLE_LOG="$LOG_DIR/queue_console_$(date +%Y%m%d_%H%M%S).log"
-
-# Número de GPUs por experimento (alterar se quiser multi-gpu)
-# Como os experimentos de ImageNet-100 são grandes, definimos 2 GPUs.
-# O launcher (`auto_run_on_free_gpu.py`) aguardará pelo menos esse número livre
-# antes de disparar – portanto as duas devem estar abaixo do threshold.
-GPUS=2    # set to >1 to run with torchrun (distributed); mudar caso necessario
 
 # Criar diretório de logs se não existir
 mkdir -p "$LOG_DIR"
@@ -52,13 +103,17 @@ main() {
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}    TagFex Auto Experiment Queue${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
+echo -e "${BLUE}🖥️  Máquina:${NC} $MACHINE_LABEL"
+echo -e "${BLUE}⚙️  GPUs/exp:${NC} $GPUS   ${BLUE}Threshold:${NC} ${MEMORY_THRESHOLD#--memory-threshold }% ocupada\n"
 
 log_progress "🚀 Iniciando fila de experimentos"
+log_progress "🖥️  Máquina: $MACHINE_LABEL  (GPUs/exp: $GPUS)"
 log_progress "📁 Logs salvos em: $LOG_DIR"
 log_progress "📊 Log de progresso: $PROGRESS_LOG"
 
@@ -91,8 +146,7 @@ queue_experiment() {
         --threshold $THRESHOLD \
         $MEMORY_THRESHOLD \
         --interval $INTERVAL \
-        --log-dir $LOG_DIR \
-        --no-wait
+        --no-screen
     
     if [ $? -eq 0 ]; then
         log_progress "✅ Experimento disparado: $description"
@@ -113,25 +167,92 @@ queue_experiment() {
 }
 
 # ═══════════════════════════════════════════════════════════
-# Queue de experimentos ImageNet-100
+# Filas de experimentos — separadas por máquina
 # ═══════════════════════════════════════════════════════════
 
-echo -e "${YELLOW}═══ ImageNet-100 Experiments ═══${NC}\n"
+if [ "$MACHINE" = "quati" ]; then
 
-# ImageNet-100 50-10 Baseline Local
-queue_experiment \
-    "configs/all_in_one/imagenet100_50-10_baseline_local_resnet18.yaml" \
-    "ImageNet-100 50-10 Baseline (Local Anchor)"
+    # ─────────────────────────────────────────────────────
+    # quati · RTX 4090 24GB · single GPU
+    # Datasets que cabem em 24GB: Tiny ImageNet, CIFAR-100
+    # ─────────────────────────────────────────────────────
+    echo -e "${YELLOW}═══ Tiny ImageNet 20-20 Experiments ═══${NC}\n"
 
-# ImageNet-100 10-10 ANT (Best Configuration)
-queue_experiment \
-    "configs/all_in_one/imagenet100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-    "ImageNet-100 10-10 ANT (β=0.5, margin=0.5, Local)"
+    queue_experiment \
+        "configs/all_in_one/tiny_imagenet_20-20_baseline_local_resnet18.yaml" \
+        "Tiny ImageNet 20-20 Baseline (Local Anchor)"
 
-# ImageNet-100 50-10 ANT (Best Configuration)
-queue_experiment \
-    "configs/all_in_one/imagenet100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-    "ImageNet-100 50-10 ANT (β=0.5, margin=0.5, Local)"
+    queue_experiment \
+        "configs/all_in_one/tiny_imagenet_20-20_baseline_global_resnet18.yaml" \
+        "Tiny ImageNet 20-20 Baseline (Global Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "Tiny ImageNet 20-20 ANT (β=0.5, margin=0.5, Local)"
+
+    queue_experiment \
+        "configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_global_resnet18.yaml" \
+        "Tiny ImageNet 20-20 ANT (β=0.5, margin=0.5, Global)"
+
+elif [ "$MACHINE" = "fera" ]; then
+
+    # ─────────────────────────────────────────────────────
+    # fera · 2× ~49GB · torchrun 2 GPUs
+    # Datasets: ImageNet-100 (10-10 e 50-10) + CIFAR-100
+    # ─────────────────────────────────────────────────────
+    echo -e "${YELLOW}═══ CIFAR-100 Experiments ═══${NC}\n"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline (Local Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_baseline_global_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline (Global Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 10-10 ANT (β=0.5, margin=0.5, Local)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline (Local Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_baseline_global_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline (Global Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 50-10 ANT (β=0.5, margin=0.5, Local)"
+
+    echo -e "${YELLOW}═══ ImageNet-100 Experiments ═══${NC}\n"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml" \
+        "ImageNet-100 10-10 Baseline (Local Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_10-10_baseline_global_resnet18.yaml" \
+        "ImageNet-100 10-10 Baseline (Global Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "ImageNet-100 10-10 ANT (β=0.5, margin=0.5, Local)"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_50-10_baseline_local_resnet18.yaml" \
+        "ImageNet-100 50-10 Baseline (Local Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_50-10_baseline_global_resnet18.yaml" \
+        "ImageNet-100 50-10 Baseline (Global Anchor)"
+
+    queue_experiment \
+        "configs/all_in_one/imagenet100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "ImageNet-100 50-10 ANT (β=0.5, margin=0.5, Local)"
+
+fi
 
 log_progress "✅ Todos os experimentos enfileirados!"
 log_progress "📺 $(screen -ls | grep -c Detached) sessões screen ativas"
