@@ -15,4 +15,4 @@ data/
 # Checkpoints
 ckpt/
 *.pth
-*.pt
+*.ptpapers/
