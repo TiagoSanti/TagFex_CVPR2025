@@ -56,6 +56,7 @@ python3 auto_run_on_free_gpu.py \
 - `--command`: Comando a executar quando GPU ficar disponível (obrigatório)
 - `--threshold`: % de utilização máxima para considerar GPU livre (padrão: 1.0)
 - `--memory-threshold`: % de memória máxima para considerar GPU livre (padrão: None)
+- `--min-free-mb`: MB livres mínimos para considerar GPU disponível (padrão: None). Útil para execução paralela — verifica espaço absoluto, não percentual
 - `--interval`: Intervalo de verificação em segundos (padrão: 30)
 - `--no-screen`: Não usar sessão screen (executa diretamente)
 
@@ -339,6 +340,20 @@ python3 auto_run_on_free_gpu.py \
   --memory-threshold 15.0
 ```
 
+### **Execução paralela (dois jobs simultâneos):**
+Use `--min-free-mb` para executar um experimento secundário enquanto outro está rodando.
+O parâmetro verifica se há **N MB livres** — ao contrário de `--memory-threshold` (que bloqueia se % usada for alta), `--min-free-mb` garante que há espaço suficiente para mais um job.
+
+```bash
+# Primeiro job já rodando (ex: TinyImageNet ~6 GB)
+# Segundo job aguarda até haver ≥8 GB livres
+python3 auto_run_on_free_gpu.py \
+  --config configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml \
+  --threshold 100.0 \
+  --min-free-mb 8000 \
+  --no-screen --wait
+```
+
 ---
 
 ## 📊 Logs e Monitoramento
@@ -445,11 +460,12 @@ pip install -r requirements.txt
 
 **Quando usar cada um:**
 
-| Cenário | Threshold Utilização | Threshold Memória |
-|---------|---------------------|-------------------|
-| GPU completamente livre | `--threshold 1.0` | (não precisa) |
-| GPU com processos idle | `--threshold 5.0` | `--memory-threshold 10.0` |
-| GPU com modelo carregado mas não treinando | `--threshold 5.0` | `--memory-threshold 20.0` |
+| Cenário | Threshold Utilização | Threshold Memória | Min Free MB |
+|---------|---------------------|-------------------|-------------|
+| GPU completamente livre | `--threshold 1.0` | (não precisa) | (não precisa) |
+| GPU com processos idle | `--threshold 5.0` | `--memory-threshold 10.0` | (não precisa) |
+| GPU com modelo carregado mas não treinando | `--threshold 5.0` | `--memory-threshold 20.0` | (não precisa) |
+| Execução paralela (outro job rodando) | `--threshold 100.0` | (não aplicar) | `--min-free-mb 8000` |
 
 **Exemplo real (caso atual):**
 ```
