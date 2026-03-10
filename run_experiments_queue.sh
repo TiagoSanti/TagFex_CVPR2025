@@ -117,6 +117,10 @@ log_progress "🖥️  Máquina: $MACHINE_LABEL  (GPUs/exp: $GPUS)"
 log_progress "📁 Logs salvos em: $LOG_DIR"
 log_progress "📊 Log de progresso: $PROGRESS_LOG"
 
+# Contador global de posição na fila
+EXP_COUNTER=0
+EXP_TOTAL=0  # Definido em cada bloco de máquina abaixo
+
 # Função para enfileirar experimento
 # Arguments: 1=config_file  2=description  3=seed (opcional, padrão=1993)
 # Usa variável global GPUS para escolher entre single- ou multi-gpu (torchrun)
@@ -125,11 +129,14 @@ queue_experiment() {
     local description=$2
     local seed=${3:-1993}
 
-    log_progress "📋 Enfileirando: $description  [seed=$seed]"
+    EXP_COUNTER=$((EXP_COUNTER + 1))
+    local pos="[$EXP_COUNTER/$EXP_TOTAL]"
+
+    log_progress "🔄 $pos Iniciando: $description  [seed=$seed]"
     log_progress "   Config: $config_file"
     log_progress "   GPUs necessárias: $GPUS"
 
-    echo -e "${YELLOW}📋 Enfileirando:${NC} $description  [seed=$seed]"
+    echo -e "${YELLOW}🔄 $pos Iniciando:${NC} $description  [seed=$seed]"
     echo -e "   Config: $config_file"
     echo -e "   GPUs necessárias: $GPUS"
     echo -e "   Aguardando GPU(s) disponíveis...\n"
@@ -148,18 +155,13 @@ queue_experiment() {
         $MEMORY_THRESHOLD \
         --interval $INTERVAL \
         --no-screen
-    
+
     if [ $? -eq 0 ]; then
-        log_progress "✅ Experimento disparado: $description"
-        # Extrair nome da sessão screen do output (última sessão criada)
-        local screen_session=$(screen -ls | grep -oE '[0-9]+\.[a-zA-Z0-9_-]+' | tail -1)
-        if [ -n "$screen_session" ]; then
-            log_progress "   📺 Sessão screen: $screen_session"
-        fi
-        echo -e "${GREEN}✅ Experimento disparado com sucesso!${NC}\n"
+        log_progress "✅ $pos Concluído: $description  [seed=$seed]"
+        echo -e "${GREEN}✅ $pos Concluído com sucesso! (${EXP_COUNTER}/${EXP_TOTAL} feitos)${NC}\n"
     else
-        log_progress "❌ ERRO ao disparar experimento: $description"
-        echo -e "${RED}❌ Erro ao disparar experimento${NC}\n"
+        log_progress "❌ $pos ERRO: $description  [seed=$seed]"
+        echo -e "${RED}❌ $pos Erro no experimento${NC}\n"
         return 1
     fi
     
@@ -197,6 +199,21 @@ if [ "$MACHINE" = "quati" ]; then
     # quati · RTX 4090 24GB · single GPU
     # Datasets que cabem em 24GB: Tiny ImageNet, CIFAR-100
     # ─────────────────────────────────────────────────────
+    # 4 Tiny ImageNet (seed 1993)
+    # + 4×2 CIFAR-100 10-10 (seeds 1994-1997) = 8
+    # + 4   CIFAR-100 50-10 baseline (seeds 1994-1997) = 4
+    # + 5   CIFAR-100 50-10 ANT (seeds 1993-1997) = 5
+    # Total: 4 + 8 + 4 + 5 = 21
+    EXP_TOTAL=21
+    log_progress "📋 Total de experimentos nesta fila: $EXP_TOTAL"
+    echo -e "${BLUE}📋 Total de experimentos: ${EXP_TOTAL}${NC}\n"
+    echo -e "${BLUE}Ordem de execução:${NC}"
+    echo -e "   1-4  : Tiny ImageNet 20-20 (baseline local/global + ANT local/global) — seed 1993"
+    echo -e "   5-8  : CIFAR-100 10-10 Baseline Local — seeds 1994, 1995, 1996, 1997"
+    echo -e "   9-12 : CIFAR-100 10-10 ANT β=0.5 m=0.5 Local — seeds 1994, 1995, 1996, 1997"
+    echo -e "   13-16: CIFAR-100 50-10 Baseline Local — seeds 1994, 1995, 1996, 1997"
+    echo -e "   17-21: CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seeds 1993, 1994, 1995, 1996, 1997"
+    echo -e ""
 
     # ── Tiny ImageNet 20-20 ── seed 1993 (primeira execução)
     echo -e "${YELLOW}═══ Tiny ImageNet 20-20 — seed 1993 ═══${NC}\n"
@@ -247,7 +264,11 @@ elif [ "$MACHINE" = "fera" ]; then
     # ─────────────────────────────────────────────────────
     # fera · 2× ~49GB · torchrun 2 GPUs
     # NOTA: fera atualmente indisponível. Manter para quando retornar.
+    # 2 CIFAR-100 global anchor (seed 1993) + 6 ImageNet-100 (seed 1993) = 8
     # ─────────────────────────────────────────────────────
+    EXP_TOTAL=8
+    log_progress "📋 Total de experimentos nesta fila: $EXP_TOTAL"
+    echo -e "${BLUE}📋 Total de experimentos: ${EXP_TOTAL}${NC}\n"
 
     # ── CIFAR-100 — seed 1993 (exploratory / global anchor) ──
     echo -e "${YELLOW}═══ CIFAR-100 Experiments (fera) ═══${NC}\n"
