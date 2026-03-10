@@ -25,10 +25,10 @@
 
 ## 🖥️ Ambientes de Execução
 
-| Máquina | GPU | VRAM | Config. na fila |
-|---------|-----|------|-----------------|
-| **quati** (atual) | NVIDIA RTX 4090 | 24 GB · 1 GPU | `MACHINE="quati"` — Tiny ImageNet, CIFAR-100 |
-| **fera** (anterior) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | `MACHINE="fera"` — ImageNet-100, CIFAR-100 |
+| Máquina | GPU | VRAM | Responsabilidade |
+|---------|-----|------|------------------|
+| **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | Tiny ImageNet 20-20 + CIFAR-100 (todas as seeds) |
+| **fera** (indisponível) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | ImageNet-100 (quando retornar) |
 
 O script de fila [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).
 
@@ -352,26 +352,53 @@ ant_max_global: false   # Local normalization
 
 ---
 
-## �📊 Estado Atual do Projeto
+## 📊 Estado Atual do Projeto
 
-### Última Atualização: Dezembro 2025
+### Última Atualização: Março 2026
 
-**Status**: ✅ Fase experimental **COMPLETA** - Melhor configuração identificada
+**Status**: 🔄 Fase de **reproducibilidade** — rodando 5 seeds para resultados do paper
 
-**Experimentos Totais**: 15 configurações testadas
-- ✅ 13 experimentos completos
-- 🔄 1 experimento debug em andamento
-- 📂 3 datasets testados (CIFAR-100 10-10, CIFAR-100 50-10, ImageNet-100 10-10)
+**Experimentos Totais**: 15 configurações exploradas (seed 1993) → agora reproduzindo 4 configurações-chave com 5 seeds (1993–1997)
 
-### Últimos Experimentos (Cronologia)
+### Convenção de Seeds
 
-| Data | Experimento | Status | Observação |
-|------|-------------|--------|------------|
-| **Dez 8-10, 2025** | ANT β=0.5, margins 0.5/0.6/0.7, Local | ✅ Completo | **MELHOR RESULTADO** com m=0.5 |
-| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | ✅ Completo | β alto menos estável |
-| Nov 20-22, 2025 | CIFAR-100 50-10, ANT variations | ✅ Completo | ANT teve impacto mínimo |
-| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | ✅ Completo | Local anchor isolado funciona |
-| Nov 12-13, 2025 | Local vs Global comparison | ✅ Completo | Local > Global |
+Cada run recebe o sufixo `_s{seed}` no diretório de log:
+- Seed `1993` — padrão da comunidade (iCaRL, PyCIL, C3Box), já executado
+- Seeds `1994–1997` — runs adicionais para média ± desvio padrão no paper
+- A `class_order` está fixa no YAML (não varia com seed); apenas inicialização de pesos e augmentation variam
+
+### Filas em Execução (quati · 10 mar 2026)
+
+| Sessão screen | Script | Runs | Observação |
+|---------------|--------|------|------------|
+| `tagfex_queue` | `run_experiments_queue.sh` | 4 | Tiny ImageNet 20-20 × seed 1993 |
+| `cifar100_queue` | `run_cifar100_parallel_queue.sh` | 17 | CIFAR-100 5 seeds, paralelo |
+
+**`tagfex_queue`** (iniciada 14:41, sequencial):
+| # | Experimento | Seed | Status |
+|---|-------------|------|--------|
+| 1 | Tiny ImageNet 20-20 Baseline Local | 1993 | 🔄 Rodando |
+| 2 | Tiny ImageNet 20-20 Baseline Global | 1993 | ⏳ |
+| 3 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | 1993 | ⏳ |
+| 4 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global | 1993 | ⏳ |
+
+**`cifar100_queue`** (iniciada 17:09, paralela via `--min-free-mb 8000`):
+| # | Experimento | Seed | Status |
+|---|-------------|------|--------|
+| 1–4 | CIFAR-100 10-10 Baseline Local | 1994–1997 | ⏳ |
+| 5–8 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1994–1997 | ⏳ |
+| 9–12 | CIFAR-100 50-10 Baseline Local | 1994–1997 | ⏳ |
+| 13–17 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local | 1993–1997 | ⏳ |
+
+### Experimentos Concluídos (seed 1993)
+
+| Data | Experimento | Seed | Diretório |
+|------|-------------|------|----------|
+| Dez 8-10, 2025 | ANT β=0.5, margins 0.5/0.6/0.7, Local | 1993 | `done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993` |
+| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | 1993 | `done_exp_cifar100_10-10_antB1_*_s1993` |
+| Nov 20-22, 2025 | CIFAR-100 50-10 variations | 1993 | `done_exp_cifar100_50-10_*_s1993` |
+| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | 1993 | `done_exp_*_s1993` |
+| Nov 12-13, 2025 | Local vs Global comparison | 1993 | `done_exp_*_s1993` |
 
 ---
 
@@ -475,22 +502,20 @@ CUDA_VISIBLE_DEVICES=0 python main.py train \
 
 #### Auto-Lançamento com Fila de GPUs 🚀
 
-Sistema automático que monitora GPUs e dispara experimentos quando uma ficar disponível. O script de fila tem **perfis por máquina** configurados (quati/fera), com auto-detecção pelo hostname:
+Sistema automático que monitora GPUs e dispara experimentos quando há recursos disponíveis. Suporta **duas filas paralelas** na quati:
 
 ```bash
-# Fila de múltiplos experimentos - RECOMENDADO para SSH (roda em screen)
-./start_queue_monitor.sh  # Pode desconectar do SSH!
+# Fila principal (Tiny ImageNet) — roda em screen
+./start_queue_monitor.sh        # cria sessão screen tagfex_queue
 
-# Ou diretamente (sem screen de monitoramento)
-./run_experiments_queue.sh
+# Fila CIFAR-100 paralela — roda em segundo screen simultâneo
+screen -dmS cifar100_queue ./run_cifar100_parallel_queue.sh
 
-# Forçar perfil de máquina específico
-MACHINE=fera ./run_experiments_queue.sh
-
-# Experimento único - aguarda GPU disponível automaticamente
+# Experimento único com espera por memória livre absoluta
+# --min-free-mb: útil para paralelismo (não depende de GPU "idle")
 python3 auto_run_on_free_gpu.py \
-  --command "python main.py train --exp-configs configs/all_in_one/tiny_imagenet_20-20_baseline_local_resnet18.yaml" \
-  --memory-threshold 10.0
+  --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml --seed 1994" \
+  --min-free-mb 8000
 
 # Verificar processos idle ocupando GPUs
 ./check_gpu_processes.sh
@@ -498,26 +523,41 @@ python3 auto_run_on_free_gpu.py \
 
 **Perfis de máquina em [`run_experiments_queue.sh`](run_experiments_queue.sh):**
 
-| `MACHINE` | GPUs/exp | Threshold | Fila |
-|-----------|----------|-----------|------|
-| `quati` | 1 | 10% VRAM | Tiny ImageNet 20-20 |
-| `fera` | 2 (torchrun) | 5% VRAM | CIFAR-100 + ImageNet-100 |
+| `MACHINE` | GPUs/exp | Critério de GPU livre | Fila |
+|-----------|----------|-----------------------|------|
+| `quati` | 1 | 10% VRAM ocupada | Tiny ImageNet 20-20 (seed 1993) |
+| `fera` | 2 (torchrun) | 5% VRAM ocupada | ImageNet-100 + CIFAR-100 global |
+
+**[`run_cifar100_parallel_queue.sh`](run_cifar100_parallel_queue.sh)** — fila dedicada CIFAR-100:
+- Usa `--min-free-mb 8000` em vez de threshold percentual
+- Inicia quando há ≥ 8 GB livres — funciona **em paralelo com Tiny ImageNet (~6.5 GB)**
+- 17 runs: CIFAR-100 10-10 e 50-10, seeds 1994–1997 (+ seed 1993 para 50-10 ANT)
+
+**Parâmetros de [`auto_run_on_free_gpu.py`](auto_run_on_free_gpu.py):**
+
+| Flag | Descrição | Uso típico |
+|------|-----------|------------|
+| `--threshold` | % de utilização máxima | GPU idle sem job |
+| `--memory-threshold` | % de VRAM máxima ocupada | GPU com processo leve |
+| `--min-free-mb` | MB mínimos **livres** | Execução paralela |
 
 **Vantagens:**
 - ✅ Não precisa monitorar manualmente com `gpustat`
-- ✅ Dispara automaticamente ao detectar GPU livre
+- ✅ Dois experimentos em paralelo na mesma GPU (Tiny ImageNet + CIFAR-100)
 - ✅ Perfis por máquina — sem precisar ajustar manualmente
-- ✅ Suporta fila de experimentos overnight
-- ✅ Executa em sessões `screen` (pode desconectar do SSH)
+- ✅ Suporta fila overnight com logging de progresso `[N/total]`
 
 📖 **Documentação completa**: [AUTO_GPU_LAUNCHER.md](AUTO_GPU_LAUNCHER.md)  
 🧠 **GPU com memória ocupada mas 0% uso?** Veja: [GPU_MEMORY_GUIDE.md](GPU_MEMORY_GUIDE.md)
 
 ```bash
-# Monitorar experimento em execução
-screen -ls
-screen -r tagfex_queue         # fila de orquestração
-tail -f logs/exp_.../exp_stdlog0.log  # logs do treino
+# Monitorar filas em execução
+screen -ls                                              # listar sessões
+screen -r tagfex_queue                                 # fila Tiny ImageNet
+screen -r cifar100_queue                               # fila CIFAR-100
+tail -f logs/auto_experiments/queue_progress.log       # log tagfex_queue
+tail -f logs/auto_experiments/cifar100_queue_progress.log  # log cifar100_queue
+tail -f logs/exp_.../exp_stdlog0.log                   # log de treino individual
 ```
 
 ### Exemplos de Uso
@@ -592,16 +632,27 @@ python plot_loss_components.py \
 
 ### Tiny ImageNet 20-20 (10 tasks × 20 classes) 🆕
 
-200 classes, imagens 64×64. Executado na quati (RTX 4090 24GB, single GPU).
+200 classes, imagens 64×64. Executado na quati (RTX 4090 24GB, single GPU). Apenas seed 1993 (exploração inicial; 5 seeds para CIFAR-100 que são os resultados do paper).
 
 | Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 | Status |
 |--------------|-----------|------------|-----------|--------|
-| Baseline Local | — | — | — | 🔄 Rodando |
-| Baseline Global | — | — | — | ⏳ Aguardando |
-| ANT β=0.5, m=0.5, Local | — | — | — | ⏳ Aguardando |
-| ANT β=0.5, m=0.5, Global | — | — | — | ⏳ Aguardando |
+| Baseline Local | — | — | — | 🔄 Rodando (s1993) |
+| Baseline Global | — | — | — | ⏳ |
+| ANT β=0.5, m=0.5, Local | — | — | — | ⏳ |
+| ANT β=0.5, m=0.5, Global | — | — | — | ⏳ |
 
-> Os experimentos Global vs Local no mesmo β/margin permitem isolar o efeito da normalização de âncora.
+> Os experimentos Global vs Local permitem isolar o efeito da normalização de âncora.
+
+### CIFAR-100 — Reproducibilidade Paper (5 seeds)
+
+Resultados do paper: média ± desvio padrão de 5 seeds (1993–1997), seguindo convenção do TagFex original ("5 runs, mean values reported").
+
+| Cenário | Configuração | Seeds concluídas | Seeds pendentes |
+|---------|--------------|------------------|-----------------|
+| 10-10 | Baseline Local | 1993 ✅ | 1994–1997 ⏳ |
+| 10-10 | ANT β=0.5 m=0.5 Local | 1993 ✅ | 1994–1997 ⏳ |
+| 50-10 | Baseline Local | 1993 ✅ | 1994–1997 ⏳ |
+| 50-10 | ANT β=0.5 m=0.5 Local | — | 1993–1997 ⏳ |
 
 ---
 
@@ -789,9 +840,10 @@ TagFex_CVPR2025/
 ├── trainddp.sh                    # Multi-GPU training
 ├── requirements.txt               # Dependências
 ├── setup_tiny_imagenet.py         # Download e verificação do Tiny ImageNet 🆕
-├── run_experiments_queue.sh       # Fila de experimentos (perfis quati/fera)
-├── start_queue_monitor.sh         # Lança fila em sessão screen
-├── auto_run_on_free_gpu.py        # Monitor de GPU para disparo automático
+├── run_experiments_queue.sh       # Fila principal (Tiny ImageNet + ImageNet-100)
+├── run_cifar100_parallel_queue.sh # Fila CIFAR-100 5-seed (paralelo, --min-free-mb)
+├── start_queue_monitor.sh         # Lança fila principal em sessão screen
+├── auto_run_on_free_gpu.py        # Monitor GPU: --threshold / --memory-threshold / --min-free-mb
 │
 ├── configs/                       # Configurações
 │   ├── all_in_one/               # Configs prontas (all-in-one YAML)
