@@ -167,12 +167,22 @@ queue_experiment() {
     sleep 5
 }
 
-# Atalho: roda 5 seeds (1993-1997) para uma config — para resultados do paper
+# Roda 5 seeds (1993-1997) para uma config — resultados do paper
 # Arguments: 1=config_file  2=description_base
 queue_experiment_5seeds() {
     local config_file=$1
     local description=$2
     for seed in 1993 1994 1995 1996 1997; do
+        queue_experiment "$config_file" "$description" "$seed"
+    done
+}
+
+# Roda apenas seeds 1994-1997 (quando seed 1993 já foi executado)
+# Arguments: 1=config_file  2=description_base
+queue_experiment_remaining_seeds() {
+    local config_file=$1
+    local description=$2
+    for seed in 1994 1995 1996 1997; do
         queue_experiment "$config_file" "$description" "$seed"
     done
 }
@@ -187,7 +197,9 @@ if [ "$MACHINE" = "quati" ]; then
     # quati · RTX 4090 24GB · single GPU
     # Datasets que cabem em 24GB: Tiny ImageNet, CIFAR-100
     # ─────────────────────────────────────────────────────
-    echo -e "${YELLOW}═══ Tiny ImageNet 20-20 Experiments ═══${NC}\n"
+
+    # ── Tiny ImageNet 20-20 ── seed 1993 (primeira execução)
+    echo -e "${YELLOW}═══ Tiny ImageNet 20-20 — seed 1993 ═══${NC}\n"
 
     queue_experiment \
         "configs/all_in_one/tiny_imagenet_20-20_baseline_local_resnet18.yaml" \
@@ -205,39 +217,51 @@ if [ "$MACHINE" = "quati" ]; then
         "configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_global_resnet18.yaml" \
         "Tiny ImageNet 20-20 ANT (β=0.5, margin=0.5, Global)"
 
+    # ── CIFAR-100 10-10 — paper reproducibility (5 seeds) ──
+    # Seed 1993 já executado → apenas remaining seeds 1994-1997
+    echo -e "${YELLOW}═══ CIFAR-100 10-10 — Paper Reproducibility (seeds 1994-1997) ═══${NC}\n"
+
+    queue_experiment_remaining_seeds \
+        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline (Local)"
+
+    queue_experiment_remaining_seeds \
+        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local"
+
+    # ── CIFAR-100 50-10 — paper reproducibility (5 seeds) ──
+    # Baseline local seed 1993 já executado; ANT best seed 1993 NÃO foi executado ainda
+    echo -e "${YELLOW}═══ CIFAR-100 50-10 — Paper Reproducibility ═══${NC}\n"
+
+    queue_experiment_remaining_seeds \
+        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline (Local)"
+
+    # 50-10 ANT best (β=0.5, m=0.5) — seed 1993 ainda não executado → 5 seeds completos
+    queue_experiment_5seeds \
+        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local"
+
 elif [ "$MACHINE" = "fera" ]; then
 
     # ─────────────────────────────────────────────────────
     # fera · 2× ~49GB · torchrun 2 GPUs
-    # Datasets: ImageNet-100 (10-10 e 50-10) + CIFAR-100
+    # NOTA: fera atualmente indisponível. Manter para quando retornar.
     # ─────────────────────────────────────────────────────
-    echo -e "${YELLOW}═══ CIFAR-100 Experiments ═══${NC}\n"
 
-    queue_experiment \
-        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 10-10 Baseline (Local Anchor)"
+    # ── CIFAR-100 — seed 1993 (exploratory / global anchor) ──
+    echo -e "${YELLOW}═══ CIFAR-100 Experiments (fera) ═══${NC}\n"
 
     queue_experiment \
         "configs/all_in_one/cifar100_10-10_baseline_global_resnet18.yaml" \
         "CIFAR-100 10-10 Baseline (Global Anchor)"
 
     queue_experiment \
-        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 10-10 ANT (β=0.5, margin=0.5, Local)"
-
-    queue_experiment \
-        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 50-10 Baseline (Local Anchor)"
-
-    queue_experiment \
         "configs/all_in_one/cifar100_50-10_baseline_global_resnet18.yaml" \
         "CIFAR-100 50-10 Baseline (Global Anchor)"
 
-    queue_experiment \
-        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 50-10 ANT (β=0.5, margin=0.5, Local)"
-
-    echo -e "${YELLOW}═══ ImageNet-100 Experiments ═══${NC}\n"
+    # ── ImageNet-100 — seed 1993 (primeira execução) ──
+    echo -e "${YELLOW}═══ ImageNet-100 Experiments (fera) ═══${NC}\n"
 
     queue_experiment \
         "configs/all_in_one/imagenet100_10-10_baseline_local_resnet18.yaml" \
@@ -262,31 +286,6 @@ elif [ "$MACHINE" = "fera" ]; then
     queue_experiment \
         "configs/all_in_one/imagenet100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
         "ImageNet-100 50-10 ANT (β=0.5, margin=0.5, Local)"
-
-    # ─────────────────────────────────────────────────────
-    # fera · Reproducibilidade do paper — 5 seeds (1993-1997)
-    # Apenas as 4 configs que entram na Tabela 1 do ant.tex:
-    #   · baseline CIFAR-100 10-10 e 50-10 (TagFex reproduzido)
-    #   · melhor ANT CIFAR-100 10-10 e 50-10 (β=0.5, m=0.5, Local)
-    # Seed 1993 já foi executados acima; seeds 1994-1997 serão novos.
-    # ─────────────────────────────────────────────────────
-    echo -e "${YELLOW}═══ CIFAR-100 Paper Reproducibility — 5 seeds ═══${NC}\n"
-
-    queue_experiment_5seeds \
-        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 10-10 Baseline (Local) — paper 5-seed"
-
-    queue_experiment_5seeds \
-        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local — paper 5-seed"
-
-    queue_experiment_5seeds \
-        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 50-10 Baseline (Local) — paper 5-seed"
-
-    queue_experiment_5seeds \
-        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — paper 5-seed"
 
 fi
 
