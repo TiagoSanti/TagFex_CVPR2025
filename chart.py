@@ -43,10 +43,10 @@ EXPERIMENT_SERIES = {
     # Baseline Local: 5-seed average of our reproduced TagFex (antBeta=0, local anchor)
     "Baseline Local": [
         "done_exp_cifar100_10-10_baseline_tagfex_original_s1993",
-        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1994",
-        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1995",
-        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1996",
-        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1997",
+        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1994",
+        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1995",
+        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1996",
+        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1997",
     ],
     # ANT (β=0.5, m=0.5, Local) — uncomment when multi-seed runs complete
     # "ANT": [
