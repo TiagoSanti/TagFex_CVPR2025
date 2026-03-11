@@ -354,11 +354,11 @@ ant_max_global: false   # Local normalization
 
 ## 📊 Estado Atual do Projeto
 
-### Última Atualização: Março 2026
+### Última Atualização: 11 Março 2026
 
 **Status**: 🔄 Fase de **reproducibilidade** — rodando 5 seeds para resultados do paper
 
-**Experimentos Totais**: 15 configurações exploradas (seed 1993) → agora reproduzindo 4 configurações-chave com 5 seeds (1993–1997)
+**Experimentos Totais**: 15 configurações exploradas (seed 1993) → reproduzindo 4 configurações-chave com 5 seeds (1993–1997)
 
 ### Convenção de Seeds
 
@@ -367,38 +367,44 @@ Cada run recebe o sufixo `_s{seed}` no diretório de log:
 - Seeds `1994–1997` — runs adicionais para média ± desvio padrão no paper
 - A `class_order` está fixa no YAML (não varia com seed); apenas inicialização de pesos e augmentation variam
 
-### Filas em Execução (quati · 10 mar 2026)
+### Filas Ativas (quati · 11 mar 2026)
 
-| Sessão screen | Script | Runs | Observação |
-|---------------|--------|------|------------|
-| `tagfex_queue` | `run_experiments_queue.sh` | 4 | Tiny ImageNet 20-20 × seed 1993 |
-| `cifar100_queue` | `run_cifar100_parallel_queue.sh` | 17 | CIFAR-100 5 seeds, paralelo |
+| Sessão screen | Script | Status |
+|---------------|--------|--------|
+| `tagfex_queue` | `run_experiments_queue.sh` | 🔄 Tiny ImageNet 20-20 — exp 2/4 em andamento |
+| `cifar100_queue` | `run_cifar100_parallel_queue.sh` | 🔄 CIFAR-100 — exp 5/17 em andamento |
 
-**`tagfex_queue`** (iniciada 14:41, sequencial):
-| # | Experimento | Seed | Status |
-|---|-------------|------|--------|
-| 1 | Tiny ImageNet 20-20 Baseline Local | 1993 | 🔄 Rodando |
-| 2 | Tiny ImageNet 20-20 Baseline Global | 1993 | ⏳ |
-| 3 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | 1993 | ⏳ |
-| 4 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global | 1993 | ⏳ |
+**`tagfex_queue`** (sequencial, seed 1993):
+| # | Experimento | Status | avg_nme1 |
+|---|-------------|--------|----------|
+| 1 | Tiny ImageNet 20-20 Baseline Local | ✅ Concluído | **57.14%** |
+| 2 | Tiny ImageNet 20-20 Baseline Global | 🔄 Rodando (task 4/10) | — |
+| 3 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | ⏳ | — |
+| 4 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global | ⏳ | — |
 
-**`cifar100_queue`** (iniciada 17:09, paralela via `--min-free-mb 8000`):
-| # | Experimento | Seed | Status |
-|---|-------------|------|--------|
-| 1–4 | CIFAR-100 10-10 Baseline Local | 1994–1997 | ⏳ |
-| 5–8 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1994–1997 | ⏳ |
-| 9–12 | CIFAR-100 50-10 Baseline Local | 1994–1997 | ⏳ |
-| 13–17 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local | 1993–1997 | ⏳ |
+**`cifar100_queue`** (paralela via `--min-free-mb 8000`):
+| # | Experimento | Status | avg_nme1 |
+|---|-------------|--------|----------|
+| 1–4 | CIFAR-100 10-10 Baseline Local s1994–1997 | ✅ Concluídos | 75.89 / 76.08 / 75.39 / 75.37 |
+| 5 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1994 | 🔄 Rodando (task 7/10) | — |
+| 6–8 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1995–1997 | ⏳ | — |
+| 9–12 | CIFAR-100 50-10 Baseline Local s1994–1997 | ⏳ | — |
+| 13–17 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local s1993–1997 | ⏳ | — |
 
-### Experimentos Concluídos (seed 1993)
+### Experimentos Concluídos
 
-| Data | Experimento | Seed | Diretório |
+| Data | Experimento | Seed | avg_nme1 |
 |------|-------------|------|----------|
-| Dez 8-10, 2025 | ANT β=0.5, margins 0.5/0.6/0.7, Local | 1993 | `done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993` |
-| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | 1993 | `done_exp_cifar100_10-10_antB1_*_s1993` |
-| Nov 20-22, 2025 | CIFAR-100 50-10 variations | 1993 | `done_exp_cifar100_50-10_*_s1993` |
-| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | 1993 | `done_exp_*_s1993` |
-| Nov 12-13, 2025 | Local vs Global comparison | 1993 | `done_exp_*_s1993` |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1994 | 75.89% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1995 | 76.08% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1996 | 75.39% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1997 | 75.37% |
+| Mar 11, 2026 | Tiny ImageNet 20-20 Baseline Local | 1993 | 57.14% |
+| Dez 8-10, 2025 | ANT β=0.5, margins 0.5/0.6/0.7, Local | 1993 | 76.18% |
+| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | 1993 | — |
+| Nov 20-22, 2025 | CIFAR-100 50-10 variations | 1993 | — |
+| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | 1993 | — |
+| Nov 12-13, 2025 | Local vs Global comparison | 1993 | — |
 
 ---
 
@@ -406,7 +412,7 @@ Cada run recebe o sufixo `_s{seed}` no diretório de log:
 
 ### ANT β=0.5, margin=0.5, Local Anchor
 
-**Experimento**: `done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/`
+**Experimento**: `done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993/`
 
 #### Resultados CIFAR-100 10-10 (10 tasks)
 
@@ -632,12 +638,12 @@ python plot_loss_components.py \
 
 ### Tiny ImageNet 20-20 (10 tasks × 20 classes) 🆕
 
-200 classes, imagens 64×64. Executado na quati (RTX 4090 24GB, single GPU). Apenas seed 1993 (exploração inicial; 5 seeds para CIFAR-100 que são os resultados do paper).
+200 classes, imagens 64×64. Executado na quati (RTX 4090 24GB, single GPU). Apenas seed 1993 (exploração inicial; 5 seeds para CIFAR-100 são os resultados do paper).
 
 | Configuração | Avg Acc@1 | Last Acc@1 | Avg NME@1 | Status |
 |--------------|-----------|------------|-----------|--------|
-| Baseline Local | — | — | — | 🔄 Rodando (s1993) |
-| Baseline Global | — | — | — | ⏳ |
+| Baseline Local | **60.68%** | 52.57% | **57.14%** | ✅ Concluído (s1993) |
+| Baseline Global | — | — | — | 🔄 Rodando (task 4/10) |
 | ANT β=0.5, m=0.5, Local | — | — | — | ⏳ |
 | ANT β=0.5, m=0.5, Global | — | — | — | ⏳ |
 
@@ -647,12 +653,14 @@ python plot_loss_components.py \
 
 Resultados do paper: média ± desvio padrão de 5 seeds (1993–1997), seguindo convenção do TagFex original ("5 runs, mean values reported").
 
-| Cenário | Configuração | Seeds concluídas | Seeds pendentes |
-|---------|--------------|------------------|-----------------|
-| 10-10 | Baseline Local | 1993 ✅ | 1994–1997 ⏳ |
-| 10-10 | ANT β=0.5 m=0.5 Local | 1993 ✅ | 1994–1997 ⏳ |
-| 50-10 | Baseline Local | 1993 ✅ | 1994–1997 ⏳ |
-| 50-10 | ANT β=0.5 m=0.5 Local | — | 1993–1997 ⏳ |
+| Cenário | Configuração | Seeds concluídas | avg_nme1 (média) | Seeds pendentes |
+|---------|--------------|------------------|------------------|-----------------|
+| 10-10 | Baseline Local | 1993–1997 ✅ | **75.66%** | — |
+| 10-10 | ANT β=0.5 m=0.5 Local | 1993 ✅ | — | 1994–1997 🔄 |
+| 50-10 | Baseline Local | 1993 ✅ | — | 1994–1997 ⏳ |
+| 50-10 | ANT β=0.5 m=0.5 Local | — | — | 1993–1997 ⏳ |
+
+**Gráfico atualizado**: [`cifar100_10-10.png`](cifar100_10-10.png) — Baseline Local 5 seeds vs. baselines do paper (iCaRL, DyTox, DER, TagFex ref).
 
 ---
 
@@ -876,10 +884,16 @@ TagFex_CVPR2025/
 │   └── utils.py
 │
 ├── logs/                          # Experimentos executados
-│   ├── done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal/  # ⭐ Melhor
-│   ├── done_exp_cifar100_10-10_baseline_tagfex_original/
-│   ├── exp_tiny_imagenet_20-20_antB0_nceA1_antLocal/  # 🔄 Em execução
-│   └── ... (15 concluídos)
+│   ├── done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1993/        # Baseline Local seed 1993
+│   ├── done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1994/        # avg_nme1=75.89
+│   ├── done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1995/        # avg_nme1=76.08
+│   ├── done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1996/        # avg_nme1=75.39
+│   ├── done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1997/        # avg_nme1=75.37
+│   ├── done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993/  # ⭐ Melhor ANT
+│   ├── done_exp_tiny_imagenet_20-20_antB0_nceA1_antLocal_s1993/   # avg_nme1=57.14
+│   ├── exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1994/  # 🔄 Rodando
+│   ├── exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_s1993/       # 🔄 Rodando
+│   └── ... (15+ concluídos)
 │
 ├── analysis/                      # Scripts de análise
 │   ├── scripts/
