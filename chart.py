@@ -36,31 +36,36 @@ REFERENCE_DATA = {
 # exist yet are silently skipped, so the chart can be regenerated at any time
 # as seeds complete.
 EXPERIMENT_SERIES = {
+    # TagFex: single-seed paper reference (s1993 only — the original published run)
     "TagFex": [
-        # seed 1993 — old naming kept for backward-compat
         "done_exp_cifar100_10-10_baseline_tagfex_original_s1993",
-        # seeds 1994-1997 — produced by run_cifar100_parallel_queue.sh
-        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1994",
-        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1995",
-        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1996",
-        "done_exp_cifar100_10-10_antB0_nceA1_antLocal_s1997",
     ],
-    "ANT": [
-        "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993",
-        "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1994",
-        "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1995",
-        "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1996",
-        "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1997",
+    # Baseline Local: 5-seed average of our reproduced TagFex (antBeta=0, local anchor)
+    "Baseline Local": [
+        "done_exp_cifar100_10-10_baseline_tagfex_original_s1993",
+        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1994",
+        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1995",
+        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1996",
+        "exp_cifar100_10-10_antB0_nceA1_antLocal_s1997",
     ],
+    # ANT (β=0.5, m=0.5, Local) — uncomment when multi-seed runs complete
+    # "ANT": [
+    #     "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993",
+    #     "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1994",
+    #     "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1995",
+    #     "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1996",
+    #     "done_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1997",
+    # ],
 }
 
 # Visual style for every series (order matters for the legend)
 SERIES_STYLE = {
-    "iCaRL":  dict(marker="^", color="tab:blue",   markersize=8,  linestyle="-"),
-    "DyTox":  dict(marker="s", color="tab:cyan",   markersize=8,  linestyle="-"),
-    "DER":    dict(marker="o", color="tab:green",  markersize=8,  linestyle="-"),
-    "TagFex": dict(marker="*", color="tab:red",    markersize=10, linestyle="-"),
-    "ANT":    dict(marker="p", color="tab:purple", markersize=10, linestyle="-"),
+    "iCaRL":          dict(marker="^", color="tab:blue",   markersize=8,  linestyle="-"),
+    "DyTox":          dict(marker="s", color="tab:cyan",   markersize=8,  linestyle="-"),
+    "DER":            dict(marker="o", color="tab:green",  markersize=8,  linestyle="-"),
+    "TagFex":         dict(marker="*", color="tab:red",    markersize=10, linestyle="-"),
+    "Baseline Local": dict(marker="p", color="tab:purple", markersize=10, linestyle="-"),
+    "ANT":            dict(marker="p", color="tab:purple", markersize=10, linestyle="-"),
 }
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -156,18 +161,20 @@ def build_chart(show: bool = False):
             continue
         ax.plot(CLASSES, series_data[name], label=name, **style)
 
-    # Delta annotations: ANT vs. best of all other plotted methods
-    if "ANT" in series_data:
-        ant_curve = series_data["ANT"]
-        others = [v for k, v in series_data.items() if k != "ANT"]
+    # Delta annotations: top series vs. best of all other plotted methods
+    # Priority: ANT > Baseline Local (whichever is present)
+    highlight_key = next((k for k in ("ANT", "Baseline Local") if k in series_data), None)
+    if highlight_key:
+        top_curve = series_data[highlight_key]
+        others = [v for k, v in series_data.items() if k != highlight_key]
         if others:
             best_other = np.max(np.stack(others), axis=0)
             for i, class_num in enumerate(CLASSES):
-                delta = ant_curve[i] - best_other[i]
+                delta = top_curve[i] - best_other[i]
                 sign = "+" if delta >= 0 else "-"
                 ax.text(
                     class_num,
-                    ant_curve[i] + 1.5,
+                    top_curve[i] + 1.5,
                     f"{sign} {abs(delta):.2f}",
                     ha="center",
                     va="bottom",
