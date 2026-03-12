@@ -209,13 +209,14 @@ if [ "$MACHINE" = "quati" ]; then
     echo -e "${BLUE} Total de experimentos: ${EXP_TOTAL}${NC}\n"
     echo -e "${BLUE}Ordem de execução:${NC}"
     echo -e "   1-4  : Tiny ImageNet 20-20 (baseline local/global + ANT local/global) — seed 1993"
-    echo -e "   5-8  : CIFAR-100 10-10 Baseline Local — seeds 1994, 1995, 1996, 1997"
-    echo -e "   9-12 : CIFAR-100 10-10 ANT β=0.5 m=0.5 Local — seeds 1994, 1995, 1996, 1997"
-    echo -e "   13-16: CIFAR-100 50-10 Baseline Local — seeds 1994, 1995, 1996, 1997"
-    echo -e "   17-21: CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seeds 1993, 1994, 1995, 1996, 1997"
+    echo -e "     5  : CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seed 1993 (único CIFAR pendente)"
+    echo -e "   6-9  : todos os 4 CIFAR configs — seed 1994"
+    echo -e "  10-13 : todos os 4 CIFAR configs — seed 1995"
+    echo -e "  14-17 : todos os 4 CIFAR configs — seed 1996"
+    echo -e "  18-21 : todos os 4 CIFAR configs — seed 1997"
     echo -e ""
 
-    # ── Tiny ImageNet 20-20 ── seed 1993 (primeira execução)
+    # ── Tiny ImageNet 20-20 ── seed 1993 (primeira execução, exploratório)
     echo -e "${YELLOW}═══ Tiny ImageNet 20-20 — seed 1993 ═══${NC}\n"
 
     queue_experiment \
@@ -234,30 +235,38 @@ if [ "$MACHINE" = "quati" ]; then
         "configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_global_resnet18.yaml" \
         "Tiny ImageNet 20-20 ANT (β=0.5, margin=0.5, Global)"
 
-    # ── CIFAR-100 10-10 — paper reproducibility (5 seeds) ──
-    # Seed 1993 já executado → apenas remaining seeds 1994-1997
-    echo -e "${YELLOW}═══ CIFAR-100 10-10 — Paper Reproducibility (seeds 1994-1997) ═══${NC}\n"
+    # ── CIFAR-100 seed 1993 — apenas 50-10 ANT (restante já executado) ──
+    echo -e "${YELLOW}═══ CIFAR-100 seed 1993 — 50-10 ANT (único config pendente) ═══${NC}\n"
 
-    queue_experiment_remaining_seeds \
-        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 10-10 Baseline (Local)"
-
-    queue_experiment_remaining_seeds \
-        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local"
-
-    # ── CIFAR-100 50-10 — paper reproducibility (5 seeds) ──
-    # Baseline local seed 1993 já executado; ANT best seed 1993 NÃO foi executado ainda
-    echo -e "${YELLOW}═══ CIFAR-100 50-10 — Paper Reproducibility ═══${NC}\n"
-
-    queue_experiment_remaining_seeds \
-        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
-        "CIFAR-100 50-10 Baseline (Local)"
-
-    # 50-10 ANT best (β=0.5, m=0.5) — seed 1993 ainda não executado → 5 seeds completos
-    queue_experiment_5seeds \
+    queue_experiment \
         "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local"
+        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local" \
+        1993
+
+    # ── CIFAR-100 seeds 1994-1997 — todos os experimentos por seed ──
+    for seed in 1994 1995 1996 1997; do
+        echo -e "${YELLOW}═══ CIFAR-100 seed ${seed} — todos os experimentos ═══${NC}\n"
+
+        queue_experiment \
+            "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
+            "CIFAR-100 10-10 Baseline (Local)" \
+            $seed
+
+        queue_experiment \
+            "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+            "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local" \
+            $seed
+
+        queue_experiment \
+            "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+            "CIFAR-100 50-10 Baseline (Local)" \
+            $seed
+
+        queue_experiment \
+            "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+            "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local" \
+            $seed
+    done
 
 elif [ "$MACHINE" = "fera" ]; then
 

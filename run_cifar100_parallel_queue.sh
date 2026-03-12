@@ -116,35 +116,46 @@ echo -e "${GREEN}═════════════════════
 echo -e "${BLUE} Total: ${EXP_TOTAL} experimentos${NC}"
 echo -e "${BLUE} Requisito: >= ${MIN_FREE_MB} MB livres na GPU antes de cada run${NC}\n"
 echo -e "${BLUE}Ordem de execução:${NC}"
-echo -e "   1-4  : CIFAR-100 10-10 Baseline Local  — seeds 1994, 1995, 1996, 1997"
-echo -e "   5-8  : CIFAR-100 10-10 ANT β=0.5 m=0.5 — seeds 1994, 1995, 1996, 1997"
-echo -e "   9-12 : CIFAR-100 50-10 Baseline Local  — seeds 1994, 1995, 1996, 1997"
-echo -e "   13-17: CIFAR-100 50-10 ANT β=0.5 m=0.5 — seeds 1993, 1994, 1995, 1996, 1997"
+echo -e "     1  : CIFAR-100 50-10 ANT β=0.5 m=0.5 — seed 1993 (único pendente)"
+echo -e "   2-5  : CIFAR-100 10-10 Baseline Local  — seed 1994 → 10-10 ANT → 50-10 Baseline → 50-10 ANT"
+echo -e "   6-9  : mesmos 4 experimentos — seed 1995"
+echo -e "  10-13 : mesmos 4 experimentos — seed 1996"
+echo -e "  14-17 : mesmos 4 experimentos — seed 1997"
 echo -e ""
 log_progress ">> Iniciando fila CIFAR-100 paralela  (total: $EXP_TOTAL)"
 
-# ── CIFAR-100 10-10 ── seed 1993 já executado → apenas 1994-1997
-echo -e "${YELLOW}═══ CIFAR-100 10-10 (seeds 1994-1997) ═══${NC}\n"
+# ── seed 1993 — apenas 50-10 ANT (restante já executado) ──
+echo -e "${YELLOW}═══ seed 1993 — 50-10 ANT (único config pendente) ═══${NC}\n"
 
-queue_experiment_remaining_seeds \
-    "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
-    "CIFAR-100 10-10 Baseline Local"
-
-queue_experiment_remaining_seeds \
-    "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-    "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local"
-
-# ── CIFAR-100 50-10 ── baseline seed 1993 já executado; ANT best nunca executado
-echo -e "${YELLOW}═══ CIFAR-100 50-10 ═══${NC}\n"
-
-queue_experiment_remaining_seeds \
-    "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
-    "CIFAR-100 50-10 Baseline Local"
-
-# ANT 50-10: seed 1993 nunca foi executado → 5 seeds completos
-queue_experiment_5seeds \
+queue_experiment \
     "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-    "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local"
+    "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local" \
+    1993
+
+# ── seeds 1994-1997 — todos os experimentos por seed ──
+for seed in 1994 1995 1996 1997; do
+    echo -e "${YELLOW}═══ Seed ${seed} — todos os experimentos ═══${NC}\n"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline Local" \
+        $seed
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local" \
+        $seed
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline Local" \
+        $seed
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local" \
+        $seed
+done
 
 # ═══════════════════════════════════════════════════════════
 log_progress "[OK] Fila CIFAR-100 concluída! ($EXP_TOTAL/$EXP_TOTAL)"
