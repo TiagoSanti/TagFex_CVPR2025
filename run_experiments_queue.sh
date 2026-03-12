@@ -169,22 +169,29 @@ queue_experiment() {
     sleep 5
 }
 
-# Roda 5 seeds (1993-1997) para uma config — resultados do paper
+# Seeds selecionadas por análise de diversidade (distância L2 máxima entre curvas NME):
+#   Usadas: 1993 (médio), 1995 (máximo), 1996 (mínimo)  → soma L2 pairwise = 5.96
+#   Diferidas: 1994 (próxima a 1993) e 1997 (próxima a 1996)
+SEEDS_ACTIVE=(1995 1996)        # seeds adicionais além de 1993
+SEEDS_ALL=(1993 1995 1996)      # todas as seeds ativas
+SEEDS_DEFERRED=(1994 1997)      # diferidas para validação futura
+
+# Roda as 3 seeds ativas (1993, 1995, 1996) para uma config
 # Arguments: 1=config_file  2=description_base
-queue_experiment_5seeds() {
+queue_experiment_3seeds() {
     local config_file=$1
     local description=$2
-    for seed in 1993 1994 1995 1996 1997; do
+    for seed in "${SEEDS_ALL[@]}"; do
         queue_experiment "$config_file" "$description" "$seed"
     done
 }
 
-# Roda apenas seeds 1994-1997 (quando seed 1993 já foi executado)
+# Roda apenas as seeds adicionais ativas (1995, 1996) — quando seed 1993 já foi executado
 # Arguments: 1=config_file  2=description_base
 queue_experiment_remaining_seeds() {
     local config_file=$1
     local description=$2
-    for seed in 1994 1995 1996 1997; do
+    for seed in "${SEEDS_ACTIVE[@]}"; do
         queue_experiment "$config_file" "$description" "$seed"
     done
 }
@@ -199,21 +206,20 @@ if [ "$MACHINE" = "quati" ]; then
     # quati · RTX 4090 24GB · single GPU
     # Datasets que cabem em 24GB: Tiny ImageNet, CIFAR-100
     # ─────────────────────────────────────────────────────
+    # Seeds ativas: 1993 (base), 1995, 1996  (diferidas: 1994, 1997)
     # 4 Tiny ImageNet (seed 1993)
-    # + 4×2 CIFAR-100 10-10 (seeds 1994-1997) = 8
-    # + 4   CIFAR-100 50-10 baseline (seeds 1994-1997) = 4
-    # + 5   CIFAR-100 50-10 ANT (seeds 1993-1997) = 5
-    # Total: 4 + 8 + 4 + 5 = 21
-    EXP_TOTAL=21
+    # + 1   CIFAR-100 50-10 ANT seed 1993 (único pendente)
+    # + 2×4 CIFAR-100 configs × seeds 1995,1996 = 8
+    # Total: 4 + 1 + 8 = 13
+    EXP_TOTAL=13
     log_progress " Total de experimentos nesta fila: $EXP_TOTAL"
     echo -e "${BLUE} Total de experimentos: ${EXP_TOTAL}${NC}\n"
     echo -e "${BLUE}Ordem de execução:${NC}"
     echo -e "   1-4  : Tiny ImageNet 20-20 (baseline local/global + ANT local/global) — seed 1993"
     echo -e "     5  : CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seed 1993 (único CIFAR pendente)"
-    echo -e "   6-9  : todos os 4 CIFAR configs — seed 1994"
-    echo -e "  10-13 : todos os 4 CIFAR configs — seed 1995"
-    echo -e "  14-17 : todos os 4 CIFAR configs — seed 1996"
-    echo -e "  18-21 : todos os 4 CIFAR configs — seed 1997"
+    echo -e "   6-9  : todos os 4 CIFAR configs — seed 1995"
+    echo -e "  10-13 : todos os 4 CIFAR configs — seed 1996"
+    echo -e "   [diferidas: seeds 1994 e 1997]"
     echo -e ""
 
     # ── Tiny ImageNet 20-20 ── seed 1993 (primeira execução, exploratório)
@@ -244,7 +250,7 @@ if [ "$MACHINE" = "quati" ]; then
         1993
 
     # ── CIFAR-100 seeds 1994-1997 — todos os experimentos por seed ──
-    for seed in 1994 1995 1996 1997; do
+    for seed in "${SEEDS_ACTIVE[@]}"; do
         echo -e "${YELLOW}═══ CIFAR-100 seed ${seed} — todos os experimentos ═══${NC}\n"
 
         queue_experiment \

@@ -52,10 +52,11 @@ log_progress() {
 
 # ── Contadores ──
 EXP_COUNTER=0
-# CIFAR-100 10-10: baseline 4 seeds + ANT 4 seeds = 8
-# CIFAR-100 50-10: baseline 4 seeds + ANT 5 seeds = 9
-# Total: 17
-EXP_TOTAL=17
+# Seeds ativas: 1993 (base), 1995, 1996  (diferidas: 1994, 1997)
+# CIFAR-100 10-10: baseline 2 seeds + ANT 2 seeds = 4
+# CIFAR-100 50-10: baseline 2 seeds + ANT (1993)+2 seeds = 5
+# Total: 9
+EXP_TOTAL=9
 
 queue_experiment() {
     local config_file=$1
@@ -92,18 +93,25 @@ queue_experiment() {
     sleep 5
 }
 
+# Seeds selecionadas por análise de diversidade (distância L2 máxima entre curvas NME):
+#   Usadas: 1993 (médio), 1995 (máximo), 1996 (mínimo)  → soma L2 pairwise = 5.96
+#   Diferidas: 1994 (próxima a 1993) e 1997 (próxima a 1996)
+SEEDS_ACTIVE=(1995 1996)        # seeds adicionais além de 1993
+SEEDS_ALL=(1993 1995 1996)      # todas as seeds ativas (incluindo base)
+SEEDS_DEFERRED=(1994 1997)      # diferidas para validação futura
+
 queue_experiment_remaining_seeds() {
     local config_file=$1
     local description=$2
-    for seed in 1994 1995 1996 1997; do
+    for seed in "${SEEDS_ACTIVE[@]}"; do
         queue_experiment "$config_file" "$description" "$seed"
     done
 }
 
-queue_experiment_5seeds() {
+queue_experiment_3seeds() {
     local config_file=$1
     local description=$2
-    for seed in 1993 1994 1995 1996 1997; do
+    for seed in "${SEEDS_ALL[@]}"; do
         queue_experiment "$config_file" "$description" "$seed"
     done
 }
@@ -117,10 +125,9 @@ echo -e "${BLUE} Total: ${EXP_TOTAL} experimentos${NC}"
 echo -e "${BLUE} Requisito: >= ${MIN_FREE_MB} MB livres na GPU antes de cada run${NC}\n"
 echo -e "${BLUE}Ordem de execução:${NC}"
 echo -e "     1  : CIFAR-100 50-10 ANT β=0.5 m=0.5 — seed 1993 (único pendente)"
-echo -e "   2-5  : CIFAR-100 10-10 Baseline Local  — seed 1994 → 10-10 ANT → 50-10 Baseline → 50-10 ANT"
-echo -e "   6-9  : mesmos 4 experimentos — seed 1995"
-echo -e "  10-13 : mesmos 4 experimentos — seed 1996"
-echo -e "  14-17 : mesmos 4 experimentos — seed 1997"
+echo -e "   2-5  : CIFAR-100 10-10 Baseline → 10-10 ANT → 50-10 Baseline → 50-10 ANT — seed 1995"
+echo -e "   6-9  : mesmos 4 experimentos — seed 1996"
+echo -e "   [diferidas: seeds 1994 e 1997]"
 echo -e ""
 log_progress ">> Iniciando fila CIFAR-100 paralela  (total: $EXP_TOTAL)"
 
@@ -133,7 +140,7 @@ queue_experiment \
     1993
 
 # ── seeds 1994-1997 — todos os experimentos por seed ──
-for seed in 1994 1995 1996 1997; do
+for seed in "${SEEDS_ACTIVE[@]}"; do
     echo -e "${YELLOW}═══ Seed ${seed} — todos os experimentos ═══${NC}\n"
 
     queue_experiment \
