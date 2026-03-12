@@ -32,7 +32,11 @@ class LoguruLogger:
             logfile_prefix = self.configs.get("output_file_prefix", "loguru")
 
             filename = f"{logfile_prefix}_stdlog{rank}.log"
-            self.logger.add(log_dir / filename, level="INFO")
+            self.logger.add(
+                log_dir / filename,
+                level="INFO",
+                filter=lambda r: not r["extra"].get("sim_debug", False),
+            )
 
             if self.configs.get("debug"):
                 debug_filename = f"{logfile_prefix}_debuglog{rank}.log"
