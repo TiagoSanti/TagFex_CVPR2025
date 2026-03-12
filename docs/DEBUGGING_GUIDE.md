@@ -19,27 +19,39 @@ Adicione os seguintes parâmetros ao seu arquivo de configuração YAML:
 # Habilitar debug de similaridade
 debug_similarity: true
 
-# Tamanho do batch para debug (cria matrizes 16x16)
-debug_similarity_batch_size: 16
+# Controle de sampling: 1 batch por época (uniforme ao longo do treino)
+debug_similarity_epoch_interval: 1    # log a cada N épocas (1 = toda época)
+debug_similarity_batches_per_epoch: 1 # número de batches a registar por época selecionada
 ```
 
-### 2. Exemplo Completo
+O batch de debug usa o **mesmo batch size do treino real** (sem override), garantindo que as matrizes reflitam o comportamento real do modelo.
 
-Veja o arquivo `configs/exps/debug_similarity_example.yaml` para uma configuração completa.
+### 2. Configs de Referência
+
+Dois arquivos de configuração prontos para experimentos de debug em CIFAR-100 10-10:
+
+| Config                                                                              | Descrição                           |
+| ----------------------------------------------------------------------------------- | ----------------------------------- |
+| `configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_debug_resnet18.yaml` | ANT β=0.5, margin=0.5, anchor local |
+| `configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml`              | Baseline InfoNCE puro, anchor local |
 
 ### 3. Executar Experimento
 
 ```bash
-python main.py --config configs/exps/debug_similarity_example.yaml
+# ANT com debug
+python main.py --config configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_debug_resnet18.yaml
+
+# Baseline com debug
+python main.py --config configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml
 ```
 
 ## Outputs Gerados
 
-Quando `debug_similarity: true`, três tipos de outputs são criados no diretório de logs:
+Quando `debug_similarity: true`, dois tipos de outputs são criados no diretório de logs:
 
 ### 1. `similarity_debug.log`
 
-Arquivo de texto com análise detalhada de cada batch:
+Arquivo de texto com análise detalhada de cada batch selecionado:
 
 ```
 ================================================================================
@@ -69,30 +81,33 @@ Local max per anchor: min=0.4523, max=0.8912, mean=0.6234
 - **Above threshold**: Amostras que violam a margem (contribuem para loss ANT)
 - **Below threshold**: Amostras bem separadas (não contribuem significativamente)
 
-### 2. `similarity_heatmaps/`
+### 2. `exp_debug0.log`
 
-Diretório com visualizações em PNG de cada matriz de similaridade:
+Log compacto com estatísticas por batch (todas as épocas, todos os batches):
 
-- **Nome**: `sim_heatmap_T{task}_E{epoch}_B{batch}_{type}.png`
-- **Formato**: Heatmap colorido com valores anotados
-- **Elementos visuais**:
-  - Cores: Verde (alta similaridade) → Amarelo → Vermelho (baixa similaridade)
-  - Valores numéricos em cada célula
-  - Linhas azuis tracejadas separando pares originais/aumentados
-  - Diagonal destacada (auto-similaridade = 1.0)
+- `[T E B] Loss components: ...` — componentes individuais da loss (NCE, ANT, total)
+- `[T E B] ANT distance stats: ...` — estatísticas de gap e violações
+- `[T E B] Contrastive stats: ...` — pos_mean, neg_mean, gap médio
 
-**Interpretação do Heatmap:**
-- Diagonal principal: sempre 1.0 (auto-similaridade)
-- Valores próximos à diagonal: negativos dentro do batch
-- Valores no quadrante oposto: pares positivos (augmentations)
-- Cores quentes próximas ao threshold: violações de margem
+Este log é a fonte do **Training Overview** no Similarity Viewer.
 
 ### 3. Logs Padrão
 
-Os logs normais (`loguru_stdlog0.log`, `loguru_debuglog0.log`) continuam contendo:
-- Estatísticas básicas de contrastive learning
-- Componentes da loss
-- Métricas de treinamento
+Os logs normais (`exp_stdlog0.log`, `exp_gistlog.log`) contêm apenas mensagens de nível INFO/SUCCESS — mensagens de debug de similaridade são excluídas automaticamente via filtro Loguru (bind `sim_debug=True`).
+
+## Similarity Viewer
+
+A ferramenta de análise interativa está em `analysis/scripts/similarity_viewer.py`:
+
+```bash
+streamlit run analysis/scripts/similarity_viewer.py
+```
+
+Duas tabs:
+- **Training Overview** — curvas de loss, gap, violations por época a partir do `exp_debug0.log`
+- **Batch Inspector** — heatmap interativo, stats por âncora e evolução de loss para cada entrada do `similarity_debug.log`
+
+O Batch Inspector suporta navegação por Task/Epoch/Batch com teclado (← → ↑ ↓).
 
 ## Análise dos Resultados
 
@@ -141,15 +156,28 @@ ant_max_global: false
 - Todos valores vermelhos → modelo não está aprendendo
 - Pares positivos em vermelho → augmentations muito fortes
 
+## Estimativa de Armazenamento
+
+Com `debug_similarity_epoch_interval: 1` e `debug_similarity_batches_per_epoch: 1` (1 batch por época):
+
+| Arquivo                   | Estimativa (CIFAR-100 10-10, bs=128) |
+| ------------------------- | ------------------------------------ |
+| `similarity_debug.log`    | ~3.5 GB                              |
+| `exp_debug0.log`          | ~855 MB                              |
+| `exp_stdlog0.log`         | ~0 MB (filtrado)                     |
+| **Total por experimento** | **~4.4 GB**                          |
+
+Para 2 experimentos (ANT + baseline): ~8.8 GB.
+
 ## Ajuste de Hiperparâmetros
 
 ### Margin (ant_margin)
 
 - **Muito pequeno** (< 0.05): Muitas violações, loss alta
-- **Ideal** (0.1 - 0.3): 10-30% de violações
-- **Muito grande** (> 0.5): Poucas/nenhuma violação, loss → 0
+- **Ideal** (0.3 - 0.6): 10-30% de violações
+- **Muito grande** (> 0.8): Poucas/nenhuma violação, loss → 0
 
-**Como verificar**: Olhe "violation_pct" no log.
+**Como verificar**: Olhe "violation_pct" no log ou no Training Overview.
 
 ### Beta (ant_beta)
 
@@ -163,32 +191,24 @@ Controla o peso da loss ANT:
 
 ## Troubleshooting
 
-### Matrizes muito grandes (> 16x16)
+### Log de similaridade vazio
 
-**Solução**: Reduza `debug_similarity_batch_size`:
-
-```yaml
-debug_similarity_batch_size: 8  # Matrizes 8x8
-```
+Verificar se `debug_similarity: true` está no YAML e se o diretório de logs tem permissão de escrita.
 
 ### Muitos arquivos de heatmap
 
-Os heatmaps são salvos para **cada batch**. Em um epoch típico com 391 batches, isso gera 391 imagens.
-
-**Solução 1**: Limitar debug aos primeiros batches (modificar código para condicional)
-
-**Solução 2**: Analisar apenas primeiros epochs:
-
-```yaml
-debug: true  # Reduz para 5 epochs
-```
+Os heatmaps em PNG foram removidos do pipeline de debug. O Batch Inspector no Similarity Viewer renderiza os heatmaps interativamente a partir do `similarity_debug.log`, sem gerar ficheiros PNG.
 
 ### Debug muito lento
 
-**Solução**: 
-1. Use `debug_similarity_batch_size: 8` (menor)
-2. Rode debug apenas no primeiro task
-3. Desabilite após entender o comportamento
+Aumentar `debug_similarity_epoch_interval` para amostrar menos épocas:
+
+```yaml
+debug_similarity_epoch_interval: 10  # só log a cada 10 épocas
+debug_similarity_batches_per_epoch: 1
+```
+
+As primeiras e últimas épocas de cada task são sempre incluídas independentemente do intervalo.
 
 ## Exemplos de Uso
 
@@ -196,66 +216,53 @@ debug: true  # Reduz para 5 epochs
 
 ```yaml
 debug_similarity: true
-debug_similarity_batch_size: 16
+debug_similarity_epoch_interval: 1
+debug_similarity_batches_per_epoch: 1
 ant_beta: 0.5
-ant_margin: 0.1
-ant_max_global: true
-init_epochs: 5  # Apenas alguns epochs para testar
+ant_margin: 0.5
+ant_max_global: false
 ```
 
-**O que verificar:**
-- Loss ANT > 0 quando ant_beta > 0
-- Violações de margem presentes mas não excessivas
-- Heatmaps mostram gradiente de cores
+**O que verificar no Similarity Viewer:**
+- `violation_pct` no Training Overview — deve ser 10–30%
+- Heatmap no Batch Inspector — pares positivos em verde, maioria dos negativos em vermelho
+- Loss ANT×β positiva e decrescendo ao longo das épocas
 
-### Caso 2: Comparar estratégias de normalização
+### Caso 2: Comparar ANT vs Baseline
 
-Execute dois experimentos lado a lado:
+Use os dois configs de debug prontos:
 
 ```bash
-# Experimento Global
-python main.py --config configs/debug_global.yaml
+# ANT
+python main.py --config configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_debug_resnet18.yaml
 
-# Experimento Local
-python main.py --config configs/debug_local.yaml
+# Baseline
+python main.py --config configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml
 ```
 
-**Compare os logs:**
-```bash
-# Verificar distribuição de violations
-grep "violation_pct" logs/exp_global/similarity_debug.log
-grep "violation_pct" logs/exp_local/similarity_debug.log
-```
+Depois abra o Similarity Viewer apontando para cada diretório de logs.
 
-### Caso 3: Otimizar margin
+### Caso 3: Ajustar margin
 
-Teste diferentes valores:
-
-```yaml
-# configs/debug_margin_test.yaml
-ant_margin: 0.05  # Teste 0.05, 0.1, 0.2, 0.3, 0.5
-```
-
-**Analise:** Relação entre margin e violation_pct no log.
+Mude `ant_margin` no config ANT de debug (0.3, 0.5, 0.7) e compare o `violation_pct` médio no Training Overview.
 
 ## Limitações
 
-1. **Performance**: Debug adiciona overhead (~10-20% mais lento)
-2. **Espaço em disco**: Heatmaps podem ocupar muito espaço
-3. **Batch size**: Reduzir batch pode afetar convergência
-4. **Apenas treinamento**: Debug não funciona durante avaliação
+1. **Performance**: Debug adiciona overhead (~10-20% mais lento) devido ao log das matrizes
+2. **Espaço em disco**: ~4.4 GB por experimento com configuração padrão (1 batch/época, bs=128)
+3. **Apenas treinamento**: Debug não funciona durante avaliação
 
 ## Dicas
 
-1. **Sempre verifique os primeiros batches**: Comportamento inicial é indicativo
-2. **Compare heatmaps entre epochs**: Deve ver evolução (mais separação)
-3. **Use grep para extrair estatísticas**: `grep "violation_pct" similarity_debug.log | awk '{print $NF}'`
-4. **Desabilite após validação**: Não use em produção/experimentos finais
+1. **Use o Similarity Viewer** para navegar — muito mais eficiente do que ler os logs directamente
+2. **Compare Training Overview entre experimentos** para ver o efeito do ANT nas curvas de loss
+3. **Use `debug_similarity_epoch_interval`** para reduzir o volume de dados se necessário
+4. **Desabilite após validação**: `debug_similarity: false` para experimentos de produção
 
 ## Próximos Passos
 
 Após validar o comportamento:
 
 1. Desabilite debug: `debug_similarity: false`
-2. Restaure batch size normal
-3. Execute experimento completo com configurações otimizadas
+2. Execute experimento completo com o config não-debug correspondente
+3. Use `analysis/scripts/similarity_viewer.py` para análise post-hoc se necessário
