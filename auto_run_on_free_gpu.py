@@ -24,7 +24,8 @@ import re
 
 class GPUMonitor:
     def __init__(
-        self, threshold=95.0, memory_threshold=None, min_free_mb=None, interval=30, verbose=True
+        self, threshold=95.0, memory_threshold=None, min_free_mb=None, interval=30,
+        verbose=True, allowed_gpu_ids=None
     ):
         """
         Args:
@@ -34,12 +35,14 @@ class GPUMonitor:
                          paralela sem depender do estado "idle" da GPU (None = ignorar)
             interval: Intervalo entre checagens (segundos)
             verbose: Se True, mostra mensagens detalhadas
+            allowed_gpu_ids: Lista de IDs de GPUs permitidas (None = todas)
         """
         self.threshold = threshold
         self.memory_threshold = memory_threshold
         self.min_free_mb = min_free_mb
         self.interval = interval
         self.verbose = verbose
+        self.allowed_gpu_ids = set(allowed_gpu_ids) if allowed_gpu_ids else None
         self.running = True
 
         # Registrar handler para Ctrl+C
@@ -149,6 +152,9 @@ class GPUMonitor:
             return []
 
         free_ids = [gpu["id"] for gpu in gpus if gpu["free"]]
+        # Filtrar pelas GPUs permitidas, se especificado
+        if self.allowed_gpu_ids is not None:
+            free_ids = [gid for gid in free_ids if gid in self.allowed_gpu_ids]
         if len(free_ids) >= count:
             # somente retornar as 'count' primeiras GPUs livres para consistência
             return free_ids[:count]
@@ -476,6 +482,14 @@ Exemplos:
     )
 
     parser.add_argument(
+        "--allowed-gpu-ids",
+        type=int,
+        nargs="+",
+        default=None,
+        help="IDs das GPUs permitidas (ex: --allowed-gpu-ids 0 1). Se None, usa todas as GPUs.",
+    )
+
+    parser.add_argument(
         "--interval",
         "-i",
         type=int,
@@ -525,6 +539,7 @@ Exemplos:
         min_free_mb=args.min_free_mb,
         interval=args.interval,
         verbose=not args.quiet,
+        allowed_gpu_ids=args.allowed_gpu_ids,
     )
 
     # Aguardar GPUs disponíveis
