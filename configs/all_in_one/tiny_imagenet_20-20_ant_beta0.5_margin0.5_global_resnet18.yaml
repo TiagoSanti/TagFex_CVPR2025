@@ -30,7 +30,6 @@ ant_max_global: true    # Global anchor (isolates anchor type parameter)
 
 # Similarity Matrix Debugging
 debug_similarity: false
-debug_similarity_batch_size: 16
 
 backbone_configs:
   name: resnet18

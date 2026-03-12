@@ -7,7 +7,8 @@ import torch.utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+
+matplotlib.use("Agg")  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
@@ -75,14 +76,6 @@ class TagFex(HerdingIndicesLearner):
             "world_size"
         ]
         torch.distributed.barrier()
-
-    def _should_use_debug_batch(self):
-        """Check if we should use reduced batch size for similarity debug."""
-        return self.configs.get("debug_similarity", False)
-
-    def _get_debug_batch_size(self):
-        """Get batch size for similarity debugging (creates 16x16 matrices)."""
-        return self.configs.get("debug_similarity_batch_size", 16)
 
     def _model_to_ddp(self):
         self.network = nn.parallel.DistributedDataParallel(
@@ -193,14 +186,7 @@ class TagFex(HerdingIndicesLearner):
             new_indices = np.concatenate((task_train.indices, memory_indices))
             task_train.indices = new_indices
 
-            # Adjust batch size for similarity debugging if enabled
             trainloader_params = self.configs["trainloader_params"].copy()
-            if self._should_use_debug_batch():
-                debug_batch_size = self._get_debug_batch_size()
-                self.print_logger.info(
-                    f"Debug mode: Using reduced batch size {debug_batch_size} for similarity analysis"
-                )
-                trainloader_params["batch_size"] = debug_batch_size
 
             # get dataloaders
             if self.configs["ffcv"]:
@@ -384,11 +370,30 @@ class TagFex(HerdingIndicesLearner):
             # self.print_logger.debug(f'rank {self.distributed["rank"]}, batch {batch}, cls_loss: {cls_loss}')
 
             embedding = out["embedding"]
-            
-            # Get debug parameters if similarity debugging is enabled
-            debug_logger = getattr(self, 'similarity_debug_logger', None) if self.configs.get("debug_similarity", False) else None
-            heatmap_dir = getattr(self, 'heatmap_dir', None) if self.configs.get("debug_similarity", False) else None
-            
+
+            # Get debug parameters if similarity debugging is enabled, gated by
+            # epoch-interval and max-batches-per-epoch sampling controls.
+            debug_logger = None
+            heatmap_dir = None
+            if self.configs.get("debug_similarity", False):
+                _interval = self.configs.get("debug_similarity_epoch_interval", 1)
+                _max_batches = self.configs.get(
+                    "debug_similarity_batches_per_epoch", 9999
+                )
+                _cur_task = self.state["cur_task"]
+                _cur_epoch = self.state["cur_epoch"]
+                _max_epoch = self.configs.get(
+                    "init_epochs" if _cur_task == 1 else "inc_epochs", 200
+                )
+                _epoch_sampled = (
+                    _cur_epoch == 1
+                    or _cur_epoch % _interval == 0
+                    or _cur_epoch == _max_epoch
+                )
+                if _epoch_sampled and (batch + 1) <= _max_batches:
+                    debug_logger = getattr(self, "similarity_debug_logger", None)
+                    heatmap_dir = getattr(self, "heatmap_dir", None)
+
             infonce_loss = infoNCE_loss(
                 embedding,
                 self.configs["infonce_temp"],
@@ -616,12 +621,12 @@ class TagFex(HerdingIndicesLearner):
         """Initialize separate logger for similarity matrix debugging."""
         if not self.configs.get("debug_similarity", False):
             return
-        
+
         from loguru import logger
-        
+
         log_dir = Path(self.configs.get("log_dir"))
         debug_log_path = log_dir / "similarity_debug.log"
-        
+
         # Add new handler for similarity debugging and store the handler ID
         self.similarity_debug_handler_id = logger.add(
             debug_log_path,
@@ -629,14 +634,16 @@ class TagFex(HerdingIndicesLearner):
             format="{time:YYYY-MM-DD HH:mm:ss} | {message}",
             enqueue=True,
         )
-        
-        self.similarity_debug_logger = logger
+
+        self.similarity_debug_logger = logger.bind(sim_debug=True)
         self.print_logger.info(f"Similarity debug logging to: {debug_log_path}")
-        
+
         # Create directory for heatmaps
         self.heatmap_dir = log_dir / "similarity_heatmaps"
         self.heatmap_dir.mkdir(parents=True, exist_ok=True)
-        self.print_logger.info(f"Similarity heatmaps will be saved to: {self.heatmap_dir}")
+        self.print_logger.info(
+            f"Similarity heatmaps will be saved to: {self.heatmap_dir}"
+        )
 
     def _adjust_log_dir_with_loss_params(self):
         """Adjust log directory name based on loss parameters (ANT, contrast factors, etc.)"""
@@ -1109,12 +1116,12 @@ def _debug_similarity_matrices(
 ):
     """
     Debug and visualize similarity matrices with detailed analysis.
-    
+
     This function creates:
     1. Text logs with matrix values, highlighting anchors and margin violations
     2. Heatmap visualizations showing similarity patterns
     3. Statistical summaries
-    
+
     Args:
         cos_sim: Cosine similarity matrix [N, N]
         ant_margin: Margin threshold for ANT
@@ -1128,27 +1135,29 @@ def _debug_similarity_matrices(
     """
     import matplotlib.pyplot as plt
     import seaborn as sns
-    
+
     # Convert to numpy for easier manipulation
     cos_sim_np = cos_sim.detach().cpu().numpy()
     N = cos_sim_np.shape[0]
     batch_size = N // 2
-    
+
     # Context string for logging
     context = f"T{task}_E{epoch}_B{batch}_{log_prefix}"
-    
+
     debug_logger.info(f"\n{'='*80}")
     debug_logger.info(f"SIMILARITY MATRIX DEBUG - {context}")
     debug_logger.info(f"Matrix shape: {cos_sim_np.shape}")
-    debug_logger.info(f"ANT margin: {ant_margin}, Max strategy: {'Global' if max_global else 'Local'}")
+    debug_logger.info(
+        f"ANT margin: {ant_margin}, Max strategy: {'Global' if max_global else 'Local'}"
+    )
     debug_logger.info(f"{'='*80}\n")
-    
+
     # Split into first half (anchors) for analysis
     cos_sim_anchors = cos_sim_np[:batch_size, :batch_size]
-    
+
     # Mask diagonal (self-similarity)
     mask_diag = np.eye(batch_size, dtype=bool)
-    
+
     # Compute max for each anchor (or global)
     if max_global:
         global_max = np.max(cos_sim_anchors[~mask_diag])
@@ -1157,18 +1166,20 @@ def _debug_similarity_matrices(
         debug_logger.info(f"Threshold (max - margin): {threshold:.4f}\n")
     else:
         local_maxs = np.max(np.where(mask_diag, -np.inf, cos_sim_anchors), axis=1)
-        debug_logger.info(f"Local max per anchor: min={local_maxs.min():.4f}, "
-                         f"max={local_maxs.max():.4f}, mean={local_maxs.mean():.4f}\n")
-    
+        debug_logger.info(
+            f"Local max per anchor: min={local_maxs.min():.4f}, "
+            f"max={local_maxs.max():.4f}, mean={local_maxs.mean():.4f}\n"
+        )
+
     # Analyze each anchor (show first 8 for readability)
     num_show = min(8, batch_size)
     for anchor_idx in range(num_show):
         debug_logger.info(f"--- Anchor {anchor_idx} ---")
-        
+
         # Get similarities for this anchor (excluding self)
         sims = cos_sim_anchors[anchor_idx].copy()
         sims[anchor_idx] = np.nan  # Mark self-similarity as NaN
-        
+
         # Compute threshold for this anchor
         if max_global:
             anchor_threshold = threshold
@@ -1176,14 +1187,14 @@ def _debug_similarity_matrices(
         else:
             anchor_max = local_maxs[anchor_idx]
             anchor_threshold = anchor_max - ant_margin
-        
+
         # Find positive pair (should be at batch_size + anchor_idx)
         pos_sim = cos_sim_np[anchor_idx, batch_size + anchor_idx]
-        
+
         # Categorize values
         above_threshold = []
         below_threshold = []
-        
+
         for neg_idx in range(batch_size):
             if neg_idx == anchor_idx:
                 continue
@@ -1192,12 +1203,18 @@ def _debug_similarity_matrices(
                 above_threshold.append((neg_idx, sim_val))
             else:
                 below_threshold.append((neg_idx, sim_val))
-        
+
         # Log anchor info
-        debug_logger.info(f"  Positive pair (idx {batch_size + anchor_idx}): {pos_sim:.4f}")
-        debug_logger.info(f"  Anchor max: {anchor_max:.4f}, Threshold: {anchor_threshold:.4f}")
-        debug_logger.info(f"  Above threshold: {len(above_threshold)}, Below threshold: {len(below_threshold)}")
-        
+        debug_logger.info(
+            f"  Positive pair (idx {batch_size + anchor_idx}): {pos_sim:.4f}"
+        )
+        debug_logger.info(
+            f"  Anchor max: {anchor_max:.4f}, Threshold: {anchor_threshold:.4f}"
+        )
+        debug_logger.info(
+            f"  Above threshold: {len(above_threshold)}, Below threshold: {len(below_threshold)}"
+        )
+
         # Show values above threshold (potential margin violations)
         if above_threshold:
             above_threshold.sort(key=lambda x: x[1], reverse=True)
@@ -1205,7 +1222,7 @@ def _debug_similarity_matrices(
             for neg_idx, sim_val in above_threshold[:5]:  # Show top 5
                 gap = sim_val - anchor_threshold
                 debug_logger.info(f"    idx {neg_idx}: {sim_val:.4f} (gap: +{gap:.4f})")
-        
+
         # Show some values below threshold
         if below_threshold and len(below_threshold) > 0:
             below_threshold.sort(key=lambda x: x[1], reverse=True)
@@ -1213,27 +1230,35 @@ def _debug_similarity_matrices(
             for neg_idx, sim_val in below_threshold[:3]:  # Show top 3
                 gap = anchor_threshold - sim_val
                 debug_logger.info(f"    idx {neg_idx}: {sim_val:.4f} (gap: -{gap:.4f})")
-        
+
         debug_logger.info("")
-    
+
     # Overall statistics
     all_neg_sims = cos_sim_anchors[~mask_diag].flatten()
     pos_sims = np.array([cos_sim_np[i, batch_size + i] for i in range(batch_size)])
-    
+
     debug_logger.info(f"--- Overall Statistics ---")
-    debug_logger.info(f"Positive pairs: min={pos_sims.min():.4f}, max={pos_sims.max():.4f}, "
-                     f"mean={pos_sims.mean():.4f}, std={pos_sims.std():.4f}")
-    debug_logger.info(f"Negative pairs: min={all_neg_sims.min():.4f}, max={all_neg_sims.max():.4f}, "
-                     f"mean={all_neg_sims.mean():.4f}, std={all_neg_sims.std():.4f}")
-    debug_logger.info(f"Gap (pos_mean - neg_mean): {pos_sims.mean() - all_neg_sims.mean():.4f}")
-    
+    debug_logger.info(
+        f"Positive pairs: min={pos_sims.min():.4f}, max={pos_sims.max():.4f}, "
+        f"mean={pos_sims.mean():.4f}, std={pos_sims.std():.4f}"
+    )
+    debug_logger.info(
+        f"Negative pairs: min={all_neg_sims.min():.4f}, max={all_neg_sims.max():.4f}, "
+        f"mean={all_neg_sims.mean():.4f}, std={all_neg_sims.std():.4f}"
+    )
+    debug_logger.info(
+        f"Gap (pos_mean - neg_mean): {pos_sims.mean() - all_neg_sims.mean():.4f}"
+    )
+
     if max_global:
         violations = (all_neg_sims >= threshold).sum()
-        debug_logger.info(f"Margin violations: {violations} / {len(all_neg_sims)} "
-                         f"({100 * violations / len(all_neg_sims):.2f}%)")
-    
+        debug_logger.info(
+            f"Margin violations: {violations} / {len(all_neg_sims)} "
+            f"({100 * violations / len(all_neg_sims):.2f}%)"
+        )
+
     debug_logger.info(f"\n{'='*80}\n")
-    
+
     # Log the complete similarity matrix in text format
     _log_similarity_matrix(
         cos_sim_np=cos_sim_np,
@@ -1244,7 +1269,7 @@ def _debug_similarity_matrices(
         local_maxs=local_maxs if not max_global else None,
         threshold=threshold if max_global else None,
     )
-    
+
     # Create and save heatmap
     # _save_similarity_heatmap(
     #     cos_sim_np=cos_sim_np,
@@ -1253,6 +1278,7 @@ def _debug_similarity_matrices(
     #     ant_margin=ant_margin,
     #     max_global=max_global,
     # )
+
 
 def _log_similarity_matrix(
     cos_sim_np,
@@ -1265,7 +1291,7 @@ def _log_similarity_matrix(
 ):
     """
     Log the complete similarity matrix in a formatted text representation.
-    
+
     Args:
         cos_sim_np: Similarity matrix as numpy array
         debug_logger: Logger instance
@@ -1277,35 +1303,35 @@ def _log_similarity_matrix(
     """
     N = cos_sim_np.shape[0]
     batch_size = N // 2
-    
+
     debug_logger.info(f"\n{'='*80}")
     debug_logger.info(f"COMPLETE SIMILARITY MATRIX - {context}")
     debug_logger.info(f"{'='*80}\n")
-    
+
     # Create header row
     header = "     |"
     for j in range(N):
         header += f"  {j:2d}  |"
     debug_logger.info(header)
     debug_logger.info("-" * len(header))
-    
+
     # Log each row with highlighting
     for i in range(N):
         row_str = f" {i:2d}  |"
-        
+
         # Determine if this is an anchor row (first half)
         is_anchor = i < batch_size
-        
+
         # Get threshold for this anchor
         if is_anchor:
             if max_global:
                 anchor_threshold = threshold
             else:
                 anchor_threshold = local_maxs[i] - ant_margin
-        
+
         for j in range(N):
             val = cos_sim_np[i, j]
-            
+
             # Determine highlighting
             marker = ""
             if i == j:
@@ -1318,11 +1344,11 @@ def _log_similarity_matrix(
                 # Negative within batch - check if above threshold
                 if val >= anchor_threshold:
                     marker = "!"  # Violation
-            
+
             row_str += f" {val:5.2f}{marker}|"
-        
+
         debug_logger.info(row_str)
-    
+
     # Add legend
     debug_logger.info("\nLegend:")
     debug_logger.info("  * = Self-similarity (diagonal, always 1.0)")
@@ -1340,7 +1366,7 @@ def _save_similarity_heatmap(
 ):
     """
     Create and save heatmap visualization of similarity matrix.
-    
+
     Args:
         cos_sim_np: Similarity matrix as numpy array
         heatmap_dir: Directory to save heatmap
@@ -1350,9 +1376,9 @@ def _save_similarity_heatmap(
     """
     import matplotlib.pyplot as plt
     import seaborn as sns
-    
+
     fig, ax = plt.subplots(figsize=(12, 10))
-    
+
     # Create heatmap
     sns.heatmap(
         cos_sim_np,
@@ -1367,26 +1393,28 @@ def _save_similarity_heatmap(
         cbar_kws={"label": "Cosine Similarity"},
         ax=ax,
     )
-    
+
     # Add title with parameters
     max_strategy = "Global" if max_global else "Local"
-    ax.set_title(f"Similarity Matrix - {context}\nMargin: {ant_margin}, Max: {max_strategy}", 
-                 fontsize=12, pad=20)
+    ax.set_title(
+        f"Similarity Matrix - {context}\nMargin: {ant_margin}, Max: {max_strategy}",
+        fontsize=12,
+        pad=20,
+    )
     ax.set_xlabel("Sample Index", fontsize=10)
     ax.set_ylabel("Sample Index (Anchor)", fontsize=10)
-    
+
     # Highlight diagonal
     N = cos_sim_np.shape[0]
     batch_size = N // 2
-    
+
     # Draw lines to separate augmented pairs
-    ax.axhline(y=batch_size, color='blue', linewidth=2, linestyle='--', alpha=0.7)
-    ax.axvline(x=batch_size, color='blue', linewidth=2, linestyle='--', alpha=0.7)
-    
+    ax.axhline(y=batch_size, color="blue", linewidth=2, linestyle="--", alpha=0.7)
+    ax.axvline(x=batch_size, color="blue", linewidth=2, linestyle="--", alpha=0.7)
+
     # Save figure
     filename = f"sim_heatmap_{context}.png"
     filepath = Path(heatmap_dir) / filename
     plt.tight_layout()
-    plt.savefig(filepath, dpi=150, bbox_inches='tight')
+    plt.savefig(filepath, dpi=150, bbox_inches="tight")
     plt.close(fig)
-

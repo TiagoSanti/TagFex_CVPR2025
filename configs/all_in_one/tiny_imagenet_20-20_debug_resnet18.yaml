@@ -29,7 +29,6 @@ ant_margin: 0.1
 ant_max_global: false
 
 debug_similarity: false
-debug_similarity_batch_size: 16
 
 backbone_configs:
   name: resnet18

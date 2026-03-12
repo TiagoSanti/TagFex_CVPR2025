@@ -23,14 +23,16 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# InfoNCE + ANT Loss (Best Configuration)
-nce_alpha: 1.0          # InfoNCE loss weight
-ant_beta: 0.5           # ANT loss weight (optimal balance)
-ant_margin: 0.5         # Margin threshold for hard negatives
+# InfoNCE Loss Only — Baseline (Local Anchor, no ANT)
+nce_alpha: 1.0
+ant_beta: 0.0           # ANT disabled
+ant_margin: 0.1         # Not used when ant_beta=0
 ant_max_global: false   # Local anchor normalization
 
 # Similarity Matrix Debugging
-debug_similarity: false
+debug_similarity: true
+debug_similarity_epoch_interval: 1   # log 1 batch every epoch (all epochs)
+debug_similarity_batches_per_epoch: 1 # only the first batch per sampled epoch
 
 backbone_configs: 
   name: resnet18

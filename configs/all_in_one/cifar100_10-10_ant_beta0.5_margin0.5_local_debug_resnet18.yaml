@@ -31,7 +31,8 @@ ant_max_global: false   # Local anchor for both InfoNCE and ANT
 
 # Similarity Matrix Debugging
 debug_similarity: true
-debug_similarity_batch_size: 16
+debug_similarity_epoch_interval: 1   # log 1 batch every epoch (all epochs)
+debug_similarity_batches_per_epoch: 1 # only the first batch per sampled epoch
 
 backbone_configs: 
   name: resnet18
