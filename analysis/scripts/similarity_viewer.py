@@ -90,6 +90,30 @@ RE_CELL = re.compile(r"(-?\d+\.\d+)([*+!]?)")
 
 
 # ---------------------------------------------------------------------------
+# Compact marker encoding  (uint8 saves ~98 % disk/memory vs dtype=object)
+# ---------------------------------------------------------------------------
+_MARKER_ENC: dict[str, int] = {"": 0, "*": 1, "+": 2, "!": 3}
+_MARKER_DEC = np.array(["", "*", "+", "!"])  # index by uint8 value
+
+
+def _encode_markers(marker_rows: list[list[str]]) -> np.ndarray:
+    """Encode a list-of-lists of marker chars into a compact uint8 ndarray."""
+    arr = np.array(marker_rows, dtype=object)
+    return np.vectorize(_MARKER_ENC.get)(arr, 0).astype(np.uint8)
+
+
+def _decode_markers(markers: np.ndarray) -> np.ndarray:
+    """Convert a compact uint8 marker array back to a string ndarray.
+
+    No-op when *markers* is already a string/object array (backward-compatible
+    with old pickle caches that stored dtype=object arrays).
+    """
+    if markers.dtype == np.uint8:
+        return _MARKER_DEC[markers]
+    return markers
+
+
+# ---------------------------------------------------------------------------
 # Main log parsing  (structured [T E B] lines from exp_debug0.log)
 # ---------------------------------------------------------------------------
 
@@ -266,6 +290,34 @@ def build_or_load_debug_index(log_path: str) -> dict:
     with open(cache_path, "w") as fh:
         json.dump(index, fh)
     return index
+
+
+@st.cache_data(show_spinner=False)
+def _build_entries_df(log_path: str) -> pd.DataFrame:
+    """Build and cache the entries DataFrame from the similarity debug log index.
+
+    Cached at the Streamlit session level — avoids rebuilding on every rerun
+    (each button click / slider move triggers a full page re-execution).
+    """
+    _idx = build_or_load_debug_index(log_path)
+    _parsed = []
+    for key in _idx:
+        parts = key.split("_")
+        if len(parts) == 4:
+            _parsed.append(
+                {
+                    "task": int(parts[0]),
+                    "epoch": int(parts[1]),
+                    "batch": int(parts[2]),
+                    "type": parts[3],
+                    "key": key,
+                }
+            )
+    return (
+        pd.DataFrame(_parsed)
+        .sort_values(["task", "epoch", "batch", "type"])
+        .reset_index(drop=True)
+    )
 
 
 def _entry_disk_cache_path(log_path: str, offset: int) -> Path:
@@ -516,7 +568,7 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
         try:
             # Fast path: matrix is always NxN so all rows have the same length
             result["matrix"] = np.array(matrix_rows, dtype=np.float32)
-            result["markers"] = np.array(marker_rows, dtype=object)
+            result["markers"] = _encode_markers(marker_rows)
         except ValueError:
             # Fallback for ragged rows (shouldn't happen with well-formed logs)
             max_cols = max(len(r) for r in matrix_rows)
@@ -526,7 +578,7 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
                 mat[i, : len(rv)] = rv
                 mk[i, : len(rm)] = rm
             result["matrix"] = mat
-            result["markers"] = mk
+            result["markers"] = np.vectorize(_MARKER_ENC.get)(mk, 0).astype(np.uint8)
 
     # Persist to disk so subsequent sessions skip re-parsing
     try:
@@ -667,6 +719,8 @@ def render_matrix_heatmap(
     """32×32 similarity heatmap with threshold-violation overlays."""
     N = matrix.shape[0]
     batch_size = N // 2
+    if markers is not None:
+        markers = _decode_markers(markers)
     cell_px = max(0.35, min(0.55, 12 / N))
     fig_size = min(N * cell_px + 2.5, 16)
     fig, ax = plt.subplots(figsize=(fig_size, fig_size - 0.5))
@@ -817,20 +871,28 @@ def render_matrix_heatmap_plotly(
     batch_size = N // 2
 
     mk_labels = {"*": "self-sim", "+": "positive pair", "!": "ANT violation"}
-    hover = []
-    for i in range(N):
-        row_h = []
-        for j in range(N):
-            mk = (
-                markers[i, j]
-                if markers is not None and i < markers.shape[0] and j < markers.shape[1]
-                else ""
-            )
-            lbl = mk_labels.get(mk, "negative")
-            row_h.append(
-                f"row {i} / col {j}<br>sim = {matrix[i, j]:.4f}<br><i>{lbl}</i>"
-            )
-        hover.append(row_h)
+    # Decode compact uint8 markers (no-op for old object-array caches)
+    if markers is not None:
+        markers = _decode_markers(markers)
+    # Vectorised hover: list comprehension is ~3× faster than nested .append loops
+    if markers is not None:
+        _mk = markers[:N, :N]
+        hover = [
+            [
+                f"row {i} / col {j}<br>sim = {matrix[i, j]:.4f}<br>"
+                f"<i>{mk_labels.get(str(_mk[i, j]), 'negative')}</i>"
+                for j in range(N)
+            ]
+            for i in range(N)
+        ]
+    else:
+        hover = [
+            [
+                f"row {i} / col {j}<br>sim = {matrix[i, j]:.4f}<br><i>negative</i>"
+                for j in range(N)
+            ]
+            for i in range(N)
+        ]
 
     strat = max_strategy or "?"
     m_str = f"margin={margin}" if margin is not None else ""
@@ -860,35 +922,27 @@ def render_matrix_heatmap_plotly(
     )
 
     # Marker annotations (+ and ! only; * clutters the chart)
+    # np.argwhere replaces the O(N²) nested loop — only iterates over matched cells
     annotations = []
     if markers is not None:
-        for i in range(min(N, markers.shape[0])):
-            for j in range(min(N, markers.shape[1])):
-                mk = markers[i, j]
-                if mk == "+":
-                    annotations.append(
-                        dict(
-                            x=j,
-                            y=i,
-                            text="+",
-                            showarrow=False,
-                            xref="x",
-                            yref="y",
-                            font=dict(color="#00cc44", size=9, family="Arial Black"),
-                        )
+        _mk = markers[:N, :N]
+        _ann_style = {
+            "+": dict(color="#00cc44", size=9, family="Arial Black"),
+            "!": dict(color="#cc0000", size=9, family="Arial Black"),
+        }
+        for sym, font_kw in _ann_style.items():
+            for i, j in np.argwhere(_mk == sym):
+                annotations.append(
+                    dict(
+                        x=int(j),
+                        y=int(i),
+                        text=sym,
+                        showarrow=False,
+                        xref="x",
+                        yref="y",
+                        font=font_kw,
                     )
-                elif mk == "!":
-                    annotations.append(
-                        dict(
-                            x=j,
-                            y=i,
-                            text="!",
-                            showarrow=False,
-                            xref="x",
-                            yref="y",
-                            font=dict(color="#cc0000", size=9, family="Arial Black"),
-                        )
-                    )
+                )
     if annotations:
         fig.update_layout(annotations=annotations)
 
@@ -1003,6 +1057,36 @@ def render_anchor_chart_plotly(anchors: list[dict], N: int) -> go.Figure:
     # Push the first subplot title down so it doesn't collide with the legend
     fig.layout.annotations[0].update(y=fig.layout.annotations[0].y - 0.03)
     return fig
+
+
+# ---------------------------------------------------------------------------
+# Cached figure builders  — keyed on (log_path, offset) to avoid recomputing
+# on every Streamlit rerun.  Each button click triggers a full page re-execution;
+# without this cache, heatmap + anchor chart are rebuilt from scratch every time.
+# ---------------------------------------------------------------------------
+
+
+@st.cache_data(show_spinner=False, max_entries=500)
+def _get_heatmap_figure(log_path: str, offset: int) -> "go.Figure | None":
+    """Build and cache the Plotly similarity heatmap for the entry at *offset*."""
+    entry = parse_debug_entry(log_path, offset)
+    matrix = entry.get("matrix")
+    if matrix is None or matrix.size == 0:
+        return None
+    return render_matrix_heatmap_plotly(
+        matrix,
+        entry.get("markers"),
+        entry.get("margin"),
+        entry.get("max_strategy", "?"),
+        entry.get("context", ""),
+    )
+
+
+@st.cache_data(show_spinner=False, max_entries=500)
+def _get_anchor_figure(log_path: str, offset: int) -> go.Figure:
+    """Build and cache the Plotly anchor chart for the entry at *offset*."""
+    entry = parse_debug_entry(log_path, offset)
+    return render_anchor_chart_plotly(entry.get("anchors", []), entry["shape"][0])
 
 
 # ---------------------------------------------------------------------------
@@ -1154,25 +1238,8 @@ def main() -> None:
             st.error("No similarity matrix entries found in the log.")
             st.stop()
 
-        # Build sorted entries list
-        parsed_entries = []
-        for key in index:
-            parts = key.split("_")
-            if len(parts) == 4:
-                parsed_entries.append(
-                    {
-                        "task": int(parts[0]),
-                        "epoch": int(parts[1]),
-                        "batch": int(parts[2]),
-                        "type": parts[3],
-                        "key": key,
-                    }
-                )
-        entries_df = (
-            pd.DataFrame(parsed_entries)
-            .sort_values(["task", "epoch", "batch", "type"])
-            .reset_index(drop=True)
-        )
+        # Build sorted entries list (cached — avoids rebuilding on every rerun)
+        entries_df = _build_entries_df(sim_log)
         total_entries = len(entries_df)
 
         st.success(
@@ -1494,14 +1561,8 @@ def main() -> None:
 
         with col_heat:
             st.markdown("**Similarity Heatmap**")
-            if matrix is not None and matrix.size > 0:
-                fig_h = render_matrix_heatmap_plotly(
-                    matrix,
-                    markers_arr,
-                    margin=margin,
-                    max_strategy=max_strat,
-                    title=entry["context"],
-                )
+            fig_h = _get_heatmap_figure(sim_log, index[entry_key])
+            if fig_h is not None:
                 st.plotly_chart(fig_h, use_container_width=True)
                 st.caption(
                     "Similaridades coseno entre todos os embeddings do batch. "
@@ -1530,7 +1591,7 @@ def main() -> None:
         with col_anchor:
             st.markdown("**Per-anchor statistics**")
             if anchors:
-                fig_a = render_anchor_chart_plotly(anchors, N)
+                fig_a = _get_anchor_figure(sim_log, index[entry_key])
                 st.plotly_chart(fig_a, use_container_width=True)
                 st.caption(
                     "**Painel superior** — para cada âncora: "
@@ -1596,12 +1657,21 @@ def main() -> None:
             else:
                 st.info("No per-anchor data found in this entry.")
 
-        # ---- Prefetch adjacent entries into cache for faster navigation ----
+        # ---- Prefetch adjacent entries (figures + parse data) for faster navigation ----
+        # Covers ±1 batch (ArrowLeft/Right) and adjacent epochs (ArrowUp/Down + buttons)
+        _pf_indices: set[int] = set()
         for _pf_delta in (-1, +1):
-            _pf_idx = idx + _pf_delta
-            if 0 <= _pf_idx < total_entries:
-                _pf_key = entries_df.iloc[_pf_idx]["key"]
-                parse_debug_entry(sim_log, index[_pf_key])
+            _pf_i = idx + _pf_delta
+            if 0 <= _pf_i < total_entries:
+                _pf_indices.add(_pf_i)
+        for _ep_fn in (_prev_epoch_idx, _next_epoch_idx):
+            _ep_i = _ep_fn()
+            if _ep_i != idx:
+                _pf_indices.add(_ep_i)
+        for _pf_i in _pf_indices:
+            _pf_key = entries_df.iloc[_pf_i]["key"]
+            _get_heatmap_figure(sim_log, index[_pf_key])
+            _get_anchor_figure(sim_log, index[_pf_key])
 
 
 if __name__ == "__main__":
