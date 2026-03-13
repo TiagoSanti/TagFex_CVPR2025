@@ -30,10 +30,10 @@ DEMO_DIR = Path("logs/demo_synthetic")
 
 NUM_TASKS = 3
 TASK_EPOCHS = {1: 20, 2: 17, 3: 17}  # abbreviated (real: 200 / 170)
-BATCHES_PER_EPOCH = 5                  # abbreviated for compact demo log
-BS = 64                                # samples per GPU  (128 // 2 GPUs)
-N = BS * 2                             # cosine-sim matrix dimension (128 × 128)
-TEMP = 0.2                             # InfoNCE temperature
+BATCHES_PER_EPOCH = 5  # abbreviated for compact demo log
+BS = 64  # samples per GPU  (128 // 2 GPUs)
+N = BS * 2  # cosine-sim matrix dimension (128 × 128)
+TEMP = 0.2  # InfoNCE temperature
 NCE_ALPHA = 1.0
 ANT_BETA = 0.5
 ANT_MARGIN = 0.5
@@ -51,6 +51,7 @@ def _ts(t: datetime) -> str:
 # ---------------------------------------------------------------------------
 # Embedding / similarity simulation
 # ---------------------------------------------------------------------------
+
 
 def _make_cosim(
     task: int, epoch: int, max_epoch: int, batch: int, rng: np.random.Generator
@@ -159,21 +160,31 @@ def _compute_stats(cos_sim: np.ndarray, prefix: str = "") -> dict:
 
     return {
         "contrastive": {
-            "pos_mean": float(pos.mean()), "pos_std": float(pos.std()),
-            "neg_mean": float(neg_flat.mean()), "neg_std": float(neg_flat.std()),
+            "pos_mean": float(pos.mean()),
+            "pos_std": float(pos.std()),
+            "neg_mean": float(neg_flat.mean()),
+            "neg_std": float(neg_flat.std()),
             "gap": float(pos.mean() - neg_flat.mean()),
         },
         "ant": {
-            "pos_min": float(pos.min()), "pos_max": float(pos.max()),
-            "neg_min": float(neg_flat.min()), "neg_max": float(neg_flat.max()),
-            "gap_mean": float(per_gap.mean()), "gap_std": float(per_gap.std()),
-            "gap_min": float(per_gap.min()), "gap_max": float(per_gap.max()),
-            "margin": ANT_MARGIN, "violation_pct": viol_pct,
+            "pos_min": float(pos.min()),
+            "pos_max": float(pos.max()),
+            "neg_min": float(neg_flat.min()),
+            "neg_max": float(neg_flat.max()),
+            "gap_mean": float(per_gap.mean()),
+            "gap_std": float(per_gap.std()),
+            "gap_min": float(per_gap.min()),
+            "gap_max": float(per_gap.max()),
+            "margin": ANT_MARGIN,
+            "violation_pct": viol_pct,
             "ant_loss": ant_raw,
         },
         "loss": {
-            "nll": nll, "ant_loss": ant_raw,
-            "nce_weighted": nce_w, "ant_weighted": ant_w, "total": total_loss,
+            "nll": nll,
+            "ant_loss": ant_raw,
+            "nce_weighted": nce_w,
+            "ant_weighted": ant_w,
+            "total": total_loss,
         },
         "local_maxs": local_maxs,
         "thresholds": thresholds,
@@ -185,12 +196,14 @@ def _compute_stats(cos_sim: np.ndarray, prefix: str = "") -> dict:
 # exp_debug0.log writer
 # ---------------------------------------------------------------------------
 
+
 def write_main_log(out: Path) -> None:
     """Write exp_debug0.log with [T E B] structured stats for every batch."""
     rng = np.random.default_rng(2025)
     t = _T0
 
     with out.open("w") as f:
+
         def line(msg: str) -> None:
             f.write(f"{_ts(t)} | {msg}\n")
 
@@ -248,6 +261,7 @@ def write_main_log(out: Path) -> None:
 # similarity_debug.log helpers and writer
 # ---------------------------------------------------------------------------
 
+
 def write_sim_log(out: Path) -> None:
     """Write similarity_debug.log with 1 entry per (epoch × loss_type)."""
     rng = np.random.default_rng(2025 + 1)
@@ -281,13 +295,13 @@ def write_sim_log(out: Path) -> None:
                     context = f"T{task}_E{epoch}_B{batch}_{ltype}"
                     sep = "=" * 80
 
-                    # Record index offset at the entry header line
-                    key = f"{task}_{epoch}_{batch}_{ltype}"
-                    idx_offset = offset()
-                    index[key] = idx_offset
-
                     L()
                     L(sep)
+
+                    # Record index offset pointing directly at the header line so
+                    # parse_debug_entry can seek here and find the header first.
+                    key = f"{task}_{epoch}_{batch}_{ltype}"
+                    index[key] = offset()
                     L(f"SIMILARITY MATRIX DEBUG - {context}")
                     L(f"Matrix shape: ({N}, {N})")
                     L(f"ANT margin: {ANT_MARGIN}, Max strategy: Local")
@@ -317,8 +331,10 @@ def _write_verbose_section(
     thresholds = s["thresholds"]
     pos = s["pos"]
 
-    L(f"Local max per anchor: min={local_maxs.min():.4f}, "
-      f"max={local_maxs.max():.4f}, mean={local_maxs.mean():.4f}")
+    L(
+        f"Local max per anchor: min={local_maxs.min():.4f}, "
+        f"max={local_maxs.max():.4f}, mean={local_maxs.mean():.4f}"
+    )
     L()
 
     for ai in range(min(8, BS)):
@@ -349,10 +365,14 @@ def _write_verbose_section(
 
     a = s["ant"]
     L("--- Overall Statistics ---")
-    L(f"Positive pairs: min={a['pos_min']:.4f}, max={a['pos_max']:.4f}, "
-      f"mean={pos.mean():.4f}, std={pos.std():.4f}")
-    L(f"Negative pairs: min={a['neg_min']:.4f}, max={a['neg_max']:.4f}, "
-      f"mean={s['contrastive']['neg_mean']:.4f}, std={s['contrastive']['neg_std']:.4f}")
+    L(
+        f"Positive pairs: min={a['pos_min']:.4f}, max={a['pos_max']:.4f}, "
+        f"mean={pos.mean():.4f}, std={pos.std():.4f}"
+    )
+    L(
+        f"Negative pairs: min={a['neg_min']:.4f}, max={a['neg_max']:.4f}, "
+        f"mean={s['contrastive']['neg_mean']:.4f}, std={s['contrastive']['neg_std']:.4f}"
+    )
     L(f"Gap (pos_mean - neg_mean): {s['contrastive']['gap']:.4f}")
     total_neg = BS * (BS - 1)
     viol_cnt = round(a["violation_pct"] / 100 * total_neg)
@@ -360,9 +380,7 @@ def _write_verbose_section(
     L()
 
 
-def _write_matrix(
-    fb, cos_sim: np.ndarray, s: dict, ts: str
-) -> None:
+def _write_matrix(fb, cos_sim: np.ndarray, s: dict, ts: str) -> None:
     def L(msg: str = "") -> None:
         fb.write(f"{ts} | {msg}\n".encode())
 
@@ -408,6 +426,7 @@ def _write_matrix(
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     DEMO_DIR.mkdir(parents=True, exist_ok=True)
