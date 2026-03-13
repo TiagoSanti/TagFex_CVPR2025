@@ -10,6 +10,7 @@ Usage (from project root):
 
 import re
 import json
+import pickle
 from pathlib import Path
 import streamlit.components.v1 as components
 
@@ -36,17 +37,22 @@ def _discover_experiments() -> dict[str, Path]:
     if not _LOGS_ROOT.exists():
         return candidates
     for d in sorted(_LOGS_ROOT.iterdir()):
-        if d.is_dir() and (d / "exp_debug0.log").exists() and (d / "similarity_debug.log").exists():
+        if (
+            d.is_dir()
+            and (d / "exp_debug0.log").exists()
+            and (d / "similarity_debug.log").exists()
+        ):
             candidates[d.name] = d
     return candidates
 
 
 _EXPERIMENTS = _discover_experiments()
-_DEFAULT_KEY = (
-    next((k for k in _EXPERIMENTS if k.startswith("debug_")), None)
-    or next(iter(_EXPERIMENTS), None)
+_DEFAULT_KEY = next((k for k in _EXPERIMENTS if k.startswith("debug_")), None) or next(
+    iter(_EXPERIMENTS), None
 )
-_DEFAULT_DIR = _EXPERIMENTS[_DEFAULT_KEY] if _DEFAULT_KEY else Path("logs/demo_synthetic")
+_DEFAULT_DIR = (
+    _EXPERIMENTS[_DEFAULT_KEY] if _DEFAULT_KEY else Path("logs/demo_synthetic")
+)
 DEFAULT_MAIN_LOG = str(_DEFAULT_DIR / "exp_debug0.log")
 DEFAULT_SIM_LOG = str(_DEFAULT_DIR / "similarity_debug.log")
 
@@ -78,6 +84,9 @@ RE_LOSS_KD = re.compile(
 )
 RE_DEBUG_HEADER = re.compile(r"SIMILARITY MATRIX DEBUG - T(\d+)_E(\d+)_B(\d+)_(\w+)")
 RE_MATRIX_ROW = re.compile(r"^\s*(\d+)\s*\|(.+)$")
+# Extracts (value_str, marker) pairs from a raw matrix row in one pass.
+# Marker is one of: * (self), + (positive pair), ! (margin violation), "" (none)
+RE_CELL = re.compile(r"(-?\d+\.\d+)([*+!]?)")
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +268,11 @@ def build_or_load_debug_index(log_path: str) -> dict:
     return index
 
 
+def _entry_disk_cache_path(log_path: str, offset: int) -> Path:
+    """Returns the pickle cache path for a parsed entry (next to the log file)."""
+    return Path(log_path).parent / ".sim_entry_cache" / f"{offset}.pkl"
+
+
 @st.cache_data(show_spinner="Loading matrix entry…", max_entries=300)
 def parse_debug_entry(log_path: str, offset: int) -> dict:
     """
@@ -277,6 +291,15 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
         "matrix": None,
         "markers": None,
     }
+
+    # Check disk cache first — avoids re-parsing 1.5 GB log on every cache miss
+    _disk_cache = _entry_disk_cache_path(log_path, offset)
+    if _disk_cache.exists():
+        try:
+            with open(_disk_cache, "rb") as _fh:
+                return pickle.load(_fh)
+        except Exception:
+            pass  # corrupted cache → fall through to re-parse
 
     # Read lines from offset until next entry header
     lines: list[str] = []
@@ -335,23 +358,11 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
         if in_matrix:
             m = RE_MATRIX_ROW.match(msg)
             if m:
-                cells = m[2].split("|")
-                row_v: list[float] = []
-                row_mk: list[str] = []
-                for cell in cells:
-                    cell = cell.strip()
-                    if not cell:
-                        continue
-                    flt = re.search(r"-?\d+\.\d+", cell)
-                    if flt:
-                        row_v.append(float(flt[0]))
-                        # Marker is the non-numeric character after the float
-                        remainder = cell[flt.end() :]
-                        marker = remainder.strip()[:1] if remainder.strip() else ""
-                        row_mk.append(marker)
-                if row_v:
-                    matrix_rows.append(row_v)
-                    marker_rows.append(row_mk)
+                # One findall call per row instead of 128 individual re.search calls
+                pairs = RE_CELL.findall(m[2])
+                if pairs:
+                    matrix_rows.append([float(v) for v, _ in pairs])
+                    marker_rows.append([mk for _, mk in pairs])
             continue  # don't fall through to verbose parsers
 
         # ------------------------------------------------------------------
@@ -502,15 +513,28 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
     result["anchors"] = sorted(anchors.values(), key=lambda a: a["idx"])
 
     if matrix_rows:
-        max_cols = max(len(r) for r in matrix_rows)
-        mat = np.zeros((len(matrix_rows), max_cols), dtype=np.float32)
-        mk = np.full((len(matrix_rows), max_cols), "", dtype=object)
-        for i, (rv, rm) in enumerate(zip(matrix_rows, marker_rows)):
-            for j, (v, mk_val) in enumerate(zip(rv, rm)):
-                mat[i, j] = v
-                mk[i, j] = mk_val
-        result["matrix"] = mat
-        result["markers"] = mk
+        try:
+            # Fast path: matrix is always NxN so all rows have the same length
+            result["matrix"] = np.array(matrix_rows, dtype=np.float32)
+            result["markers"] = np.array(marker_rows, dtype=object)
+        except ValueError:
+            # Fallback for ragged rows (shouldn't happen with well-formed logs)
+            max_cols = max(len(r) for r in matrix_rows)
+            mat = np.zeros((len(matrix_rows), max_cols), dtype=np.float32)
+            mk = np.full((len(matrix_rows), max_cols), "", dtype=object)
+            for i, (rv, rm) in enumerate(zip(matrix_rows, marker_rows)):
+                mat[i, : len(rv)] = rv
+                mk[i, : len(rm)] = rm
+            result["matrix"] = mat
+            result["markers"] = mk
+
+    # Persist to disk so subsequent sessions skip re-parsing
+    try:
+        _disk_cache.parent.mkdir(exist_ok=True)
+        with open(_disk_cache, "wb") as _fh:
+            pickle.dump(result, _fh, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception:
+        pass  # non-fatal — disk cache is best-effort
 
     return result
 
@@ -1012,13 +1036,17 @@ def main() -> None:
             exp_key = st.selectbox(
                 "Diretório",
                 options=list(_EXPERIMENTS.keys()),
-                index=list(_EXPERIMENTS.keys()).index(_DEFAULT_KEY) if _DEFAULT_KEY else 0,
+                index=(
+                    list(_EXPERIMENTS.keys()).index(_DEFAULT_KEY) if _DEFAULT_KEY else 0
+                ),
             )
             _sel_dir = _EXPERIMENTS[exp_key]
             main_log = str(_sel_dir / "exp_debug0.log")
             sim_log = str(_sel_dir / "similarity_debug.log")
         else:
-            main_log = st.text_input("Main log (exp_debug0.log)", value=DEFAULT_MAIN_LOG)
+            main_log = st.text_input(
+                "Main log (exp_debug0.log)", value=DEFAULT_MAIN_LOG
+            )
             sim_log = st.text_input("Similarity debug log", value=DEFAULT_SIM_LOG)
         st.divider()
         st.markdown(
