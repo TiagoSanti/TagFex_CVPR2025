@@ -27,7 +27,26 @@ import streamlit as st
 # ---------------------------------------------------------------------------
 # Default paths  (relative to project root, where streamlit is invoked from)
 # ---------------------------------------------------------------------------
-_DEFAULT_DIR = Path("logs/demo_synthetic")
+_LOGS_ROOT = Path("logs")
+
+
+def _discover_experiments() -> dict[str, Path]:
+    """Return {label: dir_path} for every log dir that has both log files."""
+    candidates: dict[str, Path] = {}
+    if not _LOGS_ROOT.exists():
+        return candidates
+    for d in sorted(_LOGS_ROOT.iterdir()):
+        if d.is_dir() and (d / "exp_debug0.log").exists() and (d / "similarity_debug.log").exists():
+            candidates[d.name] = d
+    return candidates
+
+
+_EXPERIMENTS = _discover_experiments()
+_DEFAULT_KEY = (
+    next((k for k in _EXPERIMENTS if k.startswith("debug_")), None)
+    or next(iter(_EXPERIMENTS), None)
+)
+_DEFAULT_DIR = _EXPERIMENTS[_DEFAULT_KEY] if _DEFAULT_KEY else Path("logs/demo_synthetic")
 DEFAULT_MAIN_LOG = str(_DEFAULT_DIR / "exp_debug0.log")
 DEFAULT_SIM_LOG = str(_DEFAULT_DIR / "similarity_debug.log")
 
@@ -988,9 +1007,19 @@ def main() -> None:
 
     # ---- Sidebar ----
     with st.sidebar:
-        st.header("⚙️ Log files")
-        main_log = st.text_input("Main log (exp_debug0.log)", value=DEFAULT_MAIN_LOG)
-        sim_log = st.text_input("Similarity debug log", value=DEFAULT_SIM_LOG)
+        st.header("⚙️ Experimento")
+        if _EXPERIMENTS:
+            exp_key = st.selectbox(
+                "Diretório",
+                options=list(_EXPERIMENTS.keys()),
+                index=list(_EXPERIMENTS.keys()).index(_DEFAULT_KEY) if _DEFAULT_KEY else 0,
+            )
+            _sel_dir = _EXPERIMENTS[exp_key]
+            main_log = str(_sel_dir / "exp_debug0.log")
+            sim_log = str(_sel_dir / "similarity_debug.log")
+        else:
+            main_log = st.text_input("Main log (exp_debug0.log)", value=DEFAULT_MAIN_LOG)
+            sim_log = st.text_input("Similarity debug log", value=DEFAULT_SIM_LOG)
         st.divider()
         st.markdown(
             """**Matrix legend**
