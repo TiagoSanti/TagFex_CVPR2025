@@ -6,19 +6,17 @@
 #
 # GPUs disponíveis:
 #   [0] RTX 3080 Ti 12 GB  — pode estar parcialmente ocupada (root ~3 GB)
-#   [1] RTX 3080 Ti 12 GB  — idle por padrão → usar aqui preferencialmente
+#   [1] RTX 3080 Ti 12 GB  — idle por padrão
 #
-# Experimentos:
-#   1. CIFAR-100 10-10 Baseline Local  (ant_beta=0, debug)   seed 1993   GPU 1
-#   2. CIFAR-100 10-10 ANT β=0.5 m=0.5 Local (debug)        seed 1993   GPU 1
+# Experimentos (em paralelo, um por GPU):
+#   GPU 0 — CIFAR-100 10-10 ANT β=0.5 m=0.5 Local (debug)   seed 1993
+#   GPU 1 — CIFAR-100 10-10 Baseline Local        (debug)   seed 1993
 #
 # Uso:
 #   screen -dmS debug_wolverine bash run_debug_wolverine.sh
 #   screen -r debug_wolverine
 #
 # ─────────────────────────────────────────────────────────────────────────────
-
-set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AUTO_LAUNCHER="$SCRIPT_DIR/auto_run_on_free_gpu.py"
@@ -30,14 +28,10 @@ fi
 
 # ── Parâmetros de GPU (wolverine — RTX 3080 Ti 12 GB) ────────────────────────
 # CIFAR-100 batch_size=128 + ResNet18 + proj head → ~4-5 GB VRAM
-# Pedimos 7 GB livres para segurança confortável dentro dos 12 GB
+# GPU 0 tem ~3 GB ocupados (root); pedimos 7 GB livres → seguro nos 12 GB
 INTERVAL=30
 THRESHOLD=100.0
 MIN_FREE_MB=7000
-
-# GPU alvo: 1 (idle). Muda para "0 1" para usar ambas em experimentos paralelos
-# rodados em terminais/screens separados.
-TARGET_GPU=1
 
 # ── Logs ──────────────────────────────────────────────────────────────────────
 LOG_DIR="$LOGS_DIR/auto_experiments"
@@ -92,38 +86,68 @@ queue_experiment() {
 }
 
 # ═════════════════════════════════════════════════════════════════════════════
-# Cabeçalho
+# Lane A — GPU 1 (idle)    Baseline Local
+# Lane B — GPU 0 (parcial) ANT β=0.5 m=0.5 Local
+# As duas lanes correm em paralelo (&) e o script aguarda ambas.
 # ═════════════════════════════════════════════════════════════════════════════
+
+lane_baseline() {
+    echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  Lane A — GPU 1 — Baseline Local [debug]            ║${NC}"
+    echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}\n"
+    log_progress ">> [Lane A] Iniciando — Baseline Local (GPU 1)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline Local [debug]" \
+        1993 \
+        "debug_exp_cifar100_10-10_antB0_nceA1_antLocal_s1993" \
+        1
+
+    log_progress "[OK] [Lane A] Baseline Local concluída"
+    echo -e "${GREEN}[OK] [Lane A] Baseline Local concluída!${NC}\n"
+}
+
+lane_ant() {
+    echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  Lane B — GPU 0 — ANT β=0.5 m=0.5 Local [debug]    ║${NC}"
+    echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}\n"
+    log_progress ">> [Lane B] Iniciando — ANT β=0.5 (GPU 0)"
+
+    queue_experiment \
+        "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_debug_resnet18.yaml" \
+        "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local [debug]" \
+        1993 \
+        "debug_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993" \
+        0
+
+    log_progress "[OK] [Lane B] ANT β=0.5 concluída"
+    echo -e "${GREEN}[OK] [Lane B] ANT β=0.5 concluída!${NC}\n"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║  Debug Queue — wolverine (2× RTX 3080 Ti 12 GB)     ║${NC}"
-echo -e "${CYAN}║  GPU alvo: ${TARGET_GPU}  |  Min free: ${MIN_FREE_MB} MB          ║${NC}"
+echo -e "${CYAN}║  Lane A → GPU 1 | Lane B → GPU 0  (paralelas)       ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}\n"
-log_progress "=== Iniciando debug queue (wolverine, GPU ${TARGET_GPU}) ==="
+log_progress "=== Iniciando debug queue (wolverine, GPUs 0+1 paralelo) ==="
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. CIFAR-100 10-10 Baseline Local (debug) — seed 1993
-#    done_dir: debug_exp_cifar100_10-10_antB0_nceA1_antLocal_s1993
-# ─────────────────────────────────────────────────────────────────────────────
-queue_experiment \
-    "configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml" \
-    "CIFAR-100 10-10 Baseline Local [debug]" \
-    1993 \
-    "debug_exp_cifar100_10-10_antB0_nceA1_antLocal_s1993" \
-    "$TARGET_GPU"
+lane_baseline &
+LANE_A_PID=$!
+lane_ant &
+LANE_B_PID=$!
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. CIFAR-100 10-10 ANT β=0.5 m=0.5 Local (debug) — seed 1993
-#    done_dir: debug_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993
-# ─────────────────────────────────────────────────────────────────────────────
-queue_experiment \
-    "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_debug_resnet18.yaml" \
-    "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local [debug]" \
-    1993 \
-    "debug_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993" \
-    "$TARGET_GPU"
+echo -e "${CYAN}Lanes A e B em paralelo (PID A=${LANE_A_PID}, B=${LANE_B_PID})${NC}\n"
+wait $LANE_A_PID; A_STATUS=$?
+wait $LANE_B_PID; B_STATUS=$?
 
-# ═════════════════════════════════════════════════════════════════════════════
-echo -e "${GREEN}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║  Debug queue concluída! ✅                           ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════════╝${NC}"
-log_progress "=== Debug queue concluída ==="
+echo -e "\n${GREEN}═══════════════════════════════════════════════════════════${NC}"
+if [ $A_STATUS -eq 0 ] && [ $B_STATUS -eq 0 ]; then
+    echo -e "${GREEN}[OK] wolverine — ambas as lanes concluídas! ✅${NC}"
+    log_progress "[FIM] debug queue concluída (A=${A_STATUS}, B=${B_STATUS})"
+else
+    echo -e "${RED}[ERRO] uma ou mais lanes falharam (A=${A_STATUS}, B=${B_STATUS})${NC}"
+    log_progress "[ERRO] debug queue com falha (A=${A_STATUS}, B=${B_STATUS})"
+    exit 1
+fi
+echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
