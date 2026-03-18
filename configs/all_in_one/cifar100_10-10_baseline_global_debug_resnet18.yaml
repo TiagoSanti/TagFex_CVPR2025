@@ -23,11 +23,13 @@ infonce_kd_temp: 0.2
 kd_temp: 2
 num_aug: 2
 
-# InfoNCE Loss Only — Baseline (Local Anchor, no ANT)
+# InfoNCE Loss Only — Baseline (Global Anchor, no ANT)
 nce_alpha: 1.0
 ant_beta: 0.0           # ANT disabled
 ant_margin: 0.1         # Not used when ant_beta=0
-ant_max_global: false   # Local anchor normalization
+ant_max_global: true    # Standard InfoNCE (global max normalization)
+
+log_dir: logs/debug_exp_cifar100_10-10
 
 # Similarity Matrix Debugging
 debug_similarity: true

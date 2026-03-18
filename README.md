@@ -28,6 +28,7 @@
 | Máquina | GPU | VRAM | Responsabilidade |
 |---------|-----|------|------------------|
 | **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | Tiny ImageNet 20-20 + CIFAR-100 (todas as seeds) |
+| **wolverine** (ativo) | 2× NVIDIA RTX 3080 Ti | 12 GB · 2 GPUs | Debug com `debug_similarity=true` (similarity viewer) |
 | **fera** (indisponível) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | ImageNet-100 (quando retornar) |
 
 O script de fila [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).

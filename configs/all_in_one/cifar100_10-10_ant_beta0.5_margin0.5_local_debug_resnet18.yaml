@@ -29,6 +29,8 @@ ant_beta: 0.5           # ANT loss weight (equal contribution)
 ant_margin: 0.5         # Margin threshold for ANT
 ant_max_global: false   # Local anchor for both InfoNCE and ANT
 
+log_dir: logs/debug_exp_cifar100_10-10
+
 # Similarity Matrix Debugging
 debug_similarity: true
 debug_similarity_epoch_interval: 1   # log 1 batch every epoch (all epochs)
