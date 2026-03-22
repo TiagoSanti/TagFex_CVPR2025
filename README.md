@@ -27,15 +27,13 @@
 
 | Máquina | GPU | VRAM | Responsabilidade |
 |---------|-----|------|------------------|
-| **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | Tiny ImageNet 20-20 ANT Global s1993 + CIFAR-100 10-10 ANT s1997 |
-| **wolverine** (ativo) | 2× NVIDIA RTX 3080 Ti | 12 GB · 2 GPUs | CIFAR-100 50-10 Baseline + ANT (seeds 1994–1997, 2 GPUs paralelas) |
+| **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | CIFAR-100 50-10 (seeds 1994–1997) |
+| **wolverine** (indisponível) | 2× NVIDIA RTX 3080 Ti | 12 GB · 2 GPUs | — |
 | **fera** (indisponível) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | ImageNet-100 (quando retornar) |
 
 Cada máquina tem seu script dedicado:
 - **quati** → [`run_queue_quati.sh`](run_queue_quati.sh) (lançar com `screen -dmS quati_queue ./run_queue_quati.sh`)
-- **wolverine** → [`run_queue_wolverine.sh`](run_queue_wolverine.sh) (lançar diretamente `./run_queue_wolverine.sh`; cria os screens automaticamente)
-
-O script de fila legado [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).
+- **fera** → [`run_queue_fera.sh`](run_queue_fera.sh) (quando retornar)
 
 ---
 
@@ -372,38 +370,31 @@ Cada run recebe o sufixo `_s{seed}` no diretório de log:
 - Seeds `1994–1997` — runs adicionais para média ± desvio padrão no paper
 - A `class_order` está fixa no YAML (não varia com seed); apenas inicialização de pesos e augmentation variam
 
-### Filas Pendentes (18 mar 2026)
+### Filas Pendentes (22 mar 2026)
 
 | Máquina | Script | Experimentos pendentes |
 |---------|--------|------------------------|
-| **quati** | [`run_queue_quati.sh`](run_queue_quati.sh) | Tiny ImageNet 20-20 ANT Global s1993 · CIFAR-100 10-10 ANT s1997 |
-| **wolverine** | [`run_queue_wolverine.sh`](run_queue_wolverine.sh) | CIFAR-100 50-10 Baseline + ANT Local seeds 1994–1997 (2 GPUs paralelas) |
+| **quati** | [`run_queue_quati.sh`](run_queue_quati.sh) | CIFAR-100 50-10 Baseline Local s1994–1997 + ANT β=0.5 m=0.5 Local s1993–1997 (9 total) |
+| **fera** | [`run_queue_fera.sh`](run_queue_fera.sh) | ImageNet-100 10-10 + 50-10 (quando retornar) |
 
-> Lançar em screen para persistir após desconexão SSH:
+> Lançar quati em screen para persistir após desconexão SSH:
 > ```bash
-> # quati
 > screen -dmS quati_queue ./run_queue_quati.sh
->
-> # wolverine (cria os screens automaticamente)
-> ./run_queue_wolverine.sh
+> screen -r quati_queue   # para acompanhar
 > ```
 
 **Quati** (`run_queue_quati.sh`):
-| # | Experimento | Status | avg_nme1 |
-|---|-------------|--------|----------|
-| 1 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global s1993 | ⏳ Pendente (bug corrigido) | — |
-| 2 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1997 | ⏳ Pendente (reinicia do zero) | — |
-
-**Wolverine** (`run_queue_wolverine.sh`):
-| GPU | Seeds | Experimentos | Status |
-|-----|-------|--------------|--------|
-| GPU 0 | 1994, 1996 | CIFAR-100 50-10 Baseline Local + ANT Local (×2 seeds) | ⏳ Pendente |
-| GPU 1 | 1995, 1997 | CIFAR-100 50-10 Baseline Local + ANT Local (×2 seeds) | ⏳ Pendente |
+| # | Experimento | Seeds | Status |
+|---|-------------|-------|--------|
+| 1–4 | CIFAR-100 50-10 Baseline Local | 1994 1995 1996 1997 | ⏳ Pendente |
+| 5–9 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local | 1993 1994 1995 1996 1997 | ⏳ Pendente |
 
 ### Experimentos Concluídos
 
 | Data | Experimento | Seed | avg_nme1 | avg_acc1 |
 |------|-------------|------|----------|----------|
+| Mar 18, 2026 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global | 1993 | 57.02% | 60.17% |
+| Mar 18, 2026 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1997 | 75.68% | 78.61% |
 | Mar 12, 2026 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | 1993 | 57.16% | 60.49% |
 | Mar 12, 2026 | Tiny ImageNet 20-20 Baseline Global | 1993 | 56.49% | 60.25% |
 | Mar 12, 2026 | Tiny ImageNet 20-20 Baseline Local | 1993 | 57.14% | 60.68% |

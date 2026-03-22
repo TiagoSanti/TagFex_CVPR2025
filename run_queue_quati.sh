@@ -1,9 +1,10 @@
 #!/bin/bash
-# Fila de experimentos para Quati (RTX 4090 · 24 GB · 1 GPU)
+# Fila consolidada de experimentos — Quati (RTX 4090 · 24 GB · 1 GPU)
 #
-# Experimentos pendentes após 18 mar 2026:
-#   1. Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global — seed 1993
-#   2. CIFAR-100 10-10 ANT β=0.5 m=0.5 Local    — seed 1997
+# Experimentos pendentes (22 mar 2026):
+#   CIFAR-100 50-10 Baseline Local  — seeds 1994 1995 1996 1997
+#   CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seeds 1993 1994 1995 1996 1997
+#   Total: 9 experimentos sequenciais
 #
 # Uso (lança em screen para persistir após desconexão SSH):
 #   screen -dmS quati_queue ./run_queue_quati.sh
@@ -51,7 +52,7 @@ log_progress() {
 }
 
 EXP_COUNTER=0
-EXP_TOTAL=2
+EXP_TOTAL=9
 
 queue_experiment() {
     local config_file=$1
@@ -91,38 +92,40 @@ queue_experiment() {
 # ═══════════════════════════════════════════════════════════
 main() {
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}    Quati Queue — RTX 4090 24GB · Experimentos Pendentes${NC}"
+echo -e "${GREEN}    Quati Queue — RTX 4090 24GB · CIFAR-100 50-10${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
 echo -e "${BLUE} Total: ${EXP_TOTAL} experimentos${NC}"
 echo -e "${BLUE} Ordem de execução:${NC}"
-echo -e "     1  : Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global — seed 1993"
-echo -e "     2  : CIFAR-100 10-10 ANT β=0.5 m=0.5 Local    — seed 1997"
+echo -e "   1-4 : CIFAR-100 50-10 Baseline Local  — seeds 1994 1995 1996 1997"
+echo -e "   5-9 : CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seeds 1993 1994 1995 1996 1997"
 echo -e ""
 
 log_progress ">> Iniciando quati_queue  (total: $EXP_TOTAL)"
 
-# ── 1. Tiny ImageNet 20-20 ANT Global — seed 1993 ──
-# Crashou anteriormente por init_optimizer_configs ausente no yaml (corrigido).
-echo -e "${YELLOW}═══ Tiny ImageNet 20-20 · seed 1993 ═══${NC}\n"
+# ── CIFAR-100 50-10 Baseline Local — seeds 1994–1997 ──
+echo -e "${YELLOW}═══ CIFAR-100 50-10 Baseline Local ═══${NC}\n"
 
-queue_experiment \
-    "configs/all_in_one/tiny_imagenet_20-20_ant_beta0.5_margin0.5_global_resnet18.yaml" \
-    "Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global" \
-    1993
+for seed in 1994 1995 1996 1997; do
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_baseline_local_resnet18.yaml" \
+        "CIFAR-100 50-10 Baseline Local" \
+        $seed
+done
 
-# ── 2. CIFAR-100 10-10 ANT Local — seed 1997 ──
-# Diretório antigo (parado em task 5) foi removido; reinicia do início.
-echo -e "${YELLOW}═══ CIFAR-100 10-10 ANT · seed 1997 ═══${NC}\n"
+# ── CIFAR-100 50-10 ANT β=0.5 m=0.5 Local — seeds 1993–1997 ──
+echo -e "${YELLOW}═══ CIFAR-100 50-10 ANT β=0.5 m=0.5 Local ═══${NC}\n"
 
-queue_experiment \
-    "configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
-    "CIFAR-100 10-10 ANT β=0.5 m=0.5 Local" \
-    1997
+for seed in 1993 1994 1995 1996 1997; do
+    queue_experiment \
+        "configs/all_in_one/cifar100_50-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
+        "CIFAR-100 50-10 ANT β=0.5 m=0.5 Local" \
+        $seed
+done
 
 # ═══════════════════════════════════════════════════════════
 log_progress "[OK] quati_queue concluída! ($EXP_TOTAL/$EXP_TOTAL)"
 echo -e "\n${GREEN}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}[OK] Todos os ${EXP_TOTAL} experimentos da Quati concluídos!${NC}"
+echo -e "${GREEN}[OK] Todos os ${EXP_TOTAL} experimentos concluídos!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}\n"
 echo -e " Log de progresso : ${PROGRESS_LOG}"
 echo -e " Log completo     : ${CONSOLE_LOG}"
