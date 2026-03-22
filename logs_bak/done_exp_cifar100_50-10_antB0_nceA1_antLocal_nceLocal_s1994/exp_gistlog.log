@@ -1,0 +1,62 @@
+2026-03-22 12:19:35.365 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[1/6]E[200/200] train
+├> eval_acc1 84.28 eval_acc5 96.80 eval_nme1 84.50 eval_nme5 96.82 acc1_curve 84.28 acc5_curve 96.80 nme1_curve 84.50 nme5_curve 96.82 avg_acc1 84.28 avg_acc5 96.80 avg_nme1 84.50 avg_nme5 96.82
+├> eval_acc1_per_task [84.28]
+├> eval_acc5_per_task [96.80]
+├> eval_nme1_per_task [84.50]
+└> eval_nme5_per_task [96.82]
+2026-03-22 12:35:19.316 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[2/6]E[170/170] train
+├> eval_acc1 80.62 eval_acc5 95.75 eval_nme1 81.10 eval_nme5 95.87 avg_acc1 82.45 avg_acc5 96.27 avg_nme1 82.80 avg_nme5 96.34
+├> eval_acc1_per_task [83.28 67.30]
+├> eval_acc5_per_task [95.70 96.00]
+├> eval_nme1_per_task [80.98 81.70]
+├> eval_nme5_per_task [95.64 97.00]
+├> acc1_curve [84.28 80.62]
+├> acc5_curve [96.80 95.75]
+├> nme1_curve [84.50 81.10]
+└> nme5_curve [96.82 95.87]
+2026-03-22 12:52:20.225 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[3/6]E[170/170] train
+├> eval_acc1 78.57 eval_acc5 94.66 eval_nme1 78.54 eval_nme5 95.16 avg_acc1 81.16 avg_acc5 95.74 avg_nme1 81.38 avg_nme5 95.95
+├> eval_acc1_per_task [78.08 82.20 77.40]
+├> eval_acc5_per_task [94.12 95.80 96.20]
+├> eval_nme1_per_task [77.78 73.80 87.10]
+├> eval_nme5_per_task [94.80 95.80 96.30]
+├> acc1_curve [84.28 80.62 78.57]
+├> acc5_curve [96.80 95.75 94.66]
+├> nme1_curve [84.50 81.10 78.54]
+└> nme5_curve [96.82 95.87 95.16]
+2026-03-22 13:10:35.659 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[4/6]E[170/170] train
+├> eval_acc1 74.97 eval_acc5 94.09 eval_nme1 74.74 eval_nme5 94.31 avg_acc1 79.61 avg_acc5 95.32 avg_nme1 79.72 avg_nme5 95.54
+├> eval_acc1_per_task [74.94 74.30 87.30 63.50]
+├> eval_acc5_per_task [93.38 93.30 96.30 96.20]
+├> eval_nme1_per_task [75.02 63.80 77.20 81.80]
+├> eval_nme5_per_task [93.54 94.90 94.80 97.10]
+├> acc1_curve [84.28 80.62 78.57 74.97]
+├> acc5_curve [96.80 95.75 94.66 94.09]
+├> nme1_curve [84.50 81.10 78.54 74.74]
+└> nme5_curve [96.82 95.87 95.16 94.31]
+2026-03-22 13:30:23.294 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[5/6]E[170/170] train
+├> eval_acc1 72.98 eval_acc5 93.38 eval_nme1 72.13 eval_nme5 92.87 avg_acc1 78.28 avg_acc5 94.93 avg_nme1 78.20 avg_nme5 95.00
+├> eval_acc1_per_task [72.30 67.60 79.80 80.30 67.60]
+├> eval_acc5_per_task [92.16 93.40 95.30 95.20 95.70]
+├> eval_nme1_per_task [71.48 62.30 70.60 76.30 82.60]
+├> eval_nme5_per_task [91.74 92.40 93.50 95.10 96.10]
+├> acc1_curve [84.28 80.62 78.57 74.97 72.98]
+├> acc5_curve [96.80 95.75 94.66 94.09 93.38]
+├> nme1_curve [84.50 81.10 78.54 74.74 72.13]
+└> nme5_curve [96.82 95.87 95.16 94.31 92.87]
+2026-03-22 13:51:39.991 | SUCCESS  | methods.tagfex.tagfex:train:241 - R0T[6/6]E[170/170] train
+├> eval_acc1 71.89 eval_acc5 92.53 eval_nme1 70.30 eval_nme5 91.76 avg_acc1 77.22 avg_acc5 94.53 avg_nme1 76.89 avg_nme5 94.46
+├> eval_acc1_per_task [69.32 64.40 77.30 75.30 85.40 69.90]
+├> eval_acc5_per_task [91.20 91.30 94.80 93.70 95.80 93.70]
+├> eval_nme1_per_task [69.08 59.40 67.70 70.90 79.50 80.10]
+├> eval_nme5_per_task [90.34 91.20 91.50 93.90 94.10 95.20]
+├> acc1_curve [84.28 80.62 78.57 74.97 72.98 71.89]
+├> acc5_curve [96.80 95.75 94.66 94.09 93.38 92.53]
+├> nme1_curve [84.50 81.10 78.54 74.74 72.13 70.30]
+└> nme5_curve [96.82 95.87 95.16 94.31 92.87 91.76]
+2026-03-22 13:51:39.991 | SUCCESS  | methods.tagfex.tagfex:train:254 - R0T[6/6]E[170/170] train
+├> avg_acc1 77.22 avg_acc5 94.53 avg_nme1 76.89 avg_nme5 94.46
+├> acc1_curve [84.28 80.62 78.57 74.97 72.98 71.89]
+├> acc5_curve [96.80 95.75 94.66 94.09 93.38 92.53]
+├> nme1_curve [84.50 81.10 78.54 74.74 72.13 70.30]
+└> nme5_curve [96.82 95.87 95.16 94.31 92.87 91.76]

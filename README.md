@@ -19,7 +19,8 @@
 10. [Estrutura do Projeto](#estrutura-do-projeto)
 11. [Análise e Debugging](#análise-e-debugging)
 12. [Documentação Adicional](#documentação-adicional)
-13. [Referências](#referências)
+13. [Atualizações Operacionais (2026-03-22)](#atualizações-operacionais-2026-03-22)
+14. [Referências](#referências)
 
 ---
 
@@ -31,9 +32,48 @@
 | **wolverine** (indisponível) | 2× NVIDIA RTX 3080 Ti | 12 GB · 2 GPUs | — |
 | **fera** (indisponível) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | ImageNet-100 (quando retornar) |
 
-Cada máquina tem seu script dedicado:
-- **quati** → [`run_queue_quati.sh`](run_queue_quati.sh) (lançar com `screen -dmS quati_queue ./run_queue_quati.sh`)
-- **fera** → [`run_queue_fera.sh`](run_queue_fera.sh) (quando retornar)
+Fila debug principal no estado atual:
+- **quati** → [`run_queue_debug_anchors.sh`](run_queue_debug_anchors.sh)
+
+---
+
+## Atualizações Operacionais (2026-03-22)
+
+### Resumo da Sessão
+
+- Padronização completa dos nomes de config para incluir explicitamente: `antB`, `nceA`, `antM` (quando aplicável), `antGlobal/antLocal` e `nceGlobal/nceLocal`.
+- Correção de falha nos configs de debug (`KeyError: 'init_optimizer_configs'`) adicionando blocos de otimizador/scheduler ausentes.
+- Ajuste de logging para evitar custo de I/O no terminal em mensagens de debug de similaridade: logs de similaridade ficam no arquivo dedicado, sem poluir saída do treino.
+- Expansão da fila de debug para 3 datasets com 6 variações cada (18 experimentos):
+  - CIFAR-100 10-10
+  - CIFAR-100 50-10
+  - Tiny ImageNet 20-20
+
+### Política de Logs de Debug
+
+- Objetivo: preservar resultados de avaliação padrão, reduzindo custo de versionamento de logs volumosos de debug.
+- Mantidos para rastreio no diretório de experimento:
+  - `exp_stdlog*.log`
+  - `exp_gistlog.log`
+- Excluídos do versionamento:
+  - `exp_debug*.log`
+  - `similarity_debug.log`
+  - `similarity_heatmaps/`
+  - `debug_logs.zip`
+
+### Compactação Automática Pós-Treino
+
+- Ao finalizar cada experimento da fila debug, o script [`run_queue_debug_anchors.sh`](run_queue_debug_anchors.sh):
+  1. Compacta os artefatos de debug em `debug_logs.zip`.
+  2. Remove os arquivos de debug originais somente se a compactação for bem-sucedida.
+  3. Mantém os logs padrão de avaliação para auditoria e comparação.
+
+### Execução
+
+```bash
+screen -dmS debug_queue ./run_queue_debug_anchors.sh
+screen -r debug_queue
+```
 
 ---
 

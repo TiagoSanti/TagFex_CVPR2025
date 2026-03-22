@@ -61,7 +61,12 @@ class LoguruLogger:
         from functools import partial
 
         self.logger.remove()
-        self.logger.add(partial(tqdm.write, end=""), colorize=True, level=level)
+        self.logger.add(
+            partial(tqdm.write, end=""),
+            colorize=True,
+            level=level,
+            filter=lambda r: not r["extra"].get("sim_debug", False),
+        )
 
     def log_loss_components(
         self, components, prefix="", task=None, epoch=None, batch=None

@@ -1,9 +1,13 @@
 __pycache__/
 
-# Experiment logs - exclude heavy/incomplete runs and verbose debug logs
-logs/debug_exp_*/
-logs/auto_experiments/
+# Experiment logs
+# Keep eval logs (exp_stdlog*.log, exp_gistlog.log) tracked, even in debug runs.
+# Exclude only the heavy debug-specific files:
 **/exp_debug*.log
+**/similarity_debug.log
+**/similarity_heatmaps/
+**/debug_logs.zip
+logs/auto_experiments/
 
 # Virtual environment
 .venv/

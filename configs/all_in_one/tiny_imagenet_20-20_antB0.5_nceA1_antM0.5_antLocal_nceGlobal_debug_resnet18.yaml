@@ -1,0 +1,88 @@
+scenario: cil 20-20
+dataset_name: tiny_imagenet
+dataset_root: ~/data/datasets/tiny-imagenet-200/
+train_transform: tiny_imagenet_train_2
+test_transform: tiny_imagenet_test_1
+class_order: [168, 136, 51, 9, 183, 101, 171, 99, 42, 159, 191, 70, 16, 188, 27, 10, 175, 26, 68, 187, 98, 6, 85, 35, 112, 43, 100, 0, 103, 181, 88, 59, 4, 2, 116, 174, 94, 80, 106, 1, 147, 17, 141, 131, 72, 23, 173, 54, 197, 118, 87, 32, 79, 104, 91, 19, 135, 107, 178, 36, 11, 199, 142, 8, 122, 3, 28, 57, 153, 172, 190, 56, 49, 44, 97, 62, 151, 169, 194, 55, 192, 12, 189, 78, 66, 180, 15, 137, 109, 134, 92, 119, 126, 52, 170, 40, 148, 65, 144, 64, 138, 45, 77, 89, 154, 90, 71, 193, 74, 30, 113, 143, 96, 84, 67, 50, 186, 156, 69, 21, 18, 111, 108, 58, 125, 157, 150, 110, 182, 129, 166, 83, 81, 60, 13, 165, 14, 176, 63, 117, 5, 22, 145, 121, 38, 41, 82, 127, 114, 20, 31, 53, 37, 163, 196, 130, 152, 162, 86, 76, 24, 34, 184, 149, 33, 128, 198, 155, 146, 167, 139, 120, 140, 102, 47, 25, 158, 123, 46, 164, 61, 7, 115, 75, 133, 160, 105, 132, 179, 124, 48, 73, 93, 39, 95, 195, 29, 177, 185, 161]
+method: tagfex
+
+init_epochs: 200
+inc_epochs: 170
+eval_interval: 5
+
+contrast_factor: 1
+contrast_kd_factor: 2
+aux_factor: 2
+trans_cls_factor: 1
+transfer_factor: 1
+
+infonce_temp: 0.2
+infonce_kd_temp: 0.2
+kd_temp: 2
+num_aug: 2
+# ANT beta=0.5 m=0.5: ANT local + InfoNCE global
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+ant_max_global: false
+infonce_max_global: true
+
+log_dir: logs/debug_exp_tiny_imagenet_20-20
+
+# Similarity Matrix Debugging
+debug_similarity: true
+debug_similarity_epoch_interval: 1
+debug_similarity_batches_per_epoch: 1
+
+backbone_configs:
+  name: resnet18
+
+network_configs:
+  classifier_type: 'unified'
+  proj_hidden_dim: 2048
+  proj_output_dim: 1024
+  init_from_last: false
+  init_from_interpolation: true
+  init_interpolation_factor: 0.95
+  attn_num_heads: 8
+  merge_attn: true
+
+memory_configs:
+  fixed_size: false
+  memory_size: 2000
+
+trainloader_params:
+  batch_size: 128
+  num_workers: 8
+  drop_last: false
+
+testloader_params:
+  batch_size: 192
+  num_workers: 8
+  drop_last: false
+
+init_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5.e-4
+
+init_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [60, 120, 170]
+    gamma: 0.1
+
+inc_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 2.e-4
+
+inc_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [80, 120, 150]
+    gamma: 0.1

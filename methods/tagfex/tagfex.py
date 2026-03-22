@@ -394,13 +394,26 @@ class TagFex(HerdingIndicesLearner):
                     debug_logger = getattr(self, "similarity_debug_logger", None)
                     heatmap_dir = getattr(self, "heatmap_dir", None)
 
+            ant_beta = self.configs.get("ant_beta", 0.0)
+            ant_max_global = self.configs.get("ant_max_global", True)
+            infonce_max_global_cfg = self.configs.get("infonce_max_global", None)
+
+            # Backward compatibility:
+            # - ANT disabled: InfoNCE follows ant_max_global (legacy baseline behavior)
+            # - ANT enabled: InfoNCE stays global unless explicitly configured
+            if infonce_max_global_cfg is None:
+                infonce_max_global = ant_max_global if ant_beta == 0.0 else True
+            else:
+                infonce_max_global = infonce_max_global_cfg
+
             infonce_loss = infoNCE_loss(
                 embedding,
                 self.configs["infonce_temp"],
                 self.configs.get("nce_alpha", 1.0),
-                self.configs.get("ant_beta", 0.0),
+                ant_beta,
                 self.configs.get("ant_margin", 0.1),
-                self.configs.get("ant_max_global", True),
+                ant_max_global,
+                infonce_max_global,
                 logger=self.loguru_logger,
                 task=self.state["cur_task"],
                 epoch=self.state["cur_epoch"],
@@ -424,9 +437,10 @@ class TagFex(HerdingIndicesLearner):
                     self.last_projector(old_ta_feature),
                     self.configs["infonce_kd_temp"],
                     self.configs.get("nce_alpha", 1.0),
-                    self.configs.get("ant_beta", 0.0),
+                    ant_beta,
                     self.configs.get("ant_margin", 0.1),
-                    self.configs.get("ant_max_global", True),
+                    ant_max_global,
+                    infonce_max_global,
                     logger=self.loguru_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
@@ -671,11 +685,10 @@ class TagFex(HerdingIndicesLearner):
             suffix_parts.append(f"antM{ant_margin:.3f}".rstrip("0").rstrip("."))
 
         ant_max_global = self.configs.get("ant_max_global", True)
+        infonce_max_global = self.configs.get("infonce_max_global", ant_max_global)
 
-        if ant_max_global:
-            suffix_parts.append("antGlobal")
-        else:
-            suffix_parts.append("antLocal")
+        suffix_parts.append("antGlobal" if ant_max_global else "antLocal")
+        suffix_parts.append("nceGlobal" if infonce_max_global else "nceLocal")
 
         # Always append seed so every run has a unique, traceable directory
         seed = self.configs.get("seed", 1993)
@@ -818,7 +831,8 @@ def _compute_contrastive_loss_base(
     nce_alpha=1.0,
     ant_beta=0.0,
     ant_margin=0.1,
-    max_global=True,
+    ant_max_global=True,
+    infonce_max_global=True,
     logger=None,
     log_prefix="contrast",
     task=None,
@@ -837,7 +851,8 @@ def _compute_contrastive_loss_base(
         nce_alpha: Weight for InfoNCE loss component
         ant_beta: Weight for ANT (Adaptive Negative Thresholding) loss component
         ant_margin: Margin threshold for ANT loss
-        max_global: If True, use global maximum across all anchors; if False, use per-anchor maximum
+        ant_max_global: If True, ANT uses global maximum across anchors; if False, per-anchor maximum
+        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         logger: Logger instance for recording statistics
         log_prefix: Prefix for log messages ("contrast" or "kd")
         task: Current task number for logging
@@ -856,7 +871,7 @@ def _compute_contrastive_loss_base(
         _debug_similarity_matrices(
             cos_sim=cos_sim,
             ant_margin=ant_margin,
-            max_global=max_global,
+            max_global=ant_max_global,
             debug_logger=debug_logger,
             heatmap_dir=heatmap_dir,
             task=task,
@@ -877,7 +892,7 @@ def _compute_contrastive_loss_base(
     pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
 
     # Compute ANT loss based on max_global strategy
-    if max_global:
+    if ant_max_global:
         # Global maximum across all anchors
         q1_max = q1.max()
         mq1 = F.relu_(q1 - q1_max + ant_margin)
@@ -914,7 +929,7 @@ def _compute_contrastive_loss_base(
     # Log detailed ANT-specific statistics when ANT is active
     if logger is not None and ant_beta > 0:
         # Compute gaps: distance from max negative to margin threshold
-        if max_global:
+        if ant_max_global:
             gaps = q1_nonzero - q1_max
         else:
             # Expand q1_max to match q1 shape
@@ -954,9 +969,9 @@ def _compute_contrastive_loss_base(
     # InfoNCE loss with optional local anchor normalization
     cos_sim = cos_sim / t
 
-    # Apply local anchor normalization when ANT is disabled but max_global=False
-    # Each anchor is normalized by its own maximum negative similarity
-    if ant_beta == 0.0 and not max_global:
+    # Apply local anchor normalization for InfoNCE when configured.
+    # This strategy is now independent from ANT anchor selection.
+    if not infonce_max_global:
         # Find max negative similarity per anchor (excluding positives)
         cos_sim_neg = cos_sim.clone()
         cos_sim_neg[pos_mask] = -float("inf")
@@ -996,7 +1011,8 @@ def infoNCE_loss(
     nce_alpha=1.0,
     ant_beta=0.0,
     ant_margin=0.1,
-    max_global=True,
+    ant_max_global=True,
+    infonce_max_global=True,
     logger=None,
     task=None,
     epoch=None,
@@ -1013,7 +1029,8 @@ def infoNCE_loss(
         nce_alpha: Weight for InfoNCE loss
         ant_beta: Weight for ANT loss
         ant_margin: Margin threshold for ANT
-        max_global: If True, use global max; if False, use per-anchor max
+        ant_max_global: If True, ANT uses global max; if False, per-anchor max
+        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1034,7 +1051,8 @@ def infoNCE_loss(
         nce_alpha=nce_alpha,
         ant_beta=ant_beta,
         ant_margin=ant_margin,
-        max_global=max_global,
+        ant_max_global=ant_max_global,
+        infonce_max_global=infonce_max_global,
         logger=logger,
         log_prefix="contrast",
         task=task,
@@ -1052,7 +1070,8 @@ def infoNCE_distill_loss(
     nce_alpha=1.0,
     ant_beta=0.0,
     ant_margin=0.1,
-    max_global=True,
+    ant_max_global=True,
+    infonce_max_global=True,
     logger=None,
     task=None,
     epoch=None,
@@ -1071,7 +1090,8 @@ def infoNCE_distill_loss(
         nce_alpha: Weight for InfoNCE loss
         ant_beta: Weight for ANT loss
         ant_margin: Margin threshold for ANT
-        max_global: If True, use global max; if False, use per-anchor max
+        ant_max_global: If True, ANT uses global max; if False, per-anchor max
+        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1092,7 +1112,8 @@ def infoNCE_distill_loss(
         nce_alpha=nce_alpha,
         ant_beta=ant_beta,
         ant_margin=ant_margin,
-        max_global=max_global,
+        ant_max_global=ant_max_global,
+        infonce_max_global=infonce_max_global,
         logger=logger,
         log_prefix="kd",
         task=task,
@@ -1270,16 +1291,6 @@ def _debug_similarity_matrices(
         threshold=threshold if max_global else None,
     )
 
-    # Create and save heatmap
-    # _save_similarity_heatmap(
-    #     cos_sim_np=cos_sim_np,
-    #     heatmap_dir=heatmap_dir,
-    #     context=context,
-    #     ant_margin=ant_margin,
-    #     max_global=max_global,
-    # )
-
-
 def _log_similarity_matrix(
     cos_sim_np,
     debug_logger,
@@ -1355,66 +1366,3 @@ def _log_similarity_matrix(
     debug_logger.info("  + = Positive pair (augmentation)")
     debug_logger.info("  ! = Margin violation (negative above threshold)")
     debug_logger.info(f"\n{'='*80}\n")
-
-
-def _save_similarity_heatmap(
-    cos_sim_np,
-    heatmap_dir,
-    context,
-    ant_margin,
-    max_global,
-):
-    """
-    Create and save heatmap visualization of similarity matrix.
-
-    Args:
-        cos_sim_np: Similarity matrix as numpy array
-        heatmap_dir: Directory to save heatmap
-        context: Context string for filename
-        ant_margin: Margin value for title
-        max_global: Whether using global or local max
-    """
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
-    fig, ax = plt.subplots(figsize=(12, 10))
-
-    # Create heatmap
-    sns.heatmap(
-        cos_sim_np,
-        annot=True,
-        fmt=".2f",
-        cmap="RdYlGn",
-        center=0.0,
-        vmin=-1.0,
-        vmax=1.0,
-        square=True,
-        linewidths=0.5,
-        cbar_kws={"label": "Cosine Similarity"},
-        ax=ax,
-    )
-
-    # Add title with parameters
-    max_strategy = "Global" if max_global else "Local"
-    ax.set_title(
-        f"Similarity Matrix - {context}\nMargin: {ant_margin}, Max: {max_strategy}",
-        fontsize=12,
-        pad=20,
-    )
-    ax.set_xlabel("Sample Index", fontsize=10)
-    ax.set_ylabel("Sample Index (Anchor)", fontsize=10)
-
-    # Highlight diagonal
-    N = cos_sim_np.shape[0]
-    batch_size = N // 2
-
-    # Draw lines to separate augmented pairs
-    ax.axhline(y=batch_size, color="blue", linewidth=2, linestyle="--", alpha=0.7)
-    ax.axvline(x=batch_size, color="blue", linewidth=2, linestyle="--", alpha=0.7)
-
-    # Save figure
-    filename = f"sim_heatmap_{context}.png"
-    filepath = Path(heatmap_dir) / filename
-    plt.tight_layout()
-    plt.savefig(filepath, dpi=150, bbox_inches="tight")
-    plt.close(fig)
