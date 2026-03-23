@@ -349,7 +349,39 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
     if _disk_cache.exists():
         try:
             with open(_disk_cache, "rb") as _fh:
-                return pickle.load(_fh)
+                cached = pickle.load(_fh)
+            # Migrate old dtype=object markers to compact uint8
+            mk = cached.get("markers")
+            needs_resave = False
+            if mk is not None and mk.dtype != np.uint8:
+                cached["markers"] = np.vectorize(_MARKER_ENC.get)(mk, 0).astype(
+                    np.uint8
+                )
+                mk = cached["markers"]
+                needs_resave = True
+            # Derive violation_pct from ! markers when absent (e.g. stale cache or antLocal log)
+            if mk is not None and "violation_pct" not in cached.get("overall", {}):
+                _N = cached.get("shape", (0,))[0]
+                _bang = (
+                    int(np.sum(mk == 3))
+                    if mk.dtype == np.uint8
+                    else int(np.sum(mk == "!"))
+                )
+                _total_neg = _N * (_N - 2)
+                if _total_neg > 0:
+                    cached.setdefault("overall", {})["violation_pct"] = (
+                        _bang / _total_neg * 100.0
+                    )
+                    cached["overall"]["violations"] = _bang
+                    cached["overall"]["total_neg"] = _total_neg
+                    needs_resave = True
+            if needs_resave:
+                try:
+                    with open(_disk_cache, "wb") as _fh:
+                        pickle.dump(cached, _fh, protocol=pickle.HIGHEST_PROTOCOL)
+                except Exception:
+                    pass
+            return cached
         except Exception:
             pass  # corrupted cache → fall through to re-parse
 
@@ -579,6 +611,21 @@ def parse_debug_entry(log_path: str, offset: int) -> dict:
                 mk[i, : len(rm)] = rm
             result["matrix"] = mat
             result["markers"] = np.vectorize(_MARKER_ENC.get)(mk, 0).astype(np.uint8)
+
+    # Derive violation_pct from ! markers when the log omits the "Margin violations:" line
+    # (e.g. antLocal strategy which doesn't log that summary line)
+    if result["markers"] is not None and "violation_pct" not in result["overall"]:
+        _mk = result["markers"]
+        _N = result["shape"][0]
+        _bang = (
+            int(np.sum(_mk == 3)) if _mk.dtype == np.uint8 else int(np.sum(_mk == "!"))
+        )
+        # Each of the N anchors has N-2 potential negatives (excluding self + positive pair)
+        _total_neg = _N * (_N - 2)
+        if _total_neg > 0:
+            result["overall"]["violation_pct"] = _bang / _total_neg * 100.0
+            result["overall"]["violations"] = _bang
+            result["overall"]["total_neg"] = _total_neg
 
     # Persist to disk so subsequent sessions skip re-parsing
     try:
@@ -865,8 +912,12 @@ def render_matrix_heatmap_plotly(
     margin: float | None,
     max_strategy: str,
     title: str = "",
+    show_violation_markers: bool = False,
 ) -> go.Figure:
-    """Interactive Plotly heatmap — hover shows sim value per cell, zoom/pan enabled."""
+    """Interactive Plotly heatmap — hover shows sim value per cell, zoom/pan enabled.
+
+    Set show_violation_markers=False to hide the visual '!' overlays.
+    """
     N = matrix.shape[0]
     batch_size = N // 2
 
@@ -874,25 +925,13 @@ def render_matrix_heatmap_plotly(
     # Decode compact uint8 markers (no-op for old object-array caches)
     if markers is not None:
         markers = _decode_markers(markers)
-    # Vectorised hover: list comprehension is ~3× faster than nested .append loops
+
+    # Build customdata for marker labels (lightweight vs N² hover strings)
     if markers is not None:
         _mk = markers[:N, :N]
-        hover = [
-            [
-                f"row {i} / col {j}<br>sim = {matrix[i, j]:.4f}<br>"
-                f"<i>{mk_labels.get(str(_mk[i, j]), 'negative')}</i>"
-                for j in range(N)
-            ]
-            for i in range(N)
-        ]
+        mk_text = np.vectorize(lambda m: mk_labels.get(str(m), "negative"))(_mk)
     else:
-        hover = [
-            [
-                f"row {i} / col {j}<br>sim = {matrix[i, j]:.4f}<br><i>negative</i>"
-                for j in range(N)
-            ]
-            for i in range(N)
-        ]
+        mk_text = np.full((N, N), "negative", dtype=object)
 
     strat = max_strategy or "?"
     m_str = f"margin={margin}" if margin is not None else ""
@@ -905,7 +944,15 @@ def render_matrix_heatmap_plotly(
         labels={"color": "Cosine Sim"},
         title=f"{title}  [{m_str}, max={strat}]",
     )
-    fig.update_traces(text=hover, hovertemplate="%{text}<extra></extra>")
+    fig.update_traces(
+        customdata=mk_text,
+        hovertemplate=(
+            "row %{y} / col %{x}<br>"
+            "sim = %{z:.4f}<br>"
+            "<i>%{customdata}</i>"
+            "<extra></extra>"
+        ),
+    )
 
     # Quadrant divider (view-1 / view-2 boundary)
     fig.add_hline(
@@ -921,30 +968,28 @@ def render_matrix_heatmap_plotly(
         x=batch_size - 0.5, line_dash="dash", line_color="royalblue", line_width=2
     )
 
-    # Marker annotations (+ and ! only; * clutters the chart)
-    # np.argwhere replaces the O(N²) nested loop — only iterates over matched cells
-    annotations = []
+    # Marker overlays as scatter traces — O(1) traces vs O(N) layout annotations.
+    # For 256×256 matrices with ~16K violations, this cuts render time from ~10s to <0.5s.
+    # White is used for ! (violations) so they remain visible on red cells (low similarity).
     if markers is not None:
         _mk = markers[:N, :N]
-        _ann_style = {
-            "+": dict(color="#00cc44", size=9, family="Arial Black"),
-            "!": dict(color="#cc0000", size=9, family="Arial Black"),
-        }
-        for sym, font_kw in _ann_style.items():
-            for i, j in np.argwhere(_mk == sym):
-                annotations.append(
-                    dict(
-                        x=int(j),
-                        y=int(i),
-                        text=sym,
-                        showarrow=False,
-                        xref="x",
-                        yref="y",
-                        font=font_kw,
+        overlay_markers = [("+", "#00cc44")]
+        if show_violation_markers:
+            overlay_markers.append(("!", "#ffffff"))
+        for sym, color in overlay_markers:
+            coords = np.argwhere(_mk == sym)
+            if len(coords) > 0:
+                fig.add_trace(
+                    go.Scatter(
+                        x=coords[:, 1].tolist(),
+                        y=coords[:, 0].tolist(),
+                        mode="text",
+                        text=[sym] * len(coords),
+                        textfont=dict(color=color, size=8, family="Arial Black"),
+                        showlegend=False,
+                        hoverinfo="skip",
                     )
                 )
-    if annotations:
-        fig.update_layout(annotations=annotations)
 
     size = max(420, min(N * 18 + 120, 860))
     fig.update_layout(
@@ -1059,6 +1104,171 @@ def render_anchor_chart_plotly(anchors: list[dict], N: int) -> go.Figure:
     return fig
 
 
+def _is_baseline_experiment(exp_label: str) -> bool:
+    """Return True when experiment name indicates baseline ANT weight (antB0)."""
+    return bool(re.search(r"(?:^|_)antB0(?:[._]|$)", exp_label))
+
+
+def _apply_margin_override(entry: dict, margin_override: float | None) -> dict:
+    """Return a copy of *entry* with recomputed thresholds/violations for a new margin.
+
+    This enables post-hoc comparison of ANT-violation behavior (especially for
+    baseline ant_beta=0 runs) without rerunning training.
+    """
+    if margin_override is None:
+        return entry
+
+    matrix = entry.get("matrix")
+    if matrix is None or matrix.size == 0:
+        out = dict(entry)
+        out["margin"] = float(margin_override)
+        return out
+
+    N = int(matrix.shape[0])
+    batch_size = N // 2
+    max_strat = (entry.get("max_strategy") or "").lower()
+    use_global = max_strat == "global"
+
+    cos_sim_anchors = matrix[:batch_size, :batch_size]
+    mask_diag = np.eye(batch_size, dtype=bool)
+    neg_only = np.where(mask_diag, -np.inf, cos_sim_anchors)
+
+    if use_global:
+        anchor_maxs = np.full(batch_size, float(np.max(neg_only)), dtype=np.float32)
+    else:
+        anchor_maxs = np.max(neg_only, axis=1).astype(np.float32)
+    thresholds = anchor_maxs - float(margin_override)
+
+    # Rebuild marker matrix using the same convention as debug logger:
+    # only anchor rows from first half mark negative violations in first-half columns.
+    new_markers = np.zeros((N, N), dtype=np.uint8)
+    np.fill_diagonal(new_markers, 1)  # *
+    for i in range(batch_size):
+        new_markers[i, i + batch_size] = 2  # +
+        row_vals = cos_sim_anchors[i]
+        above = (row_vals >= thresholds[i]) & (~mask_diag[i])
+        new_markers[i, :batch_size][above] = 3  # !
+
+    violations = int(np.sum(new_markers == 3))
+    total_neg = int(batch_size * max(0, batch_size - 1))
+    violation_pct = 100.0 * violations / total_neg if total_neg > 0 else None
+
+    # Recompute per-anchor summary tables (for anchors present in parsed logs)
+    new_anchors = []
+    for a in entry.get("anchors", []):
+        i = int(a.get("idx", -1))
+        if i < 0 or i >= batch_size:
+            new_anchors.append(dict(a))
+            continue
+
+        row = cos_sim_anchors[i]
+        pos_idx = i + batch_size
+        pos_sim = float(matrix[i, pos_idx])
+        anchor_max = float(anchor_maxs[i])
+        anchor_threshold = float(thresholds[i])
+
+        above_vals: list[tuple[int, float]] = []
+        below_vals: list[tuple[int, float]] = []
+        for j in range(batch_size):
+            if j == i:
+                continue
+            v = float(row[j])
+            if v >= anchor_threshold:
+                above_vals.append((j, v))
+            else:
+                below_vals.append((j, v))
+
+        above_vals.sort(key=lambda x: x[1], reverse=True)
+        below_vals.sort(key=lambda x: x[1], reverse=True)
+
+        new_anchors.append(
+            {
+                **a,
+                "pos_idx": pos_idx,
+                "pos_sim": pos_sim,
+                "anchor_max": anchor_max,
+                "threshold": anchor_threshold,
+                "above_count": len(above_vals),
+                "below_count": len(below_vals),
+                "above": [
+                    {
+                        "idx": j,
+                        "sim": v,
+                        "gap": v - anchor_threshold,
+                    }
+                    for j, v in above_vals[:5]
+                ],
+                "below": [
+                    {
+                        "idx": j,
+                        "sim": v,
+                        "gap": anchor_threshold - v,
+                    }
+                    for j, v in below_vals[:3]
+                ],
+            }
+        )
+
+    new_local_maxs = None
+    if not use_global:
+        new_local_maxs = {
+            "min": float(np.min(anchor_maxs)),
+            "max": float(np.max(anchor_maxs)),
+            "mean": float(np.mean(anchor_maxs)),
+        }
+
+    new_overall = dict(entry.get("overall", {}))
+    new_overall["violations"] = violations
+    new_overall["total_neg"] = total_neg
+    if violation_pct is not None:
+        new_overall["violation_pct"] = violation_pct
+
+    return {
+        **entry,
+        "margin": float(margin_override),
+        "markers": new_markers,
+        "anchors": new_anchors,
+        "local_maxs": new_local_maxs,
+        "overall": new_overall,
+    }
+
+
+@st.cache_data(show_spinner=False, max_entries=1000)
+def _get_batch_loss_components(
+    main_log_path: str,
+    task: int,
+    epoch: int,
+    batch: int,
+    loss_type_hint: str | None = None,
+) -> dict:
+    """Return loss components for one (task, epoch, batch), preferring loss_type_hint."""
+    if not Path(main_log_path).exists():
+        return {}
+
+    df = parse_main_log(main_log_path)
+    if df.empty:
+        return {}
+
+    sub = df[(df["task"] == task) & (df["epoch"] == epoch) & (df["batch"] == batch)]
+    if sub.empty:
+        return {}
+
+    if loss_type_hint is not None and "loss_type" in sub.columns:
+        hinted = sub[sub["loss_type"] == loss_type_hint]
+        if not hinted.empty:
+            row = hinted.iloc[0]
+        else:
+            row = sub.iloc[0]
+    else:
+        row = sub.iloc[0]
+
+    out = {"loss_type": row.get("loss_type")}
+    for c in ["nll", "ant_loss", "ant_loss_w", "total"]:
+        if c in row and pd.notna(row[c]):
+            out[c] = float(row[c])
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Cached figure builders  — keyed on (log_path, offset) to avoid recomputing
 # on every Streamlit rerun.  Each button click triggers a full page re-execution;
@@ -1067,9 +1277,14 @@ def render_anchor_chart_plotly(anchors: list[dict], N: int) -> go.Figure:
 
 
 @st.cache_data(show_spinner=False, max_entries=500)
-def _get_heatmap_figure(log_path: str, offset: int) -> "go.Figure | None":
+def _get_heatmap_figure(
+    log_path: str,
+    offset: int,
+    show_violation_markers: bool = False,
+    margin_override: float | None = None,
+) -> "go.Figure | None":
     """Build and cache the Plotly similarity heatmap for the entry at *offset*."""
-    entry = parse_debug_entry(log_path, offset)
+    entry = _apply_margin_override(parse_debug_entry(log_path, offset), margin_override)
     matrix = entry.get("matrix")
     if matrix is None or matrix.size == 0:
         return None
@@ -1079,14 +1294,67 @@ def _get_heatmap_figure(log_path: str, offset: int) -> "go.Figure | None":
         entry.get("margin"),
         entry.get("max_strategy", "?"),
         entry.get("context", ""),
+        show_violation_markers=show_violation_markers,
     )
 
 
 @st.cache_data(show_spinner=False, max_entries=500)
-def _get_anchor_figure(log_path: str, offset: int) -> go.Figure:
+def _get_anchor_figure(
+    log_path: str, offset: int, margin_override: float | None = None
+) -> go.Figure:
     """Build and cache the Plotly anchor chart for the entry at *offset*."""
-    entry = parse_debug_entry(log_path, offset)
+    entry = _apply_margin_override(parse_debug_entry(log_path, offset), margin_override)
     return render_anchor_chart_plotly(entry.get("anchors", []), entry["shape"][0])
+
+
+@st.cache_data(show_spinner=False, max_entries=200)
+def _get_diff_heatmap(
+    log_a: str, off_a: int, log_b: str, off_b: int, label_a: str, label_b: str
+) -> "go.Figure | None":
+    """Build a difference heatmap (A − B) for two matched entries."""
+    ea = parse_debug_entry(log_a, off_a)
+    eb = parse_debug_entry(log_b, off_b)
+    ma, mb = ea.get("matrix"), eb.get("matrix")
+    if ma is None or mb is None or ma.shape != mb.shape:
+        return None
+    diff = ma - mb
+    N = ma.shape[0]
+    batch_size = N // 2
+    abs_max = max(float(np.abs(diff).max()), 0.01)
+    hover = [
+        [
+            f"row {i} / col {j}<br>Δ = {diff[i, j]:+.4f}<br>"
+            f"A = {ma[i, j]:.4f} · B = {mb[i, j]:.4f}"
+            for j in range(N)
+        ]
+        for i in range(N)
+    ]
+    fig = px.imshow(
+        diff,
+        color_continuous_scale="RdBu_r",
+        zmin=-abs_max,
+        zmax=abs_max,
+        aspect="equal",
+        labels={"color": "Δ Sim"},
+        title=f"Δ ({label_a} − {label_b})",
+    )
+    fig.update_traces(text=hover, hovertemplate="%{text}<extra></extra>")
+    fig.add_hline(
+        y=batch_size - 0.5,
+        line_dash="dash",
+        line_color="royalblue",
+        line_width=2,
+    )
+    fig.add_vline(
+        x=batch_size - 0.5, line_dash="dash", line_color="royalblue", line_width=2
+    )
+    size = max(420, min(N * 18 + 120, 860))
+    fig.update_layout(
+        height=size,
+        margin=dict(l=40, r=60, t=60, b=40),
+        coloraxis_colorbar=dict(title="Δ Sim", thickness=14, len=0.75),
+    )
+    return fig
 
 
 # ---------------------------------------------------------------------------
@@ -1148,8 +1416,26 @@ def main() -> None:
             "Quanto maior `violation_pct`, mais pares negativos são difíceis para o modelo."
         )
 
-    tab_overview, tab_inspector = st.tabs(
-        ["📈  Training Overview", "🔍  Batch Inspector"]
+        st.divider()
+        st.markdown("**Post-hoc margin (baseline)**")
+        baseline_margin_override_enabled = st.checkbox(
+            "Forçar margin=0.50 no baseline (sem re-treinar)", value=True
+        )
+        baseline_margin_override_value = st.number_input(
+            "Margin exibida nos títulos",
+            min_value=0.0,
+            max_value=2.0,
+            value=0.5,
+            step=0.05,
+            format="%.2f",
+            help=(
+                "Recalcula threshold, violações (!) e violation % para experimentos "
+                "baseline (antB0) diretamente no viewer."
+            ),
+        )
+
+    tab_overview, tab_inspector, tab_comparison = st.tabs(
+        ["📈  Training Overview", "🔍  Batch Inspector", "🔄  Batch Comparison"]
     )
 
     # ==================================================================
@@ -1437,7 +1723,14 @@ def main() -> None:
 
         # ---- Parse entry ----
         entry_key = cur_row["key"]
-        entry = parse_debug_entry(sim_log, index[entry_key])
+        inspector_margin_override = None
+        if baseline_margin_override_enabled and _EXPERIMENTS:
+            if _is_baseline_experiment(exp_key):
+                inspector_margin_override = float(baseline_margin_override_value)
+
+        entry = _apply_margin_override(
+            parse_debug_entry(sim_log, index[entry_key]), inspector_margin_override
+        )
 
         overall = entry.get("overall", {})
         margin = entry.get("margin")
@@ -1450,6 +1743,8 @@ def main() -> None:
 
         # ---- KPI row ----
         st.subheader(f"`{entry['context']}`")
+        if inspector_margin_override is not None:
+            st.caption(f"Baseline exibido com margin = {inspector_margin_override:.2f}")
         k1, k2, k3, k4, k5, k6 = st.columns(6)
         k1.metric("pos mean", _fmt(overall.get("pos_mean")))
         k2.metric("neg mean", _fmt(overall.get("neg_mean")))
@@ -1461,6 +1756,23 @@ def main() -> None:
         k4.metric("violation %", f"{viol:.1f}%" if viol is not None else "—")
         k5.metric("ANT margin", f"{margin}" if margin is not None else "—")
         k6.metric("max strategy", max_strat)
+
+        _batch_loss = _get_batch_loss_components(
+            main_log,
+            cur_task,
+            cur_epoch,
+            cur_batch,
+            loss_type_hint=cur_type,
+        )
+        if _batch_loss:
+            st.caption(
+                "Loss do batch: "
+                f"tipo={_batch_loss.get('loss_type', '—')} · "
+                f"NCE={_fmt(_batch_loss.get('nll'))} · "
+                f"ANT={_fmt(_batch_loss.get('ant_loss'))} · "
+                f"ANT×β={_fmt(_batch_loss.get('ant_loss_w'))} · "
+                f"Total={_fmt(_batch_loss.get('total'))}"
+            )
 
         if local_maxs:
             lm1, lm2 = st.columns(2)
@@ -1560,8 +1872,17 @@ def main() -> None:
         col_heat, col_anchor = st.columns([5, 3])
 
         with col_heat:
-            st.markdown("**Similarity Heatmap**")
-            fig_h = _get_heatmap_figure(sim_log, index[entry_key])
+            _heat_title = "**Similarity Heatmap**"
+            if inspector_margin_override is not None:
+                _heat_title = (
+                    f"**Similarity Heatmap — margin={inspector_margin_override:.2f}**"
+                )
+            st.markdown(_heat_title)
+            fig_h = _get_heatmap_figure(
+                sim_log,
+                index[entry_key],
+                margin_override=inspector_margin_override,
+            )
             if fig_h is not None:
                 st.plotly_chart(fig_h, use_container_width=True)
                 st.caption(
@@ -1589,9 +1910,16 @@ def main() -> None:
                 )
 
         with col_anchor:
-            st.markdown("**Per-anchor statistics**")
+            _anc_title = "**Per-anchor statistics**"
+            if inspector_margin_override is not None:
+                _anc_title = f"**Per-anchor statistics — margin={inspector_margin_override:.2f}**"
+            st.markdown(_anc_title)
             if anchors:
-                fig_a = _get_anchor_figure(sim_log, index[entry_key])
+                fig_a = _get_anchor_figure(
+                    sim_log,
+                    index[entry_key],
+                    margin_override=inspector_margin_override,
+                )
                 st.plotly_chart(fig_a, use_container_width=True)
                 st.caption(
                     "**Painel superior** — para cada âncora: "
@@ -1658,9 +1986,9 @@ def main() -> None:
                 st.info("No per-anchor data found in this entry.")
 
         # ---- Prefetch adjacent entries (figures + parse data) for faster navigation ----
-        # Covers ±1 batch (ArrowLeft/Right) and adjacent epochs (ArrowUp/Down + buttons)
+        # Covers ±3 batches (ArrowLeft/Right) and adjacent epochs (ArrowUp/Down + buttons)
         _pf_indices: set[int] = set()
-        for _pf_delta in (-1, +1):
+        for _pf_delta in (-3, -2, -1, +1, +2, +3):
             _pf_i = idx + _pf_delta
             if 0 <= _pf_i < total_entries:
                 _pf_indices.add(_pf_i)
@@ -1670,8 +1998,410 @@ def main() -> None:
                 _pf_indices.add(_ep_i)
         for _pf_i in _pf_indices:
             _pf_key = entries_df.iloc[_pf_i]["key"]
-            _get_heatmap_figure(sim_log, index[_pf_key])
-            _get_anchor_figure(sim_log, index[_pf_key])
+            _get_heatmap_figure(
+                sim_log,
+                index[_pf_key],
+                margin_override=inspector_margin_override,
+            )
+            _get_anchor_figure(
+                sim_log,
+                index[_pf_key],
+                margin_override=inspector_margin_override,
+            )
+
+    # ==================================================================
+    # TAB 3 — Batch Comparison  (side-by-side two experiments)
+    # ==================================================================
+    with tab_comparison:
+        if len(_EXPERIMENTS) < 2:
+            st.warning(
+                "Precisa de pelo menos **2 experimentos debug** disponíveis "
+                "em `logs/` (cada um com `exp_debug0.log` e `similarity_debug.log`)."
+            )
+            st.stop()
+
+        exp_keys = list(_EXPERIMENTS.keys())
+        debug_keys = [k for k in exp_keys if k.startswith("debug_")]
+        _default_a = debug_keys[0] if debug_keys else exp_keys[0]
+        _default_b = (
+            debug_keys[1]
+            if len(debug_keys) > 1
+            else exp_keys[min(1, len(exp_keys) - 1)]
+        )
+
+        c_sel_a, c_sel_b = st.columns(2)
+        with c_sel_a:
+            cmp_exp_a = st.selectbox(
+                "Experimento A",
+                exp_keys,
+                index=exp_keys.index(_default_a),
+                key="cmp_exp_a",
+            )
+        with c_sel_b:
+            cmp_exp_b = st.selectbox(
+                "Experimento B",
+                exp_keys,
+                index=exp_keys.index(_default_b),
+                key="cmp_exp_b",
+            )
+
+        dir_a = _EXPERIMENTS[cmp_exp_a]
+        dir_b = _EXPERIMENTS[cmp_exp_b]
+        main_log_a = str(dir_a / "exp_debug0.log")
+        main_log_b = str(dir_b / "exp_debug0.log")
+        sim_log_a = str(dir_a / "similarity_debug.log")
+        sim_log_b = str(dir_b / "similarity_debug.log")
+
+        idx_a = build_or_load_debug_index(sim_log_a)
+        idx_b = build_or_load_debug_index(sim_log_b)
+
+        common_keys = sorted(set(idx_a.keys()) & set(idx_b.keys()))
+
+        if not common_keys:
+            st.error("Nenhuma entrada em comum entre os dois experimentos.")
+            st.stop()
+
+        # Build a lightweight DataFrame for the common entries
+        _cmp_parsed = []
+        for key in common_keys:
+            parts = key.split("_")
+            if len(parts) == 4:
+                _cmp_parsed.append(
+                    {
+                        "task": int(parts[0]),
+                        "epoch": int(parts[1]),
+                        "batch": int(parts[2]),
+                        "type": parts[3],
+                        "key": key,
+                    }
+                )
+        cmp_df = (
+            pd.DataFrame(_cmp_parsed)
+            .sort_values(["task", "epoch", "batch", "type"])
+            .reset_index(drop=True)
+        )
+        total_cmp = len(cmp_df)
+
+        st.success(
+            f"**{total_cmp:,}** entradas em comum · "
+            f"**{cmp_df['task'].nunique()}** tasks · "
+            f"tipos: {', '.join(sorted(cmp_df['type'].unique()))}"
+        )
+
+        # ---- Session-state comparison index ----
+        if "cmp_idx" not in st.session_state:
+            st.session_state.cmp_idx = 0
+
+        cmp_i = int(st.session_state.cmp_idx)
+        cmp_i = max(0, min(cmp_i, total_cmp - 1))
+        cmp_row = cmp_df.iloc[cmp_i]
+        cmp_task = int(cmp_row["task"])
+        cmp_epoch = int(cmp_row["epoch"])
+        cmp_batch = int(cmp_row["batch"])
+        cmp_type = cmp_row["type"]
+
+        # ---- Navigation helpers ----
+        def _cmp_prev_epoch():
+            sub = cmp_df[(cmp_df["task"] == cmp_task) & (cmp_df["epoch"] < cmp_epoch)]
+            if sub.empty:
+                return cmp_i
+            ep = sub["epoch"].max()
+            sub2 = sub[sub["epoch"] == ep]
+            same = sub2[sub2["type"] == cmp_type]
+            return int((same if not same.empty else sub2).index[0])
+
+        def _cmp_next_epoch():
+            sub = cmp_df[(cmp_df["task"] == cmp_task) & (cmp_df["epoch"] > cmp_epoch)]
+            if sub.empty:
+                return cmp_i
+            ep = sub["epoch"].min()
+            sub2 = sub[sub["epoch"] == ep]
+            same = sub2[sub2["type"] == cmp_type]
+            return int((same if not same.empty else sub2).index[0])
+
+        def _cmp_prev_task():
+            prev = [t for t in sorted(cmp_df["task"].unique()) if t < cmp_task]
+            if not prev:
+                return cmp_i
+            return int(cmp_df[cmp_df["task"] == prev[-1]].index[0])
+
+        def _cmp_next_task():
+            nxt = [t for t in sorted(cmp_df["task"].unique()) if t > cmp_task]
+            if not nxt:
+                return cmp_i
+            return int(cmp_df[cmp_df["task"] == nxt[0]].index[0])
+
+        # ---- Navigation bar ----
+        cn = st.columns([1, 1, 1, 4, 1, 1, 1])
+        if cn[0].button("⏮ Task", key="cmp_pt"):
+            st.session_state.cmp_idx = _cmp_prev_task()
+            st.rerun()
+        if cn[1].button("◀ Epoch", key="cmp_pe"):
+            st.session_state.cmp_idx = _cmp_prev_epoch()
+            st.rerun()
+        if cn[2].button("◀ Batch", key="cmp_pb"):
+            st.session_state.cmp_idx = max(0, cmp_i - 1)
+            st.rerun()
+        cn[3].markdown(
+            f"<div style='text-align:center;padding-top:8px;font-size:0.9em'>"
+            f"Entrada <b>{cmp_i + 1}</b>&nbsp;/&nbsp;<b>{total_cmp}</b>"
+            f"&nbsp;&nbsp;|&nbsp;&nbsp;"
+            f"T{cmp_task} · E{cmp_epoch} · B{cmp_batch} · {cmp_type}"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        if cn[4].button("Batch ▶", key="cmp_nb"):
+            st.session_state.cmp_idx = min(total_cmp - 1, cmp_i + 1)
+            st.rerun()
+        if cn[5].button("Epoch ▶", key="cmp_ne"):
+            st.session_state.cmp_idx = _cmp_next_epoch()
+            st.rerun()
+        if cn[6].button("Task ⏭▶", key="cmp_nt"):
+            st.session_state.cmp_idx = _cmp_next_task()
+            st.rerun()
+
+        # ---- Slider ----
+        def _cmp_fmt(i: int) -> str:
+            r = cmp_df.iloc[i]
+            return (
+                f"T{int(r['task'])}·E{int(r['epoch'])}·B{int(r['batch'])}·{r['type']}"
+            )
+
+        cmp_slider = st.select_slider(
+            "Entrada",
+            options=list(range(total_cmp)),
+            value=cmp_i,
+            format_func=_cmp_fmt,
+            label_visibility="collapsed",
+            key="cmp_slider",
+        )
+        if cmp_slider != cmp_i:
+            st.session_state.cmp_idx = cmp_slider
+            st.rerun()
+
+        # ---- Keyboard navigation ----
+        components.html(
+            """
+<script>
+(function() {
+    const doc = window.parent.document;
+    function clickBtn(label) {
+        const b = [...doc.querySelectorAll('button')].find(el => el.innerText.trim() === label);
+        if (b) b.click();
+    }
+    doc.addEventListener('keydown', function(e) {
+        const tag = e.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); clickBtn('Batch \\u25b6'); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); clickBtn('\\u25c4 Batch'); }
+        if (e.key === 'ArrowUp')    { e.preventDefault(); clickBtn('Epoch \\u25b6'); }
+        if (e.key === 'ArrowDown')  { e.preventDefault(); clickBtn('\\u25c4 Epoch'); }
+    }, false);
+})();
+</script>
+""",
+            height=0,
+        )
+
+        # ---- Parse both entries ----
+        entry_key = cmp_row["key"]
+        cmp_margin_override_a = None
+        cmp_margin_override_b = None
+        if baseline_margin_override_enabled:
+            if _is_baseline_experiment(cmp_exp_a):
+                cmp_margin_override_a = float(baseline_margin_override_value)
+            if _is_baseline_experiment(cmp_exp_b):
+                cmp_margin_override_b = float(baseline_margin_override_value)
+
+        entry_a = _apply_margin_override(
+            parse_debug_entry(sim_log_a, idx_a[entry_key]), cmp_margin_override_a
+        )
+        entry_b = _apply_margin_override(
+            parse_debug_entry(sim_log_b, idx_b[entry_key]), cmp_margin_override_b
+        )
+
+        # ---- Short labels for headers ----
+        _short_a = cmp_exp_a.replace("debug_exp_cifar100_10-10_", "").replace(
+            "_s1993", ""
+        )
+        _short_b = cmp_exp_b.replace("debug_exp_cifar100_10-10_", "").replace(
+            "_s1993", ""
+        )
+
+        # ---- KPI comparison ----
+        _cmp_title = f"`T{cmp_task}_E{cmp_epoch}_B{cmp_batch}_{cmp_type}`"
+        st.subheader(_cmp_title)
+        ov_a = entry_a.get("overall", {})
+        ov_b = entry_b.get("overall", {})
+        loss_a = _get_batch_loss_components(
+            main_log_a,
+            cmp_task,
+            cmp_epoch,
+            cmp_batch,
+            loss_type_hint=cmp_type,
+        )
+        loss_b = _get_batch_loss_components(
+            main_log_b,
+            cmp_task,
+            cmp_epoch,
+            cmp_batch,
+            loss_type_hint=cmp_type,
+        )
+
+        kpi_col_a, kpi_col_b = st.columns(2)
+        with kpi_col_a:
+            _label_a = f"**A** — `{_short_a}`"
+            if cmp_margin_override_a is not None:
+                _label_a += f" · **margin={cmp_margin_override_a:.2f}**"
+            st.markdown(_label_a)
+            ka1, ka2, ka3, ka4 = st.columns(4)
+            ka1.metric("pos mean", _fmt(ov_a.get("pos_mean")))
+            ka2.metric("neg mean", _fmt(ov_a.get("neg_mean")))
+            ka3.metric("gap", _fmt(ov_a.get("gap")))
+            viol_a = ov_a.get("violation_pct")
+            if viol_a is None and "violations" in ov_a and "total_neg" in ov_a:
+                viol_a = 100.0 * ov_a["violations"] / max(1, ov_a["total_neg"])
+            ka4.metric("violation %", f"{viol_a:.1f}%" if viol_a is not None else "—")
+            if loss_a:
+                st.caption(
+                    "Loss batch A: "
+                    f"tipo={loss_a.get('loss_type', '—')} · "
+                    f"NCE={_fmt(loss_a.get('nll'))} · "
+                    f"ANT={_fmt(loss_a.get('ant_loss'))} · "
+                    f"ANT×β={_fmt(loss_a.get('ant_loss_w'))} · "
+                    f"Total={_fmt(loss_a.get('total'))}"
+                )
+        with kpi_col_b:
+            _label_b = f"**B** — `{_short_b}`"
+            if cmp_margin_override_b is not None:
+                _label_b += f" · **margin={cmp_margin_override_b:.2f}**"
+            st.markdown(_label_b)
+            kb1, kb2, kb3, kb4 = st.columns(4)
+            kb1.metric("pos mean", _fmt(ov_b.get("pos_mean")))
+            kb2.metric("neg mean", _fmt(ov_b.get("neg_mean")))
+            kb3.metric("gap", _fmt(ov_b.get("gap")))
+            viol_b = ov_b.get("violation_pct")
+            if viol_b is None and "violations" in ov_b and "total_neg" in ov_b:
+                viol_b = 100.0 * ov_b["violations"] / max(1, ov_b["total_neg"])
+            kb4.metric("violation %", f"{viol_b:.1f}%" if viol_b is not None else "—")
+            if loss_b:
+                st.caption(
+                    "Loss batch B: "
+                    f"tipo={loss_b.get('loss_type', '—')} · "
+                    f"NCE={_fmt(loss_b.get('nll'))} · "
+                    f"ANT={_fmt(loss_b.get('ant_loss'))} · "
+                    f"ANT×β={_fmt(loss_b.get('ant_loss_w'))} · "
+                    f"Total={_fmt(loss_b.get('total'))}"
+                )
+
+        st.divider()
+
+        # ---- Side-by-side heatmaps ----
+        heat_a, heat_b = st.columns(2)
+        with heat_a:
+            _cmp_heat_a = "**A** — Similarity Heatmap"
+            if cmp_margin_override_a is not None:
+                _cmp_heat_a += f" — margin={cmp_margin_override_a:.2f}"
+            st.markdown(_cmp_heat_a)
+            fig_ha = _get_heatmap_figure(
+                sim_log_a,
+                idx_a[entry_key],
+                margin_override=cmp_margin_override_a,
+            )
+            if fig_ha is not None:
+                st.plotly_chart(fig_ha, use_container_width=True, key="cmp_heat_a")
+            else:
+                st.info("Matriz não disponível para A.")
+        with heat_b:
+            _cmp_heat_b = "**B** — Similarity Heatmap"
+            if cmp_margin_override_b is not None:
+                _cmp_heat_b += f" — margin={cmp_margin_override_b:.2f}"
+            st.markdown(_cmp_heat_b)
+            fig_hb = _get_heatmap_figure(
+                sim_log_b,
+                idx_b[entry_key],
+                margin_override=cmp_margin_override_b,
+            )
+            if fig_hb is not None:
+                st.plotly_chart(fig_hb, use_container_width=True, key="cmp_heat_b")
+            else:
+                st.info("Matriz não disponível para B.")
+
+        # ---- Difference heatmap ----
+        with st.expander("Δ Mapa de diferença (A − B)", expanded=False):
+            fig_diff = _get_diff_heatmap(
+                sim_log_a,
+                idx_a[entry_key],
+                sim_log_b,
+                idx_b[entry_key],
+                _short_a,
+                _short_b,
+            )
+            if fig_diff is not None:
+                st.plotly_chart(fig_diff, use_container_width=True, key="cmp_diff")
+                st.caption(
+                    "**Vermelho** = A tem similaridade maior que B · "
+                    "**Azul** = B tem similaridade maior que A. "
+                    "Valores próximos de zero (branco) indicam concordância entre os experimentos."
+                )
+            else:
+                st.info(
+                    "Não foi possível calcular a diferença "
+                    "(matrizes com shapes incompatíveis ou ausentes)."
+                )
+
+        st.divider()
+
+        # ---- Side-by-side anchor charts ----
+        anc_a, anc_b = st.columns(2)
+        with anc_a:
+            _cmp_anc_a = "**A** — Per-anchor statistics"
+            if cmp_margin_override_a is not None:
+                _cmp_anc_a += f" — margin={cmp_margin_override_a:.2f}"
+            st.markdown(_cmp_anc_a)
+            fig_aa = _get_anchor_figure(
+                sim_log_a,
+                idx_a[entry_key],
+                margin_override=cmp_margin_override_a,
+            )
+            st.plotly_chart(fig_aa, use_container_width=True, key="cmp_anc_a")
+        with anc_b:
+            _cmp_anc_b = "**B** — Per-anchor statistics"
+            if cmp_margin_override_b is not None:
+                _cmp_anc_b += f" — margin={cmp_margin_override_b:.2f}"
+            st.markdown(_cmp_anc_b)
+            fig_ab = _get_anchor_figure(
+                sim_log_b,
+                idx_b[entry_key],
+                margin_override=cmp_margin_override_b,
+            )
+            st.plotly_chart(fig_ab, use_container_width=True, key="cmp_anc_b")
+
+        # ---- Prefetch adjacent entries for both experiments ----
+        for _delta in (-1, +1):
+            _ni = cmp_i + _delta
+            if 0 <= _ni < total_cmp:
+                _nkey = cmp_df.iloc[_ni]["key"]
+                _get_heatmap_figure(
+                    sim_log_a,
+                    idx_a[_nkey],
+                    margin_override=cmp_margin_override_a,
+                )
+                _get_heatmap_figure(
+                    sim_log_b,
+                    idx_b[_nkey],
+                    margin_override=cmp_margin_override_b,
+                )
+                _get_anchor_figure(
+                    sim_log_a,
+                    idx_a[_nkey],
+                    margin_override=cmp_margin_override_a,
+                )
+                _get_anchor_figure(
+                    sim_log_b,
+                    idx_b[_nkey],
+                    margin_override=cmp_margin_override_b,
+                )
 
 
 if __name__ == "__main__":
