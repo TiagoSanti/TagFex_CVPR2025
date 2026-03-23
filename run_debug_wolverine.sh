@@ -10,7 +10,7 @@
 #
 # Experimentos (em paralelo, um por GPU):
 #   GPU 0 — CIFAR-100 10-10 ANT β=0.5 m=0.5 Local (debug)   seed 1993
-#   GPU 1 — CIFAR-100 10-10 Baseline Local        (debug)   seed 1993
+#   GPU 1 — CIFAR-100 10-10 Baseline Global       (debug)   seed 1993
 #
 # Uso:
 #   screen -dmS debug_wolverine bash run_debug_wolverine.sh
@@ -93,19 +93,19 @@ queue_experiment() {
 
 lane_baseline() {
     echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║  Lane A — GPU 1 — Baseline Local [debug]            ║${NC}"
+    echo -e "${CYAN}║  Lane A — GPU 1 — Baseline Global [debug]           ║${NC}"
     echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}\n"
-    log_progress ">> [Lane A] Iniciando — Baseline Local (GPU 1)"
+    log_progress ">> [Lane A] Iniciando — Baseline Global (GPU 1)"
 
     queue_experiment \
-        "configs/all_in_one/cifar100_10-10_baseline_local_debug_resnet18.yaml" \
-        "CIFAR-100 10-10 Baseline Local [debug]" \
+        "configs/all_in_one/cifar100_10-10_baseline_global_debug_resnet18.yaml" \
+        "CIFAR-100 10-10 Baseline Global [debug]" \
         1993 \
-        "debug_exp_cifar100_10-10_antB0_nceA1_antLocal_s1993" \
+        "debug_exp_cifar100_10-10_antB0_nceA1_antGlobal_s1993" \
         1
 
-    log_progress "[OK] [Lane A] Baseline Local concluída"
-    echo -e "${GREEN}[OK] [Lane A] Baseline Local concluída!${NC}\n"
+    log_progress "[OK] [Lane A] Baseline Global concluída"
+    echo -e "${GREEN}[OK] [Lane A] Baseline Global concluída!${NC}\n"
 }
 
 lane_ant() {
@@ -120,6 +120,7 @@ lane_ant() {
         1993 \
         "debug_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_s1993" \
         0
+
 
     log_progress "[OK] [Lane B] ANT β=0.5 concluída"
     echo -e "${GREEN}[OK] [Lane B] ANT β=0.5 concluída!${NC}\n"

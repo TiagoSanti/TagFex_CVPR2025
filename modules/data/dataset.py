@@ -261,6 +261,8 @@ def get_dataset(name: str, split, transform, num_aug=1, **dataset_args):
 
     if name.startswith('cifar') or name.startswith('cub') or name.startswith('domainnet'):
         is_train = (split == 'train')
+        if name.startswith('cifar'):
+            dataset_args.setdefault('download', True)
         dataset: VisionDataset = DS(train=is_train, transform=transform_dispatch(transform), **dataset_args)
     elif name.startswith('imagenet'):
         split = 'val' if split == 'test' else split

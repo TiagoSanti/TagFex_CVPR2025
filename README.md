@@ -27,10 +27,15 @@
 
 | Máquina | GPU | VRAM | Responsabilidade |
 |---------|-----|------|------------------|
-| **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | Tiny ImageNet 20-20 + CIFAR-100 (todas as seeds) |
+| **quati** (ativo) | NVIDIA RTX 4090 | 24 GB · 1 GPU | Tiny ImageNet 20-20 ANT Global s1993 + CIFAR-100 10-10 ANT s1997 |
+| **wolverine** (ativo) | 2× NVIDIA RTX 3080 Ti | 12 GB · 2 GPUs | CIFAR-100 50-10 Baseline + ANT (seeds 1994–1997, 2 GPUs paralelas) |
 | **fera** (indisponível) | 2× GPU ~49 GB | ~98 GB · 2 GPUs | ImageNet-100 (quando retornar) |
 
-O script de fila [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).
+Cada máquina tem seu script dedicado:
+- **quati** → [`run_queue_quati.sh`](run_queue_quati.sh) (lançar com `screen -dmS quati_queue ./run_queue_quati.sh`)
+- **wolverine** → [`run_queue_wolverine.sh`](run_queue_wolverine.sh) (lançar diretamente `./run_queue_wolverine.sh`; cria os screens automaticamente)
+
+O script de fila legado [`run_experiments_queue.sh`](run_experiments_queue.sh) detecta a máquina automaticamente pelo hostname (ou usa `MACHINE="auto"` no topo do script para sobrescrever).
 
 ---
 
@@ -354,11 +359,11 @@ ant_max_global: false   # Local normalization
 
 ## 📊 Estado Atual do Projeto
 
-### Última Atualização: 11 Março 2026
+### Última Atualização: 18 Março 2026
 
-**Status**: 🔄 Fase de **reproducibilidade** — rodando 5 seeds para resultados do paper
+**Status**: 🔄 Fase de **reproducibilidade** — rodando seeds restantes para resultados do paper
 
-**Experimentos Totais**: 15 configurações exploradas (seed 1993) → reproduzindo 4 configurações-chave com 5 seeds (1993–1997)
+**Experimentos Totais**: 15 configurações exploradas (seed 1993) → reproduzindo configurações-chave com seeds 1993–1997
 
 ### Convenção de Seeds
 
@@ -367,44 +372,53 @@ Cada run recebe o sufixo `_s{seed}` no diretório de log:
 - Seeds `1994–1997` — runs adicionais para média ± desvio padrão no paper
 - A `class_order` está fixa no YAML (não varia com seed); apenas inicialização de pesos e augmentation variam
 
-### Filas Ativas (quati · 11 mar 2026)
+### Filas Pendentes (18 mar 2026)
 
-| Sessão screen | Script | Status |
-|---------------|--------|--------|
-| `tagfex_queue` | `run_experiments_queue.sh` | 🔄 Tiny ImageNet 20-20 — exp 2/4 em andamento |
-| `cifar100_queue` | `run_cifar100_parallel_queue.sh` | 🔄 CIFAR-100 — exp 5/17 em andamento |
+| Máquina | Script | Experimentos pendentes |
+|---------|--------|------------------------|
+| **quati** | [`run_queue_quati.sh`](run_queue_quati.sh) | Tiny ImageNet 20-20 ANT Global s1993 · CIFAR-100 10-10 ANT s1997 |
+| **wolverine** | [`run_queue_wolverine.sh`](run_queue_wolverine.sh) | CIFAR-100 50-10 Baseline + ANT Local seeds 1994–1997 (2 GPUs paralelas) |
 
-**`tagfex_queue`** (sequencial, seed 1993):
+> Lançar em screen para persistir após desconexão SSH:
+> ```bash
+> # quati
+> screen -dmS quati_queue ./run_queue_quati.sh
+>
+> # wolverine (cria os screens automaticamente)
+> ./run_queue_wolverine.sh
+> ```
+
+**Quati** (`run_queue_quati.sh`):
 | # | Experimento | Status | avg_nme1 |
 |---|-------------|--------|----------|
-| 1 | Tiny ImageNet 20-20 Baseline Local | ✅ Concluído | **57.14%** |
-| 2 | Tiny ImageNet 20-20 Baseline Global | 🔄 Rodando (task 4/10) | — |
-| 3 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | ⏳ | — |
-| 4 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global | ⏳ | — |
+| 1 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Global s1993 | ⏳ Pendente (bug corrigido) | — |
+| 2 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1997 | ⏳ Pendente (reinicia do zero) | — |
 
-**`cifar100_queue`** (paralela via `--min-free-mb 8000`):
-| # | Experimento | Status | avg_nme1 |
-|---|-------------|--------|----------|
-| 1–4 | CIFAR-100 10-10 Baseline Local s1994–1997 | ✅ Concluídos | 75.89 / 76.08 / 75.39 / 75.37 |
-| 5 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1994 | 🔄 Rodando (task 7/10) | — |
-| 6–8 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local s1995–1997 | ⏳ | — |
-| 9–12 | CIFAR-100 50-10 Baseline Local s1994–1997 | ⏳ | — |
-| 13–17 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local s1993–1997 | ⏳ | — |
+**Wolverine** (`run_queue_wolverine.sh`):
+| GPU | Seeds | Experimentos | Status |
+|-----|-------|--------------|--------|
+| GPU 0 | 1994, 1996 | CIFAR-100 50-10 Baseline Local + ANT Local (×2 seeds) | ⏳ Pendente |
+| GPU 1 | 1995, 1997 | CIFAR-100 50-10 Baseline Local + ANT Local (×2 seeds) | ⏳ Pendente |
 
 ### Experimentos Concluídos
 
-| Data | Experimento | Seed | avg_nme1 |
-|------|-------------|------|----------|
-| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1994 | 75.89% |
-| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1995 | 76.08% |
-| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1996 | 75.39% |
-| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1997 | 75.37% |
-| Mar 11, 2026 | Tiny ImageNet 20-20 Baseline Local | 1993 | 57.14% |
-| Dez 8-10, 2025 | ANT β=0.5, margins 0.5/0.6/0.7, Local | 1993 | 76.18% |
-| Dez 3-4, 2025 | ANT β=1.0, m=0.1/0.5, Local | 1993 | — |
-| Nov 20-22, 2025 | CIFAR-100 50-10 variations | 1993 | — |
-| Nov 19, 2025 | InfoNCE Local Anchor, ImageNet-100 | 1993 | — |
-| Nov 12-13, 2025 | Local vs Global comparison | 1993 | — |
+| Data | Experimento | Seed | avg_nme1 | avg_acc1 |
+|------|-------------|------|----------|----------|
+| Mar 12, 2026 | Tiny ImageNet 20-20 ANT β=0.5 m=0.5 Local | 1993 | 57.16% | 60.49% |
+| Mar 12, 2026 | Tiny ImageNet 20-20 Baseline Global | 1993 | 56.49% | 60.25% |
+| Mar 12, 2026 | Tiny ImageNet 20-20 Baseline Local | 1993 | 57.14% | 60.68% |
+| Mar 11, 2026 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1993 | 76.18% | 79.35% |
+| Mar 11, 2026 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1994 | 76.27% | 79.51% |
+| Mar 11, 2026 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1995 | 75.86% | 79.35% |
+| Mar 11, 2026 | CIFAR-100 10-10 ANT β=0.5 m=0.5 Local | 1996 | 75.23% | 78.68% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1993 | 75.55% | 79.04% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1994 | 75.88% | 79.25% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1995 | 76.08% | 79.45% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1996 | 75.39% | 78.96% |
+| Mar 11, 2026 | CIFAR-100 10-10 Baseline Local | 1997 | 75.37% | 78.84% |
+| Dez 8-10, 2025 | CIFAR-100 50-10 Baseline Local | 1993 | 76.48% | 77.13% |
+| Dez 8-10, 2025 | CIFAR-100 50-10 ANT β=0.5 m=0.5 Local | 1993 | — | 77.08% |
+| Nov 19, 2025 | ImageNet-100 10-10 Baseline Local | 1993 | 77.36% | 81.28% |
 
 ---
 
