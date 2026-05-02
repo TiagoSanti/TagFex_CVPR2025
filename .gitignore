@@ -1,5 +1,8 @@
 __pycache__/
 
+# Generated reports (auto-created by generate_report.py)
+results_report.md
+
 # Experiment logs
 # Keep eval logs (exp_stdlog*.log, exp_gistlog.log) tracked, even in debug runs.
 # Exclude only the heavy debug-specific files:

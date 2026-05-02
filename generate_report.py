@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 LOGS_DIR   = "/mnt/raid/home/tiago/logs"
-RESULTS_MD = os.path.join(LOGS_DIR, "results_report.md")
+RESULTS_MD = "./results_report.md"
 
 _SKIP = {"auto_experiments"}
 
