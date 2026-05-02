@@ -397,6 +397,7 @@ class TagFex(HerdingIndicesLearner):
             ant_beta = self.configs.get("ant_beta", 0.0)
             ant_max_global = self.configs.get("ant_max_global", True)
             infonce_max_global_cfg = self.configs.get("infonce_max_global", None)
+            ant_symmetric_full = self.configs.get("ant_symmetric_full", False)
 
             # Backward compatibility:
             # - ANT disabled: InfoNCE follows ant_max_global (legacy baseline behavior)
@@ -414,6 +415,7 @@ class TagFex(HerdingIndicesLearner):
                 self.configs.get("ant_margin", 0.1),
                 ant_max_global,
                 infonce_max_global,
+                ant_symmetric_full,
                 logger=self.loguru_logger,
                 task=self.state["cur_task"],
                 epoch=self.state["cur_epoch"],
@@ -441,6 +443,7 @@ class TagFex(HerdingIndicesLearner):
                     self.configs.get("ant_margin", 0.1),
                     ant_max_global,
                     infonce_max_global,
+                    ant_symmetric_full,
                     logger=self.loguru_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
@@ -687,7 +690,12 @@ class TagFex(HerdingIndicesLearner):
         ant_max_global = self.configs.get("ant_max_global", True)
         infonce_max_global = self.configs.get("infonce_max_global", ant_max_global)
 
-        suffix_parts.append("antGlobal" if ant_max_global else "antLocal")
+        # Check if symmetric_full is enabled
+        ant_symmetric_full = self.configs.get("ant_symmetric_full", False)
+        if ant_symmetric_full:
+            suffix_parts.append("antSymmetricFull")
+        else:
+            suffix_parts.append("antGlobal" if ant_max_global else "antLocal")
         suffix_parts.append("nceGlobal" if infonce_max_global else "nceLocal")
 
         # Always append seed so every run has a unique, traceable directory
@@ -833,6 +841,7 @@ def _compute_contrastive_loss_base(
     ant_margin=0.1,
     ant_max_global=True,
     infonce_max_global=True,
+    ant_symmetric_full=False,
     logger=None,
     log_prefix="contrast",
     task=None,
@@ -853,6 +862,7 @@ def _compute_contrastive_loss_base(
         ant_margin: Margin threshold for ANT loss
         ant_max_global: If True, ANT uses global maximum across anchors; if False, per-anchor maximum
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         logger: Logger instance for recording statistics
         log_prefix: Prefix for log messages ("contrast" or "kd")
         task: Current task number for logging
@@ -865,6 +875,9 @@ def _compute_contrastive_loss_base(
         total_loss: Combined loss value (InfoNCE + ANT)
     """
     device = cos_sim.device
+
+    # Always define pos_start for positive similarities calculation
+    pos_start = cos_sim.shape[0] // 2
 
     # Debug similarity matrices if enabled
     if debug_logger is not None and heatmap_dir is not None:
@@ -881,12 +894,18 @@ def _compute_contrastive_loss_base(
         )
 
     # ANT (Adaptive Negative Thresholding) logic
-    # Split into first half (anchors) for computing negative statistics
-    pos_start = cos_sim.shape[0] // 2
-    cos_sim_q1 = cos_sim[:pos_start, :pos_start]
-
-    mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=device)
-    q1 = cos_sim_q1.masked_fill(mask_q1, 0.0)  # ignore self-similarity
+    if ant_symmetric_full:
+        # Use full symmetric matrix for ANT (exclude self and positives)
+        N = cos_sim.shape[0]
+        self_mask = torch.eye(N, dtype=torch.bool, device=device)
+        pos_mask_full = self_mask.roll(shifts=N // 2, dims=0)
+        neg_mask = ~(self_mask | pos_mask_full)
+        ant_sim_matrix = cos_sim.masked_fill(~neg_mask, -float("inf"))
+    else:
+        # Original: Use only intra-view block (first half)
+        cos_sim_q1 = cos_sim[:pos_start, :pos_start]
+        mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=device)
+        ant_sim_matrix = cos_sim_q1.masked_fill(mask_q1, -float("inf"))
 
     # Compute positive similarities for gap calculation and logging
     pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
@@ -894,19 +913,21 @@ def _compute_contrastive_loss_base(
     # Compute ANT loss based on max_global strategy
     if ant_max_global:
         # Global maximum across all anchors
-        q1_max = q1.max()
-        mq1 = F.relu_(q1 - q1_max + ant_margin)
+        ant_max = ant_sim_matrix.max()
+        mq = F.relu_(ant_sim_matrix - ant_max + ant_margin)
     else:
         # Maximum per anchor (per row)
-        q1_max = q1.max(dim=-1, keepdim=True).values
-        mq1 = F.relu_(q1 - q1_max + ant_margin)
+        ant_max = ant_sim_matrix.max(dim=-1, keepdim=True).values
+        mq = F.relu_(ant_sim_matrix - ant_max + ant_margin)
 
     # Compute base ANT loss
-    ant_loss = torch.logsumexp(mq1, dim=-1).mean()
+    ant_loss = torch.logsumexp(mq, dim=-1).mean()
 
-    # Get non-zero q1 values (excluding masked diagonal) for statistics
-    q1_nonzero = q1[~mask_q1]
-    neg_sims = q1_nonzero
+    # Get non-zero values for statistics
+    if ant_symmetric_full:
+        neg_sims = ant_sim_matrix[neg_mask]
+    else:
+        neg_sims = ant_sim_matrix[~mask_q1]
 
     # Always log basic contrastive statistics for monitoring
     if logger is not None:
@@ -930,15 +951,21 @@ def _compute_contrastive_loss_base(
     if logger is not None and ant_beta > 0:
         # Compute gaps: distance from max negative to margin threshold
         if ant_max_global:
-            gaps = q1_nonzero - q1_max
+            gaps = neg_sims - ant_max
         else:
-            # Expand q1_max to match q1 shape
-            q1_max_expanded = q1_max.expand_as(q1)
-            gaps = (q1 - q1_max_expanded)[~mask_q1]
+            # Expand ant_max to match neg_sims shape
+            ant_max_expanded = ant_max.expand_as(ant_sim_matrix)
+            if ant_symmetric_full:
+                gaps = (ant_sim_matrix - ant_max_expanded)[neg_mask]
+            else:
+                gaps = (ant_sim_matrix - ant_max_expanded)[~mask_q1]
 
-        # Count margin violations (mq1 > 0 means margin was violated)
-        mq1_nonzero = mq1[~mask_q1]
-        violations = (mq1_nonzero > 0).float()
+        # Count margin violations (mq > 0 means margin was violated)
+        if ant_symmetric_full:
+            mq_nonzero = mq[neg_mask]
+        else:
+            mq_nonzero = mq[~mask_q1]
+        violations = (mq_nonzero > 0).float()
         violation_pct = violations.mean().item() * 100
 
         # Prepare detailed ANT statistics (only logged when ANT is active)
@@ -1013,6 +1040,7 @@ def infoNCE_loss(
     ant_margin=0.1,
     ant_max_global=True,
     infonce_max_global=True,
+    ant_symmetric_full=False,
     logger=None,
     task=None,
     epoch=None,
@@ -1031,6 +1059,7 @@ def infoNCE_loss(
         ant_margin: Margin threshold for ANT
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1053,6 +1082,7 @@ def infoNCE_loss(
         ant_margin=ant_margin,
         ant_max_global=ant_max_global,
         infonce_max_global=infonce_max_global,
+        ant_symmetric_full=ant_symmetric_full,
         logger=logger,
         log_prefix="contrast",
         task=task,
@@ -1072,6 +1102,7 @@ def infoNCE_distill_loss(
     ant_margin=0.1,
     ant_max_global=True,
     infonce_max_global=True,
+    ant_symmetric_full=False,
     logger=None,
     task=None,
     epoch=None,
@@ -1092,6 +1123,7 @@ def infoNCE_distill_loss(
         ant_margin: Margin threshold for ANT
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1114,6 +1146,7 @@ def infoNCE_distill_loss(
         ant_margin=ant_margin,
         ant_max_global=ant_max_global,
         infonce_max_global=infonce_max_global,
+        ant_symmetric_full=ant_symmetric_full,
         logger=logger,
         log_prefix="kd",
         task=task,
