@@ -49,7 +49,8 @@ class LoguruLogger:
                 level="DEBUG",
                 filter=lambda record: "Matrix" in record["message"]
                 or "Loss components" in record["message"]
-                or "ANT distance stats" in record["message"],
+                or "ANT distance stats" in record["message"]
+                or "Contrastive stats" in record["message"],
             )
 
             if rank == 0:
