@@ -27,7 +27,8 @@ ant_margin: 0.1
 ant_max_global: false
 infonce_max_global: false
 
-log_dir: logs/debug_exp_cifar100_50-10
+log_dir: /mnt/raid/home/tiago/logs/debug_exp_cifar100_50-10
+output_file_prefix: exp
 
 # Similarity Matrix Debugging
 debug_similarity: true

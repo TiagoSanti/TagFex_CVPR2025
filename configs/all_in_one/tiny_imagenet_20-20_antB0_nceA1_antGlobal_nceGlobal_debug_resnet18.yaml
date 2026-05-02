@@ -27,7 +27,7 @@ ant_margin: 0.1
 ant_max_global: true
 infonce_max_global: true
 
-log_dir: logs/debug_exp_tiny_imagenet_20-20
+log_dir: /mnt/raid/home/tiago/logs/debug_exp_tiny_imagenet_20-20
 
 # Similarity Matrix Debugging
 debug_similarity: true
