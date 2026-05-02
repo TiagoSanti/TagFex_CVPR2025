@@ -116,7 +116,7 @@ print("=" * 100)
 print("REVISÃO COMPLETA DE MÉTRICAS - TODOS OS EXPERIMENTOS")
 print("=" * 100)
 
-logs_dir = Path("logs")
+logs_dir = Path("/mnt/raid/home/tiago/logs")
 results = []
 
 for exp_dir, dataset, description in experiments:

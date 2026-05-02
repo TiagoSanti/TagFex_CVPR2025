@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
-LOGS_DIR = Path(__file__).parent / "logs"
+LOGS_DIR = Path("/mnt/raid/home/tiago/logs")
 OUTPUT_FILE = "cifar100_10-10.png"
 
 # Number-of-classes axis (one value per incremental task)

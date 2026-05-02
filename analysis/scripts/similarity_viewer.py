@@ -28,7 +28,7 @@ import streamlit as st
 # ---------------------------------------------------------------------------
 # Default paths  (relative to project root, where streamlit is invoked from)
 # ---------------------------------------------------------------------------
-_LOGS_ROOT = Path("logs")
+_LOGS_ROOT = Path("/mnt/raid/home/tiago/logs")
 
 
 def _discover_experiments() -> dict[str, Path]:

@@ -510,7 +510,7 @@ def main():
     parser.add_argument(
         "--logs-dir",
         type=str,
-        default="logs",
+        default="/mnt/raid/home/tiago/logs",
         help="Directory containing experiment logs",
     )
     parser.add_argument(

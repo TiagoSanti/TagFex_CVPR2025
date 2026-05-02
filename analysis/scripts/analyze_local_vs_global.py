@@ -25,7 +25,7 @@ def parse_nme1_curve(log_file):
 def analyze_local_vs_global():
     """Analisa o impacto de Local vs Global anchor."""
 
-    logs_dir = Path("logs")
+    logs_dir = Path("/mnt/raid/home/tiago/logs")
 
     # Definir pares de experimentos (Local vs Global)
     pairs = [

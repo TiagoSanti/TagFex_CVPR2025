@@ -779,7 +779,7 @@ def main():
     """Main execution."""
     # Define experiment directories (relative to script location)
     script_dir = Path(__file__).parent
-    base_dir = script_dir.parent.parent / "logs"
+    base_dir = Path("/mnt/raid/home/tiago/logs")
 
     global_dir = base_dir / "exp_cifar100_50-10_antB0_nceA1_antM0_antGlobal"
     local_dir = base_dir / "exp_cifar100_50-10_antB0_nceA1_antM0_antLocal"

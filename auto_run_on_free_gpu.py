@@ -8,7 +8,7 @@ Uso:
         --command "python main.py train --exp-configs configs/all_in_one/cifar100_10-10_ant_beta0.5_margin0.5_local_resnet18.yaml" \
         --threshold 95.0 \
         --interval 30 \
-        --log-dir ./logs/auto_exp
+        --log-dir /mnt/raid/home/tiago/logs/auto_exp
 """
 
 import subprocess

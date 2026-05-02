@@ -138,7 +138,7 @@ experiments = {
     ],
 }
 
-logs_dir = Path("/home/tiago/TagFex_CVPR2025/logs")
+logs_dir = Path("/mnt/raid/home/tiago/logs")
 
 print("=" * 80)
 print("FINAL ACCURACY METRICS EXTRACTION")
