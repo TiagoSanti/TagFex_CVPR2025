@@ -48,7 +48,7 @@ def short_name(exp_name: str) -> str:
     debug_exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1993
     → β=0.5 aLocal nLocal
     debug_exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_s1993
-    → β=0 aGlobal nGlobal
+    → β=0 nGlobal ★ Baseline
     """
     m = re.search(
         r"antB([\d.]+)(?:_nceA[\d.]+)?(?:_antM[\d.]+)?_(ant\w+)_(nce\w+?)(?:_s\d+)?$",
@@ -57,17 +57,31 @@ def short_name(exp_name: str) -> str:
     if not m:
         return exp_name
     beta, ant_mode, nce_mode = m.groups()
-    return f"β={beta} {_MODE_SHORT.get(ant_mode, ant_mode)} {_MODE_SHORT.get(nce_mode, nce_mode)}"
+    name = f"β={beta} {_MODE_SHORT.get(ant_mode, ant_mode)} {_MODE_SHORT.get(nce_mode, nce_mode)}"
+    if is_true_baseline(exp_name):
+        name += " ★"
+    return name
 
 
 _DATASET_LABELS = {
-    "cifar100_10-10":      "CIFAR-100 10×10",
-    "cifar100_50-10":      "CIFAR-100 50+10×5",
-    "tiny_imagenet_20-20": "Tiny-ImageNet 20×10",
+    "cifar100_10-10":       "CIFAR-100 10×10",
+    "cifar100_50-10":       "CIFAR-100 50+10×5",
+    "tiny_imagenet_20-20":  "Tiny-ImageNet 20×10",
+    "tiny_imagenet_100-20": "Tiny-ImageNet 100+20×5",
 }
 
 def dataset_label(dataset: str) -> str:
     return _DATASET_LABELS.get(dataset, dataset)
+
+
+def is_true_baseline(exp_name: str) -> bool:
+    """β=0 antGlobal nceGlobal — the pure InfoNCE baseline with no ANT."""
+    return bool(re.search(r"antB0(?:_nceA[\d.]+)?_antGlobal_nceGlobal", exp_name))
+
+
+def extract_seed(exp_name: str):
+    m = re.search(r"_s(\d+)$", exp_name)
+    return int(m.group(1)) if m else None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -214,14 +228,16 @@ def collect_results(logs_dir: str) -> pd.DataFrame:
         fgt_nme, fgt_nme_list = avg_forgetting(parsed["per_nme_history"])
 
         row = {
-            "dataset":   infer_dataset(exp),
-            "exp":       exp,
-            "label":     short_name(exp),
-            "avg_acc":   parsed["avg_acc"],
-            "avg_nme":   parsed["avg_nme"],
-            "fgt_acc":   fgt_acc,
-            "fgt_nme":   fgt_nme,
-            "num_tasks": len(parsed["acc_curve"]),
+            "dataset":     infer_dataset(exp),
+            "exp":         exp,
+            "label":       short_name(exp),
+            "seed":        extract_seed(exp),
+            "is_baseline": is_true_baseline(exp),
+            "avg_acc":     parsed["avg_acc"],
+            "avg_nme":     parsed["avg_nme"],
+            "fgt_acc":     fgt_acc,
+            "fgt_nme":     fgt_nme,
+            "num_tasks":   len(parsed["acc_curve"]),
         }
         for i, v in enumerate(parsed["acc_curve"], 1):
             row[f"acc_T{i}"] = v
@@ -322,27 +338,47 @@ def _results_section(df: pd.DataFrame) -> list:
     )
 
     for dataset in sorted(df["dataset"].unique()):
-        g = (
-            df[df["dataset"] == dataset]
-            .copy()
-            .sort_values(["avg_acc", "fgt_acc"], ascending=[False, True])
-            .reset_index(drop=True)
-        )
+        g = df[df["dataset"] == dataset].copy()
         n  = int(g["num_tasks"].max())
         dl = dataset_label(dataset)
 
-        lines.append(f"## {dl}\n")
-        lines.append(f"Complete experiments: **{len(g)}** | Tasks per session: **{n}**\n")
+        # ── Compute delta vs true baseline (mean across seeds) ────────────────
+        baseline_rows = g[g["is_baseline"]]
+        base_mean_acc = baseline_rows["avg_acc"].mean() if not baseline_rows.empty else np.nan
+        base_mean_nme = baseline_rows["avg_nme"].mean() if not baseline_rows.empty else np.nan
+        g["delta_acc"] = np.where(g["is_baseline"], np.nan, g["avg_acc"] - base_mean_acc)
+        g["delta_nme"] = np.where(g["is_baseline"], np.nan, g["avg_nme"] - base_mean_nme)
 
-        # ── Summary: avg metrics + forgetting ────────────────────────────────
+        # ── Sort: baselines pinned to top, then others by avg_acc desc ────────
+        g["_sort"] = (~g["is_baseline"]).astype(int)
+        g = (
+            g.sort_values(["_sort", "avg_acc"], ascending=[True, False])
+            .drop(columns=["_sort"])
+            .reset_index(drop=True)
+        )
+
+        lines.append(f"## {dl}\n")
+        n_base = int(g["is_baseline"].sum())
+        n_exp  = len(g) - n_base
+        base_info = (
+            f" | True baseline (β=0 nGlobal): **{n_base}** runs, "
+            f"mean Avg Acc1 = **{base_mean_acc:.2f}%**"
+        ) if not np.isnan(base_mean_acc) else ""
+        lines.append(
+            f"Complete experiments: **{len(g)}** ({n_base} baseline + {n_exp} variants) "
+            f"| Tasks per session: **{n}**{base_info}\n"
+        )
+
+        # ── Summary: avg metrics + forgetting + delta ─────────────────────────
         lines.append("### Accuracy & Forgetting Summary\n")
+        delta_spec = [("delta_acc", "∆ Acc vs Baseline", True, 2)] if not np.isnan(base_mean_acc) else []
         lines.append(df_to_md(g, [
             ("label",   "Experiment",      None,  0),
             ("avg_acc", "Avg Acc1 (%)",    True,  2),
             ("avg_nme", "Avg NME1 (%)",    True,  2),
             ("fgt_acc", "Forgetting Acc",  False, 2),
             ("fgt_nme", "Forgetting NME",  False, 2),
-        ]))
+        ] + delta_spec))
         lines.append("")
 
         # ── Acc1 curve per task ───────────────────────────────────────────────
@@ -360,14 +396,23 @@ def _results_section(df: pd.DataFrame) -> list:
 
         # ── Best callouts ─────────────────────────────────────────────────────
         lines.append("### Highlights\n")
-        best_acc_row = g.iloc[0]
-        best_nme_row = g.sort_values("avg_nme", ascending=False).iloc[0]
-        best_fgt_row = g.sort_values(["fgt_acc", "avg_acc"], ascending=[True, False]).iloc[0]
+        non_base = g[~g["is_baseline"]]
+        cmp_g    = non_base if not non_base.empty else g
+        best_acc_row = cmp_g.sort_values("avg_acc", ascending=False).iloc[0]
+        best_nme_row = cmp_g.sort_values("avg_nme", ascending=False).iloc[0]
+        best_fgt_row = cmp_g.sort_values(["fgt_acc", "avg_acc"], ascending=[True, False]).iloc[0]
         lines.append(f"| Metric | Best Experiment | Value |")
         lines.append(f"| :--- | :--- | ---: |")
         lines.append(f"| ⭐ Highest Avg Acc1 | `{best_acc_row['label']}` | **{best_acc_row['avg_acc']:.2f}%** |")
         lines.append(f"| ⭐ Highest Avg NME1 | `{best_nme_row['label']}` | **{best_nme_row['avg_nme']:.2f}%** |")
         lines.append(f"| ⭐ Lowest Forgetting | `{best_fgt_row['label']}` | **{best_fgt_row['fgt_acc']:.2f}%** |")
+        if not np.isnan(base_mean_acc) and not non_base.empty:
+            best_delta_row = non_base.sort_values("delta_acc", ascending=False).iloc[0]
+            lines.append(
+                f"| 📈 Best ∆ vs Baseline | `{best_delta_row['label']}` "
+                f"| **{best_delta_row['delta_acc']:+.2f}%** "
+                f"(baseline mean: {base_mean_acc:.2f}%) |"
+            )
         lines.append("")
 
     return lines
@@ -515,10 +560,20 @@ def main():
     # Quick preview
     print("\n=== Quick Preview ===")
     for dataset in sorted(df["dataset"].unique()):
-        g = df[df["dataset"] == dataset].sort_values("avg_acc", ascending=False)
-        print(f"\n[{dataset_label(dataset)}]")
+        g = df[df["dataset"] == dataset].copy()
+        baseline_rows = g[g["is_baseline"]]
+        base_mean = baseline_rows["avg_acc"].mean() if not baseline_rows.empty else float("nan")
+        # baselines first, then by avg_acc desc
+        g["_s"] = (~g["is_baseline"]).astype(int)
+        g = g.sort_values(["_s", "avg_acc"], ascending=[True, False]).drop(columns=["_s"])
+        label = dataset_label(dataset)
+        base_str = f"  baseline mean={base_mean:.2f}" if not np.isnan(base_mean) else ""
+        print(f"\n[{label}]{base_str}")
         for _, row in g.iterrows():
-            print(f"  {row['label']:30s}  avg_acc={row['avg_acc']:.2f}  avg_nme={row['avg_nme']:.2f}  fgt={row['fgt_acc']:.2f}")
+            delta_str = ""
+            if not row["is_baseline"] and not np.isnan(base_mean):
+                delta_str = f"  Δ={row['avg_acc'] - base_mean:+.2f}"
+            print(f"  {row['label']:35s}  avg_acc={row['avg_acc']:.2f}  avg_nme={row['avg_nme']:.2f}  fgt={row['fgt_acc']:.2f}{delta_str}")
 
 
 if __name__ == "__main__":
