@@ -16,10 +16,28 @@ logs/auto_experiments/
 .venv/
 venv/
 
-# Data
-data/
+# Data (datasets root — anchor to project root to avoid matching modules/data/)
+/data/
 
 # Checkpoints
 ckpt/
 *.pth
-*.ptpapers/
+*.pt
+papers/
+
+# All experiment output logs
+logs/
+
+# Generated reports
+results_report*.html
+results_report*.pdf
+section0_cross_dataset_overview.html
+
+# Common generated files
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# External/reference projects and papers
+pace/
+difficult_examples_hurt_contrastive_learning/
