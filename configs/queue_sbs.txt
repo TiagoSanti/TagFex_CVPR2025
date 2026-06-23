@@ -1,0 +1,27 @@
+# SBS Ablation Queue — 8 experiments (seed 1993)
+# Format: <config_path>|<description>|<seed>
+#
+# Ablation design: 4 scenarios × 2 ANT variants × sbsQS020 (q=0.20, s=0.20)
+# If combined version shows a meaningful gain, add Q-only/S-only splits then.
+#
+# Reference (no SBS, seed 1993):
+#   C100 10-10 aLocal=78.57  aSymFull=78.28
+#   C100 50-10 aLocal=76.99  aSymFull=76.99
+#   TIN 100-20 aLocal=61.17  aSymFull=61.07
+#   TIN 20-20  aLocal=61.71  aSymFull=61.48
+
+# ── CIFAR-100 10-10 ──────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|C100-10-10 aLocal sbsQS020|1993
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|C100-10-10 aSymFull sbsQS020|1993
+
+# ── CIFAR-100 50-10 ──────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|C100-50-10 aLocal sbsQS020|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|C100-50-10 aSymFull sbsQS020|1993
+
+# ── Tiny ImageNet 100-20 ─────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|TIN-100-20 aLocal sbsQS020|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|TIN-100-20 aSymFull sbsQS020|1993
+
+# ── Tiny ImageNet 20-20 ──────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|TIN-20-20 aLocal sbsQS020|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|TIN-20-20 aSymFull sbsQS020|1993

@@ -1,0 +1,4 @@
+# Machine overlay for wolverine (10.87.10.46)
+# Overrides log_dir to local filesystem (no /mnt/raid mount on wolverine)
+# Usage: append this file to --exp-configs after the main investigation config
+log_dir: /home/tiago/TagFex_CVPR2025/logs/ant_investigation

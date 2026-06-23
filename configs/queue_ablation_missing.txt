@@ -1,0 +1,102 @@
+# queue_ablation_missing.txt — Missing multi-seed ablation experiments
+# Format: <config_path>|<description>|<seed>
+# Lines starting with # or blank are skipped.
+#
+# Scope: all anchor-locality ablations (aGlobal nGlobal / aGlobal nLocal /
+#        aLocal nGlobal) for C100-10-10, C100-50-10, TIN-20-20 needing
+#        seeds 1994 and 1995, plus the missing C100-50-10 aGlobal nLocal s1993.
+#        Also includes all single-strategy ablations (avgK10, SBS, avgK3)
+#        for seeds 1994 and 1995 across all 4 datasets.
+#
+# TIN-100-20 anchor-locality ablations are already in queue_tin100_ablation.txt.
+# Run with: bash run_ablation_missing_queue.sh
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1 — Anchor-locality ablations (β=0.5)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# C100-10-10
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[C100-10-10] aGlobal nGlobal|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[C100-10-10] aGlobal nGlobal|1995
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[C100-10-10] aGlobal nLocal|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[C100-10-10] aGlobal nLocal|1995
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[C100-10-10] aLocal nGlobal|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[C100-10-10] aLocal nGlobal|1995
+
+# C100-50-10
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[C100-50-10] aGlobal nGlobal|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[C100-50-10] aGlobal nGlobal|1995
+# aGlobal nLocal: s1993 was never run — include all 3 seeds
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[C100-50-10] aGlobal nLocal|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[C100-50-10] aGlobal nLocal|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[C100-50-10] aGlobal nLocal|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[C100-50-10] aLocal nGlobal|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[C100-50-10] aLocal nGlobal|1995
+
+# TIN-20-20
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[TIN-20-20] aGlobal nGlobal|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[TIN-20-20] aGlobal nGlobal|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[TIN-20-20] aGlobal nLocal|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[TIN-20-20] aGlobal nLocal|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[TIN-20-20] aLocal nGlobal|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[TIN-20-20] aLocal nGlobal|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2 — aLocal nLocal avgK10 (seeds 1994, 1995 — all 4 datasets)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal avgK10|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal avgK10|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal avgK10|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal avgK10|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal avgK10|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal avgK10|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal avgK10|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal avgK10|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 3 — aLocal nLocal SBS/sbsQS020 (seeds 1994, 1995 — all 4 datasets)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-10-10] aLocal SBS|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-10-10] aLocal SBS|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-50-10] aLocal SBS|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-50-10] aLocal SBS|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-100-20] aLocal SBS|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-100-20] aLocal SBS|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-20-20] aLocal SBS|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-20-20] aLocal SBS|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 4 — aSymFull avgK10 (seeds 1994, 1995 — all 4 datasets)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull avgK10|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull avgK10|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull avgK10|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull avgK10|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull avgK10|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull avgK10|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull avgK10|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull avgK10|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 5 — aSymFull SBS/sbsQS020 (seeds 1994, 1995 — all 4 datasets)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-10-10] aSymFull SBS|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-10-10] aSymFull SBS|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-50-10] aSymFull SBS|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-50-10] aSymFull SBS|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-100-20] aSymFull SBS|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-100-20] aSymFull SBS|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-20-20] aSymFull SBS|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-20-20] aSymFull SBS|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 6 — aSymFull avgK3 (seeds 1994, 1995 — all 4 datasets)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull avgK3|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull avgK3|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull avgK3|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull avgK3|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull avgK3|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull avgK3|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull avgK3|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull avgK3|1995

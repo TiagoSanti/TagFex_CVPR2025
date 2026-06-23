@@ -1,0 +1,105 @@
+# Stage 1 — ANT flattening diagnostic run
+# Goal: Determine whether raw ANT loss is dominated by the count floor (log|N|)
+#        by logging all new flattening diagnostics without changing the formulation.
+#
+# Run with: python main.py train --exp-configs configs/ant_investigation/stage1_cifar100_10-10_aSymFull_nLocal_diag.yaml --seed 1995
+#
+# Key diagnostics logged to exp_debug0.log:
+#   ANT flattening: num_neg_mean | ant_loss_raw | ant_loss_adj | active_ratio |
+#                   active_count_mean | viol_mean_all | viol_mean_act | viol_max_act |
+#                   raw_v_mean | raw_v_min | raw_v_max | hard_neg_sim | sim_gap_mean | sim_gap_min
+
+scenario: cil 10-10
+dataset_name: cifar100
+dataset_root: ~/data/datasets/cifar100/
+train_transform: cifar100_train_2
+test_transform: cifar100_test_1
+class_order: [68, 56, 78, 8, 23, 84, 90, 65, 74, 76, 40, 89, 3, 92, 55, 9, 26, 80, 43, 38, 58, 70, 77, 1, 85, 19, 17, 50, 28, 53, 13, 81, 45, 82, 6, 59, 83, 16, 15, 44, 91, 41, 72, 60, 79, 52, 20, 10, 31, 54, 37, 95, 14, 71, 96, 98, 97, 2, 64, 66, 42, 22, 35, 86, 24, 34, 87, 21, 99, 0, 88, 27, 18, 94, 11, 12, 47, 25, 30, 46, 62, 69, 36, 61, 7, 63, 75, 5, 32, 4, 51, 48, 73, 93, 39, 67, 29, 49, 57, 33]
+
+method: tagfex
+
+init_epochs: 200
+inc_epochs: 170
+eval_interval: 5
+
+contrast_factor: 1
+contrast_kd_factor: 2
+aux_factor: 2
+trans_cls_factor: 1
+transfer_factor: 1
+
+infonce_temp: 0.2
+infonce_kd_temp: 0.2
+kd_temp: 2
+num_aug: 2
+
+# ANT: beta=0.5, margin=0.5, aSymFull, nLocal — same as strong baseline
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+ant_max_global: false
+infonce_max_global: false
+ant_symmetric_full: true
+
+# ANT formulation: keep "logsumexp" (current default) for diagnostic purposes
+# All flattening diagnostics are emitted regardless of this setting
+ant_formulation: logsumexp
+
+# Disable heavy similarity matrix visualizations — not needed for diagnostics
+debug_similarity: false
+
+log_dir: /mnt/raid/home/tiago/logs/ant_investigation
+output_file_prefix: stage1_diag
+
+backbone_configs:
+  name: resnet18
+
+network_configs:
+  classifier_type: 'unified'
+  proj_hidden_dim: 2048
+  proj_output_dim: 1024
+  init_from_last: false
+  init_from_interpolation: true
+  init_interpolation_factor: 0.95
+  attn_num_heads: 8
+  merge_attn: true
+
+memory_configs:
+  fixed_size: false
+  memory_size: 2000
+
+trainloader_params:
+  batch_size: 128
+  num_workers: 8
+  drop_last: false
+
+testloader_params:
+  batch_size: 192
+  num_workers: 8
+  drop_last: false
+
+init_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5.e-4
+
+init_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [60, 120, 170]
+    gamma: 0.1
+
+inc_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 2.e-4
+
+inc_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [80, 120, 150]
+    gamma: 0.1

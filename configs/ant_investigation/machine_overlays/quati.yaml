@@ -1,0 +1,3 @@
+# Machine overlay for quaTII (local machine)
+# Uses the RAID mount for centralized log storage
+log_dir: /mnt/raid/home/tiago/logs/ant_investigation
