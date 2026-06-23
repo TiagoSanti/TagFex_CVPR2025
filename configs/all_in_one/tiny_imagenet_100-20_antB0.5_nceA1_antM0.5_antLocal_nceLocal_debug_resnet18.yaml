@@ -15,6 +15,7 @@ contrast_kd_factor: 2
 aux_factor: 2
 trans_cls_factor: 1
 transfer_factor: 1
+grad_clip_norm: 5.0
 
 infonce_temp: 0.2
 infonce_kd_temp: 0.2
