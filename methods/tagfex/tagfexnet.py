@@ -80,7 +80,7 @@ class TagFexNet(ClassIncrementalNetwork):
                 ta_features = ta_fmap.flatten(2).permute(0, 2, 1)
                 merged_feature = self.ts_attn(ta_features.detach(), ts_feature).mean(1)
                 trans_logits = self.trans_classifier(merged_feature)
-                outputs.update(trans_logits=trans_logits)
+                outputs.update(trans_logits=trans_logits, merged_feature=merged_feature.detach())
 
             if self.aux_classifier is not None:
                 aux_logits = self.aux_classifier(ts_features[-1])

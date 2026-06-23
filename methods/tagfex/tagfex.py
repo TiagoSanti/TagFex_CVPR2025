@@ -1,3 +1,5 @@
+import collections
+import copy
 import numpy as np
 import torch
 import torch.distributed
@@ -13,7 +15,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 
+from torch.utils.data import Subset
 from modules import HerdingIndicesLearner
+from modules.data.dataset import WithIndexDataset
 from .tagfexnet import TagFexNet
 from modules import (
     Accuracy,
@@ -29,6 +33,49 @@ from utils.funcs import parameter_count
 from loggers import LoguruLogger, loguru
 
 EPSILON = 1e-8
+
+
+def _sbs_keep_mask(speeds: np.ndarray, q: float, s: float, min_keep: int) -> np.ndarray:
+    """Return a boolean mask keeping the intermediate learning-speed band.
+
+    Drops the bottom *s* fraction (slow-learned, likely noisy outliers) and the
+    top *q* fraction (fast-learned, trivial samples already well-generalised).
+    Implements the SBS-fix criterion from Hacohen & Tuytelaars (ICML 2025).
+
+    Falls back to keeping all samples if the filter would leave fewer than
+    *min_keep* samples (safety guard for small classes).
+    """
+    n = len(speeds)
+    n_drop_s = int(np.floor(n * s))   # drop slowest
+    n_drop_q = int(np.floor(n * q))   # drop fastest
+    if n_drop_s + n_drop_q >= n - min_keep:
+        return np.ones(n, dtype=bool)
+    order = np.argsort(speeds)         # ascending: index 0 = slowest
+    drop = set(order[:n_drop_s].tolist())
+    if n_drop_q > 0:
+        drop.update(order[n - n_drop_q:].tolist())
+    mask = np.ones(n, dtype=bool)
+    for i in drop:
+        mask[i] = False
+    return mask
+
+
+@torch.no_grad()
+def _avg_state_dicts(state_dicts):
+    """Average a list of state dicts element-wise (float tensors averaged; others use last)."""
+    keys = list(state_dicts[0].keys())
+    n = len(state_dicts)
+    avg = {}
+    for k in keys:
+        ref = state_dicts[0][k]
+        if torch.is_floating_point(ref):
+            acc = torch.zeros_like(ref, dtype=torch.float32)
+            for sd in state_dicts:
+                acc.add_(sd[k].float())
+            avg[k] = (acc / n).to(ref.dtype)
+        else:
+            avg[k] = state_dicts[-1][k].clone()
+    return avg
 
 
 class TagFex(HerdingIndicesLearner):
@@ -53,6 +100,16 @@ class TagFex(HerdingIndicesLearner):
             self.data_manager.ordered_index_map
         ).to(self.device)
 
+        # ── SBS (Speed-Based Sampling) state ─────────────────────────────────
+        self._sbs_q: float = float(self.configs.get("sbs_q", 0.0))  # drop fastest q%
+        self._sbs_s: float = float(self.configs.get("sbs_s", 0.0))  # drop slowest s%
+        self._sbs_tracking: bool = False          # True during SBS-enabled task
+        self._sbs_correct: np.ndarray | None = None   # per-local-idx correct count
+        self._sbs_total: np.ndarray | None = None     # per-local-idx attempt count
+        self._sbs_n_new: int = 0                  # #new-class samples before memory
+        self._sbs_task_new_abs: np.ndarray | None = None  # absolute base-dataset idxs
+        self._sbs_speed_map: dict = {}            # abs_idx → learning_speed (post-task)
+
     def _init_network(self, backbone_configs, network_configs):
         if backbone_configs["name"] == "resnet18":
             params = {
@@ -70,6 +127,11 @@ class TagFex(HerdingIndicesLearner):
 
         self.last_ta_net = None
         self.last_projector = None
+
+        # Avg-K teacher buffers (populated during train_task)
+        self._avg_last_k = self.configs.get("avg_last_k", 0)
+        self._ckpt_buf_ta = None
+        self._ckpt_buf_proj = None
 
     def _init_ddp(self):
         self.configs["trainloader_params"]["batch_size"] //= self.distributed[
@@ -130,7 +192,7 @@ class TagFex(HerdingIndicesLearner):
         features /= features.norm(dim=-1, keepdim=True) + EPSILON
         return features
 
-    @loguru.logger.catch
+    @loguru.logger.catch(reraise=True)
     def train(self) -> None:
         # >>> @train_start
         self.update_state(run_state="train", num_tasks=self.data_manager.num_tasks)
@@ -159,8 +221,15 @@ class TagFex(HerdingIndicesLearner):
             )
 
             if task_id > 0:
-                self.last_ta_net = self.local_network.get_freezed_copy_ta()
-                self.last_projector = self.local_network.get_freezed_copy_projector()
+                if self._avg_last_k > 0 and self._ckpt_buf_ta is not None and len(self._ckpt_buf_ta) > 0:
+                    self.last_ta_net = self._build_avg_ta()
+                    self.last_projector = self._build_avg_projector()
+                    self.print_logger.info(
+                        f"Avg-K teacher built from {len(self._ckpt_buf_ta)} checkpoints (K={self._avg_last_k})."
+                    )
+                else:
+                    self.last_ta_net = self.local_network.get_freezed_copy_ta()
+                    self.last_projector = self.local_network.get_freezed_copy_projector()
 
             self.local_network.update_network(cur_task_num_classes)
             self.local_network.freeze_old_backbones()
@@ -182,6 +251,12 @@ class TagFex(HerdingIndicesLearner):
                 self._model_to_ddp()
 
             # add memory into training set.
+            # >>> @sbs_pre_memory — save new-class count before memory is concatenated
+            _sbs_enabled = (self._sbs_q > 0 or self._sbs_s > 0) and not self.configs.get("ffcv") and self.distributed is None
+            if _sbs_enabled:
+                self._sbs_n_new = len(task_train.indices)
+                self._sbs_task_new_abs = task_train.indices.copy()
+            # <<< @sbs_pre_memory
             memory_indices = self.get_memory()
             new_indices = np.concatenate((task_train.indices, memory_indices))
             task_train.indices = new_indices
@@ -202,8 +277,20 @@ class TagFex(HerdingIndicesLearner):
                     self.distributed is not None,
                 )
             else:
+                # >>> @sbs_wrap_loader
+                _train_src = WithIndexDataset(task_train) if _sbs_enabled else task_train
+                if _sbs_enabled:
+                    n_total = len(task_train)
+                    self._sbs_correct = np.zeros(n_total, dtype=np.int32)
+                    self._sbs_total = np.zeros(n_total, dtype=np.int32)
+                    self._sbs_tracking = True
+                    self.print_logger.info(
+                        f"SBS enabled (q={self._sbs_q}, s={self._sbs_s}): "
+                        f"tracking {self._sbs_n_new} new-class samples."
+                    )
+                # <<< @sbs_wrap_loader
                 train_loader, test_loader = get_loaders(
-                    task_train,
+                    _train_src,
                     task_test,
                     trainloader_params,
                     self.configs["testloader_params"],
@@ -212,6 +299,11 @@ class TagFex(HerdingIndicesLearner):
             # <<< @train_task_start
 
             self.train_task(train_loader, test_loader)
+
+            # >>> @sbs_finalize — build speed map after training, before memory update
+            if self._sbs_tracking:
+                self._sbs_speed_map = self._sbs_finalize_speeds()
+            # <<< @sbs_finalize
 
             # >>> @train_task_end
             self.print_logger.info(
@@ -283,6 +375,8 @@ class TagFex(HerdingIndicesLearner):
         if self.configs["debug"]:
             num_epochs = 5
         self.update_state(cur_task_num_epochs=num_epochs)
+        if self._avg_last_k > 0:
+            self._reset_ckpt_buffer()
         # <<< @after_train_task_setups
 
         rank = 0 if self.distributed is None else self.distributed["rank"]
@@ -317,8 +411,40 @@ class TagFex(HerdingIndicesLearner):
                     f"{self._get_status()} | {self._metric_repr(train_results)}"
                 )
             # <<< @train_epoch_end
+            # >>> @avg_k_checkpoint
+            if self._avg_last_k > 0 and epoch >= num_epochs - self._avg_last_k:
+                self._append_ckpt()
+            # <<< @avg_k_checkpoint
         if rank == 0:
             prog_bar.close()
+
+    def _reset_ckpt_buffer(self):
+        self._ckpt_buf_ta = collections.deque(maxlen=self._avg_last_k)
+        self._ckpt_buf_proj = collections.deque(maxlen=self._avg_last_k)
+
+    @torch.no_grad()
+    def _append_ckpt(self):
+        net = self.local_network
+        ta_sd = {k: v.detach().clone() for k, v in net.ta_net.state_dict().items()}
+        proj_sd = {k: v.detach().clone() for k, v in net.projector.state_dict().items()}
+        self._ckpt_buf_ta.append(ta_sd)
+        self._ckpt_buf_proj.append(proj_sd)
+
+    def _build_avg_ta(self):
+        avg_sd = _avg_state_dicts(list(self._ckpt_buf_ta))
+        ta_copy = copy.deepcopy(self.local_network.ta_net)
+        ta_copy.load_state_dict(avg_sd)
+        for p in ta_copy.parameters():
+            p.requires_grad_(False)
+        return ta_copy.eval()
+
+    def _build_avg_projector(self):
+        avg_sd = _avg_state_dicts(list(self._ckpt_buf_proj))
+        proj_copy = copy.deepcopy(self.local_network.projector)
+        proj_copy.load_state_dict(avg_sd)
+        for p in proj_copy.parameters():
+            p.requires_grad_(False)
+        return proj_copy.eval()
 
     def train_epoch(self, train_loader, optimizer, scheduler):
         self.network.train()
@@ -346,7 +472,9 @@ class TagFex(HerdingIndicesLearner):
                 data.to(self.device, non_blocking=True) for data in batch_data
             )
 
-            if self.configs.get("ffcv"):
+            if self._sbs_tracking:
+                local_idx, sample1, sample2, targets = batch_data
+            elif self.configs.get("ffcv"):
                 sample1, targets, sample2 = batch_data
             else:
                 sample1, sample2, targets = batch_data
@@ -398,6 +526,9 @@ class TagFex(HerdingIndicesLearner):
             ant_max_global = self.configs.get("ant_max_global", True)
             infonce_max_global_cfg = self.configs.get("infonce_max_global", None)
             ant_symmetric_full = self.configs.get("ant_symmetric_full", False)
+            ant_formulation = self.configs.get("ant_formulation", "logsumexp")
+            ant_tau = self.configs.get("ant_tau", 0.1)
+            ant_topk = self.configs.get("ant_topk", 32)
 
             # Backward compatibility:
             # - ANT disabled: InfoNCE follows ant_max_global (legacy baseline behavior)
@@ -416,6 +547,9 @@ class TagFex(HerdingIndicesLearner):
                 ant_max_global,
                 infonce_max_global,
                 ant_symmetric_full,
+                ant_formulation=ant_formulation,
+                ant_tau=ant_tau,
+                ant_topk=ant_topk,
                 logger=self.loguru_logger,
                 task=self.state["cur_task"],
                 epoch=self.state["cur_epoch"],
@@ -444,6 +578,9 @@ class TagFex(HerdingIndicesLearner):
                     ant_max_global,
                     infonce_max_global,
                     ant_symmetric_full,
+                    ant_formulation=ant_formulation,
+                    ant_tau=ant_tau,
+                    ant_topk=ant_topk,
                     logger=self.loguru_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
@@ -454,6 +591,21 @@ class TagFex(HerdingIndicesLearner):
 
                 trans_logits = out["trans_logits"]
                 cur_task_mask = targets >= learned_num_classes
+                # DEBUG: log trans_logits stats at first batch of each incremental task
+                if batch == 0 and self.state["cur_epoch"] == 1:
+                    _tl = trans_logits[cur_task_mask]
+                    _mf = out.get("merged_feature")
+                    self.print_logger.warning(
+                        f"[DEBUG T{self.state['cur_task']}E1B1] trans_logits: shape={_tl.shape} "
+                        f"mean={_tl.mean():.4f} std={_tl.std():.4f} min={_tl.min():.4f} max={_tl.max():.4f} "
+                        f"| cur_task_mask n_selected={cur_task_mask.sum().item()} "
+                        f"| learned_num_classes={learned_num_classes.item() if hasattr(learned_num_classes, 'item') else learned_num_classes}"
+                    )
+                    if _mf is not None:
+                        self.print_logger.warning(
+                            f"[DEBUG T{self.state['cur_task']}E1B1] merged_feature: shape={_mf.shape} "
+                            f"mean={_mf.mean():.4f} std={_mf.std():.4f} min={_mf.min():.4f} max={_mf.max():.4f}"
+                        )
                 trans_cls_loss = F.cross_entropy(
                     trans_logits[cur_task_mask],
                     targets[cur_task_mask] - learned_num_classes,
@@ -492,7 +644,16 @@ class TagFex(HerdingIndicesLearner):
             # >>> @train_backward
             optimizer.zero_grad()
             loss.backward()
+            grad_clip_norm = self.configs.get("grad_clip_norm", None)
+            if grad_clip_norm is not None:
+                torch.nn.utils.clip_grad_norm_(
+                    self.local_network.parameters(), max_norm=grad_clip_norm
+                )
             optimizer.step()
+            # >>> @sbs_record — accumulate per-sample correctness (new-class samples only)
+            if self._sbs_tracking:
+                self._sbs_record_batch(local_idx, logits, targets)
+            # <<< @sbs_record
             # <<< @train_backward
 
             # >>> @train_batch_end
@@ -511,6 +672,138 @@ class TagFex(HerdingIndicesLearner):
         scheduler.step()
         train_results = get_metrics(metrics)
         return train_results
+
+    # ── SBS helpers ───────────────────────────────────────────────────────────
+
+    @torch.no_grad()
+    def _sbs_record_batch(
+        self,
+        local_idx: torch.Tensor,
+        logits: torch.Tensor,
+        targets: torch.Tensor,
+    ) -> None:
+        """Accumulate per-sample correctness for SBS speed tracking.
+
+        Both *logits* and *targets* are the doubled version produced by
+        ``torch.cat((sample1_batch, sample2_batch))`` — only the first half
+        (corresponding to *sample1*) is used here to avoid double-counting.
+        *local_idx* always has batch-size B (not 2B).
+        """
+        bs = local_idx.shape[0]
+        preds = logits[:bs].argmax(dim=1)
+        correct = (preds == targets[:bs]).cpu().numpy().astype(np.int32)
+        idx_np = local_idx.cpu().numpy()
+        # Only accumulate for new-class positions (local_idx < _sbs_n_new).
+        new_mask = idx_np < self._sbs_n_new
+        if new_mask.any():
+            np.add.at(self._sbs_correct, idx_np[new_mask], correct[new_mask])
+            np.add.at(self._sbs_total, idx_np[new_mask], 1)
+
+    def _sbs_finalize_speeds(self) -> dict:
+        """Compute learning_speed = correct_count / epoch_count for new-class samples.
+
+        Returns a mapping ``{abs_dataset_idx: float speed}`` that aligns with
+        the absolute CIFAR-100 (or other base-dataset) indices stored in
+        ``self._sbs_task_new_abs``.
+        """
+        n = self._sbs_n_new
+        seen = np.maximum(self._sbs_total[:n], 1)
+        speeds = self._sbs_correct[:n].astype(np.float32) / seen
+        self.print_logger.info(
+            f"SBS: new-class learning_speed — "
+            f"mean={speeds.mean():.3f}  std={speeds.std():.3f}  "
+            f"p10={np.percentile(speeds, 10):.3f}  p90={np.percentile(speeds, 90):.3f}"
+        )
+        return {int(ai): float(sp) for ai, sp in zip(self._sbs_task_new_abs, speeds)}
+
+    # ── SBS override of update_memory ─────────────────────────────────────────
+
+    @torch.no_grad()
+    def update_memory(self) -> None:
+        """Herding with optional SBS pre-filtering.
+
+        When SBS is disabled (``sbs_q == sbs_s == 0``) or the run uses FFCV /
+        distributed training, this delegates entirely to the parent-class
+        implementation.  Otherwise it applies the SBS filter to each new class's
+        candidate pool before running the standard iCaRL greedy herding.
+        """
+        if not self._sbs_tracking or (self._sbs_q == 0.0 and self._sbs_s == 0.0):
+            super().update_memory()
+            self._sbs_tracking = False
+            return
+
+        speed_by_abs = self._sbs_speed_map
+        self._sbs_tracking = False  # reset before any early-return
+
+        num_classes = self.state["sofar_num_classes"]
+        cur_task_num_classes = self.state["cur_task_num_classes"]
+        num_seen_classes = num_classes - cur_task_num_classes
+        local_classes = np.arange(num_seen_classes, num_classes)
+
+        selected_indices: list = []
+        class_means: list = []
+
+        prog_bar_desc = (
+            f"Task {self.state['cur_task']}/{self.state['num_tasks']} "
+            f"updmem-SBS [{local_classes[0]}~{local_classes[-1]}]"
+            f"[{self.num_exemplars_per_class}]"
+        )
+        prog_bar = tqdm(local_classes, desc=prog_bar_desc)
+
+        for class_id in prog_bar:
+            inherent_class_id = self.data_manager.class_order[class_id].item()
+            class_dataset = self.data_manager.get_dataset_by_class_ids(
+                [inherent_class_id], split="train", mode="test"
+            )
+            abs_indices = np.array(class_dataset.indices)
+
+            # Map absolute indices to SBS speeds; default 0.5 for unseen samples.
+            speeds = np.array(
+                [speed_by_abs.get(int(ai), 0.5) for ai in abs_indices],
+                dtype=np.float32,
+            )
+            keep_mask = _sbs_keep_mask(
+                speeds, self._sbs_q, self._sbs_s, self.num_exemplars_per_class
+            )
+            n_kept = int(keep_mask.sum())
+            self.print_logger.info(
+                f"SBS [class {class_id}]: {len(speeds)} → {n_kept} kept "
+                f"(q={self._sbs_q}, s={self._sbs_s}) | "
+                f"speed mean={speeds.mean():.3f} min={speeds.min():.3f} max={speeds.max():.3f}"
+            )
+
+            filtered_abs = abs_indices[keep_mask]
+            assert n_kept >= self.num_exemplars_per_class, (
+                f"SBS filter left only {n_kept} samples for class {class_id} "
+                f"but need {self.num_exemplars_per_class}. "
+                f"Reduce sbs_q/sbs_s or check class size."
+            )
+
+            filtered_dataset = Subset(class_dataset.dataset, filtered_abs)
+            class_features = self.extract_herding_features(filtered_dataset)
+
+            class_mean = class_features.mean(dim=0, keepdim=True)
+            class_selected_indices: list = []
+            selected_mean = torch.zeros(
+                (self.local_network.feature_dim,), device=self.device
+            )
+
+            for n_sel in range(1, self.num_exemplars_per_class + 1):
+                mu_p = ((n_sel - 1) * selected_mean + class_features) / n_sel
+                idx = (mu_p - class_mean).norm(dim=-1).argmin().item()
+                selected_mean = mu_p[idx]
+                class_selected_indices.append(int(filtered_abs[idx]))
+                mask = torch.arange(len(class_features)) != idx
+                class_features = class_features[mask]
+                filtered_abs = np.delete(filtered_abs, idx)
+
+            selected_indices.append(class_selected_indices)
+            selected_mean /= selected_mean.norm()
+            class_means.append(selected_mean)
+
+        prog_bar.close()
+        self.memory_samples.extend(selected_indices)
+        self.class_means.extend(class_means)
 
     @torch.no_grad()
     def eval_epoch(self, data_loader):
@@ -698,6 +991,22 @@ class TagFex(HerdingIndicesLearner):
             suffix_parts.append("antGlobal" if ant_max_global else "antLocal")
         suffix_parts.append("nceGlobal" if infonce_max_global else "nceLocal")
 
+        # ANT loss formulation (only if non-default)
+        ant_formulation = self.configs.get("ant_formulation", "logsumexp")
+        if ant_formulation != "logsumexp":
+            suffix_parts.append(f"form{ant_formulation}")
+
+        # Avg-K teacher (only if enabled)
+        avg_last_k = self.configs.get("avg_last_k", 0)
+        if avg_last_k > 0:
+            suffix_parts.append(f"avgK{avg_last_k}")
+
+        # SBS (only if enabled)
+        sbs_q = self.configs.get("sbs_q", 0.0)
+        sbs_s = self.configs.get("sbs_s", 0.0)
+        if sbs_q > 0 or sbs_s > 0:
+            suffix_parts.append(f"sbsQ{sbs_q:.2f}S{sbs_s:.2f}".rstrip("0").rstrip("."))
+
         # Always append seed so every run has a unique, traceable directory
         seed = self.configs.get("seed", 1993)
         suffix_parts.append(f"s{seed}")
@@ -842,6 +1151,9 @@ def _compute_contrastive_loss_base(
     ant_max_global=True,
     infonce_max_global=True,
     ant_symmetric_full=False,
+    ant_formulation="logsumexp",
+    ant_tau=0.1,
+    ant_topk=32,
     logger=None,
     log_prefix="contrast",
     task=None,
@@ -863,6 +1175,14 @@ def _compute_contrastive_loss_base(
         ant_max_global: If True, ANT uses global maximum across anchors; if False, per-anchor maximum
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
+        ant_formulation: ANT loss variant - one of:
+            "logsumexp"  (default) log(sum(exp(relu(v)))) — has count-floor = log(N)
+            "expm1"      log1p(sum(expm1(relu(v)))) — zero contribution from non-violating
+            "softplus"   mean(softplus(v/tau)) over valid pairs — smooth, count-normalised
+            "topk"       logsumexp on top-k violations — focuses on hard negatives
+            "active_only" mean(relu(v)) over active violations — direct violation severity
+        ant_tau: Temperature for softplus formulation (default 0.1)
+        ant_topk: Number of hard negatives for topk formulation (default 32)
         logger: Logger instance for recording statistics
         log_prefix: Prefix for log messages ("contrast" or "kd")
         task: Current task number for logging
@@ -893,82 +1213,115 @@ def _compute_contrastive_loss_base(
             log_prefix=log_prefix,
         )
 
-    # ANT (Adaptive Negative Thresholding) logic
+    # ANT (Adaptive Negative Thresholding) — build similarity matrix and valid-negative mask
     if ant_symmetric_full:
-        # Use full symmetric matrix for ANT (exclude self and positives)
+        # Full symmetric matrix: exclude self and positive pairs
         N = cos_sim.shape[0]
-        self_mask = torch.eye(N, dtype=torch.bool, device=device)
-        pos_mask_full = self_mask.roll(shifts=N // 2, dims=0)
-        neg_mask = ~(self_mask | pos_mask_full)
-        ant_sim_matrix = cos_sim.masked_fill(~neg_mask, -float("inf"))
+        self_mask_ant = torch.eye(N, dtype=torch.bool, device=device)
+        pos_mask_ant = self_mask_ant.roll(shifts=N // 2, dims=0)
+        valid_neg_mask = ~(self_mask_ant | pos_mask_ant)  # [N, N]
+        ant_sim_matrix = cos_sim.masked_fill(~valid_neg_mask, -float("inf"))
     else:
-        # Original: Use only intra-view block (first half)
+        # Original: intra-view block only (first half × first half)
         cos_sim_q1 = cos_sim[:pos_start, :pos_start]
-        mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=bool, device=device)
-        ant_sim_matrix = cos_sim_q1.masked_fill(mask_q1, -float("inf"))
+        diag_mask_q1 = torch.eye(cos_sim_q1.shape[0], dtype=torch.bool, device=device)
+        valid_neg_mask = ~diag_mask_q1  # [B, B]
+        ant_sim_matrix = cos_sim_q1.masked_fill(diag_mask_q1, -float("inf"))
 
-    # Compute positive similarities for gap calculation and logging
+    # Positive similarities for gap / logging
     pos_sims = torch.diagonal(cos_sim[:pos_start, pos_start:])
 
-    # Compute ANT loss based on max_global strategy
+    # Per-anchor valid-negative count — needed for floor correction
+    num_negatives = valid_neg_mask.sum(dim=-1).float()  # [N] or [B]
+
+    # Reference similarity per anchor (global or local max of valid negatives)
     if ant_max_global:
-        # Global maximum across all anchors
         ant_max = ant_sim_matrix.max()
-        mq = F.relu_(ant_sim_matrix - ant_max + ant_margin)
     else:
-        # Maximum per anchor (per row)
-        ant_max = ant_sim_matrix.max(dim=-1, keepdim=True).values
-        mq = F.relu_(ant_sim_matrix - ant_max + ant_margin)
+        ant_max = ant_sim_matrix.max(dim=-1, keepdim=True).values  # [N,1] or [B,1]
 
-    # Compute base ANT loss
-    ant_loss = torch.logsumexp(mq, dim=-1).mean()
+    # Raw violation values before ReLU: v_i = neg_sim_i - ref_sim + margin
+    raw_v = ant_sim_matrix - ant_max + ant_margin  # same shape as ant_sim_matrix
 
-    # Get non-zero values for statistics
-    if ant_symmetric_full:
-        neg_sims = ant_sim_matrix[neg_mask]
+    # Compute ANT loss per anchor based on chosen formulation
+    if ant_formulation == "logsumexp":
+        # log(sum(exp(relu(v)))) over valid negatives only.
+        # After relu, masked positions (-inf → 0) would contribute exp(0)=1 each,
+        # inflating the count floor. Re-mask them to -inf so only valid pairs enter
+        # the logsumexp. Non-violating valid negatives still contribute exp(0)=1,
+        # so the count floor remains log(num_valid_negatives) — but no longer
+        # includes self/positive slots.
+        mq = torch.relu(raw_v)
+        mq = mq.masked_fill(~valid_neg_mask, float("-inf"))
+        ant_loss_per_anchor = torch.logsumexp(mq, dim=-1)
+
+    elif ant_formulation == "expm1":
+        # log1p(sum(expm1(relu(v)))) — non-violating and masked contribute exactly 0
+        relu_v = torch.relu(raw_v)
+        violation_mass = torch.expm1(relu_v)  # exp(relu(v)) - 1; 0 when v <= 0
+        ant_loss_per_anchor = torch.log1p(violation_mass.sum(dim=-1))
+
+    elif ant_formulation == "softplus":
+        # mean(softplus(v/tau)) over valid pairs — smooth, no hard ReLU floor
+        sp = F.softplus(raw_v / ant_tau)
+        sp = sp * valid_neg_mask.float()  # zero masked positions explicitly
+        ant_loss_per_anchor = sp.sum(dim=-1) / num_negatives.clamp_min(1.0)
+
+    elif ant_formulation == "topk":
+        # logsumexp on top-k hardest negatives — focuses pressure on hard pairs
+        k = min(ant_topk, int(num_negatives.min().item()))
+        if k > 0:
+            v_for_topk = raw_v.masked_fill(~valid_neg_mask, float("-inf"))
+            topk_v = torch.topk(v_for_topk, k=k, dim=-1).values
+            mq_topk = torch.relu(topk_v)
+            ant_loss_per_anchor = torch.logsumexp(mq_topk, dim=-1)
+        else:
+            ant_loss_per_anchor = torch.zeros(ant_sim_matrix.shape[0], device=device)
+
+    elif ant_formulation == "active_only":
+        # mean(relu(v)) over active violators — direct violation severity, no floor
+        relu_v = torch.relu(raw_v)
+        active_counts = (relu_v > 0).sum(dim=-1).clamp_min(1).float()
+        ant_loss_per_anchor = relu_v.sum(dim=-1) / active_counts
+
     else:
-        neg_sims = ant_sim_matrix[~mask_q1]
+        raise ValueError(
+            f"Unknown ant_formulation '{ant_formulation}'. "
+            "Choose from: logsumexp, expm1, softplus, topk, active_only"
+        )
+
+    ant_loss = ant_loss_per_anchor.mean()
+
+    # Valid negative similarities for statistics
+    neg_sims = ant_sim_matrix[valid_neg_mask]
 
     # Always log basic contrastive statistics for monitoring
     if logger is not None:
-        # Calculate current gap (pos_mean - neg_mean)
         pos_mean = pos_sims.mean()
         neg_mean = neg_sims.mean()
-        current_gap_computed = pos_mean - neg_mean
-
-        # Prepare basic statistics
         basic_stats = {
             "pos_mean": pos_mean.item(),
             "pos_std": pos_sims.std().item(),
             "neg_mean": neg_mean.item(),
             "neg_std": neg_sims.std().item(),
-            "current_gap": current_gap_computed.item(),
+            "current_gap": (pos_mean - neg_mean).item(),
         }
-
         logger.log_contrastive_stats(basic_stats, task=task, epoch=epoch, batch=batch)
 
     # Log detailed ANT-specific statistics when ANT is active
     if logger is not None and ant_beta > 0:
-        # Compute gaps: distance from max negative to margin threshold
+        # Gap: distance of each valid negative from the reference (ant_max)
         if ant_max_global:
             gaps = neg_sims - ant_max
         else:
-            # Expand ant_max to match neg_sims shape
             ant_max_expanded = ant_max.expand_as(ant_sim_matrix)
-            if ant_symmetric_full:
-                gaps = (ant_sim_matrix - ant_max_expanded)[neg_mask]
-            else:
-                gaps = (ant_sim_matrix - ant_max_expanded)[~mask_q1]
+            gaps = (ant_sim_matrix - ant_max_expanded)[valid_neg_mask]
 
-        # Count margin violations (mq > 0 means margin was violated)
-        if ant_symmetric_full:
-            mq_nonzero = mq[neg_mask]
-        else:
-            mq_nonzero = mq[~mask_q1]
-        violations = (mq_nonzero > 0).float()
+        # Classic violation percentage (mq > 0 in logsumexp terms, or raw_v > 0)
+        raw_v_valid = raw_v[valid_neg_mask]
+        violations = (raw_v_valid > 0).float()
         violation_pct = violations.mean().item() * 100
 
-        # Prepare detailed ANT statistics (only logged when ANT is active)
         ant_stats = {
             "pos_min": pos_sims.min().item(),
             "pos_max": pos_sims.max().item(),
@@ -982,28 +1335,90 @@ def _compute_contrastive_loss_base(
             "violation_pct": violation_pct,
             "ant_loss": ant_loss.item(),
         }
-
-        # Log detailed ANT statistics
         logger.log_ant_distance_stats(ant_stats, task=task, epoch=epoch, batch=batch)
 
-    # Mask out cosine similarity to itself
+        # --- ANT flattening diagnostics (Section 4 of investigation plan) ---
+        # 4.1 Negative-set size
+        num_neg_mean = num_negatives.mean()
+
+        # 4.2 Raw violation values (pre-ReLU, over valid pairs only)
+        raw_v_mean = raw_v_valid.mean()
+        raw_v_min = raw_v_valid.min()
+        raw_v_max = raw_v_valid.max()
+
+        # 4.3-4.4 Active violation mask and severity
+        active_mask = valid_neg_mask & (raw_v > 0)
+        active_count_per_anchor = active_mask.sum(dim=-1).float()
+        active_count_mean = active_count_per_anchor.mean()
+        active_ratio_mean = (active_count_per_anchor / num_negatives.clamp_min(1.0)).mean()
+
+        relu_v_all = torch.relu(raw_v_valid)  # [K_valid]
+        viol_mean_all = relu_v_all.mean()
+
+        if active_mask.any():
+            relu_v_act = torch.relu(raw_v[active_mask])
+            viol_mean_act = relu_v_act.mean()
+            viol_max_act = relu_v_act.max()
+        else:
+            viol_mean_act = torch.zeros(1, device=device).squeeze()
+            viol_max_act = torch.zeros(1, device=device).squeeze()
+
+        # Percentile tail metrics of raw_v over valid negatives.
+        # More informative than viol_max_act for ant_max_global=True, where the
+        # max violator is always exactly gamma (structural artifact of the
+        # local-max reference: v_max = s_max - s_max + gamma = gamma).
+        raw_v_p90 = torch.quantile(raw_v_valid, 0.90)
+        raw_v_p95 = torch.quantile(raw_v_valid, 0.95)
+
+        # 4.5 Count-floor-adjusted ANT loss (only meaningful for logsumexp formulation)
+        ant_floor_per_anchor = torch.log(num_negatives.clamp_min(1.0))
+        ant_loss_adj = (ant_loss_per_anchor - ant_floor_per_anchor).mean()
+
+        # 4.6 Hardest-negative similarity and positive–negative gap
+        # Use first pos_start rows (one view) for comparison with pos_sims [B]
+        hardest_neg_per_anchor = ant_sim_matrix[:pos_start].max(dim=-1).values  # [B]
+        hard_neg_sim_mean = hardest_neg_per_anchor.mean()
+        sim_gap = pos_sims - hardest_neg_per_anchor  # [B]
+        sim_gap_mean = sim_gap.mean()
+        sim_gap_min = sim_gap.min()
+
+        flattening_stats = {
+            "num_neg_mean": num_neg_mean.item(),
+            "ant_loss_raw": ant_loss.item(),
+            "ant_loss_adj": ant_loss_adj.item(),
+            "active_ratio": active_ratio_mean.item(),
+            "active_count_mean": active_count_mean.item(),
+            "viol_mean_all": viol_mean_all.item(),
+            "viol_mean_act": viol_mean_act.item(),
+            "viol_max_act": viol_max_act.item(),
+            "raw_v_p90": raw_v_p90.item(),
+            "raw_v_p95": raw_v_p95.item(),
+            "raw_v_mean": raw_v_mean.item(),
+            "raw_v_min": raw_v_min.item(),
+            "raw_v_max": raw_v_max.item(),
+            "hard_neg_sim": hard_neg_sim_mean.item(),
+            "sim_gap_mean": sim_gap_mean.item(),
+            "sim_gap_min": sim_gap_min.item(),
+        }
+        logger.log_ant_flattening_diagnostics(
+            flattening_stats, task=task, epoch=epoch, batch=batch
+        )
+
+    # Mask out cosine similarity to itself for InfoNCE
     self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=device)
     cos_sim.masked_fill_(self_mask, -9e15)
 
-    # Find positive example -> batch_size//2 away from the original example
+    # Positive pair mask: batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
     # InfoNCE loss with optional local anchor normalization
     cos_sim = cos_sim / t
 
     # Apply local anchor normalization for InfoNCE when configured.
-    # This strategy is now independent from ANT anchor selection.
+    # This strategy is independent from the ANT anchor selection.
     if not infonce_max_global:
-        # Find max negative similarity per anchor (excluding positives)
         cos_sim_neg = cos_sim.clone()
         cos_sim_neg[pos_mask] = -float("inf")
-
-        # Normalize by per-anchor maximum
         max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
         cos_sim = cos_sim - max_neg_per_anchor
 
@@ -1041,6 +1456,9 @@ def infoNCE_loss(
     ant_max_global=True,
     infonce_max_global=True,
     ant_symmetric_full=False,
+    ant_formulation="logsumexp",
+    ant_tau=0.1,
+    ant_topk=32,
     logger=None,
     task=None,
     epoch=None,
@@ -1060,6 +1478,9 @@ def infoNCE_loss(
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
+        ant_formulation: ANT loss variant (logsumexp, expm1, softplus, topk, active_only)
+        ant_tau: Temperature for softplus formulation
+        ant_topk: k for topk formulation
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1083,6 +1504,9 @@ def infoNCE_loss(
         ant_max_global=ant_max_global,
         infonce_max_global=infonce_max_global,
         ant_symmetric_full=ant_symmetric_full,
+        ant_formulation=ant_formulation,
+        ant_tau=ant_tau,
+        ant_topk=ant_topk,
         logger=logger,
         log_prefix="contrast",
         task=task,
@@ -1103,6 +1527,9 @@ def infoNCE_distill_loss(
     ant_max_global=True,
     infonce_max_global=True,
     ant_symmetric_full=False,
+    ant_formulation="logsumexp",
+    ant_tau=0.1,
+    ant_topk=32,
     logger=None,
     task=None,
     epoch=None,
@@ -1124,6 +1551,9 @@ def infoNCE_distill_loss(
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
         infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
+        ant_formulation: ANT loss variant (logsumexp, expm1, softplus, topk, active_only)
+        ant_tau: Temperature for softplus formulation
+        ant_topk: k for topk formulation
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1147,6 +1577,9 @@ def infoNCE_distill_loss(
         ant_max_global=ant_max_global,
         infonce_max_global=infonce_max_global,
         ant_symmetric_full=ant_symmetric_full,
+        ant_formulation=ant_formulation,
+        ant_tau=ant_tau,
+        ant_topk=ant_topk,
         logger=logger,
         log_prefix="kd",
         task=task,

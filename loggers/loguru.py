@@ -50,6 +50,7 @@ class LoguruLogger:
                 filter=lambda record: "Matrix" in record["message"]
                 or "Loss components" in record["message"]
                 or "ANT distance stats" in record["message"]
+                or "ANT flattening" in record["message"]
                 or "Contrastive stats" in record["message"],
             )
 
@@ -179,3 +180,61 @@ class LoguruLogger:
 
         log_msg = " | ".join(log_parts)
         self.logger.debug(f"{context}ANT distance stats: {log_msg}")
+
+    def log_ant_flattening_diagnostics(self, stats, task=None, epoch=None, batch=None):
+        """
+        Log ANT count-floor diagnostics to diagnose the flattening phenomenon.
+
+        Compares the raw ANT loss against a count-floor-adjusted version and
+        reports active violation statistics and hard-negative geometry.
+
+        Args:
+            stats: dict containing:
+                - num_neg_mean: mean number of valid negatives per anchor
+                - ant_loss_raw: raw ANT loss (logsumexp-based floor included)
+                - ant_loss_adj: count-floor-adjusted ANT loss
+                - active_ratio: fraction of valid negatives with active violations
+                - active_count_mean: mean count of active violations per anchor
+                - viol_mean_all: mean ReLU(raw_v) over all valid pairs
+                - viol_mean_act: mean ReLU(raw_v) over actively violating pairs only
+                - viol_max_act: max ReLU(raw_v) over actively violating pairs
+                  NOTE: uninformative when ant_max_global=True (always == gamma)
+                - raw_v_p90: 90th percentile of raw_v over valid pairs (pre-ReLU)
+                - raw_v_p95: 95th percentile of raw_v over valid pairs (pre-ReLU)
+                - hard_neg_sim: mean hardest-negative similarity per anchor
+                - sim_gap_mean: mean(pos_sim - hardest_neg_sim)
+                - sim_gap_min: min(pos_sim - hardest_neg_sim)
+                - raw_v_mean: mean raw violation value (pre-ReLU, over valid pairs)
+                - raw_v_min: min raw violation value (pre-ReLU, over valid pairs)
+                - raw_v_max: max raw violation value (pre-ReLU, over valid pairs)
+            task, epoch, batch: context for log message
+        """
+        context_parts = []
+        if task is not None:
+            context_parts.append(f"T{task}")
+        if epoch is not None:
+            context_parts.append(f"E{epoch}")
+        if batch is not None:
+            context_parts.append(f"B{batch}")
+        context = f"[{' '.join(context_parts)}] " if context_parts else ""
+
+        log_parts = [
+            f"num_neg_mean: {stats['num_neg_mean']:.1f}",
+            f"ant_loss_raw: {stats['ant_loss_raw']:.4f}",
+            f"ant_loss_adj: {stats['ant_loss_adj']:.4f}",
+            f"active_ratio: {stats['active_ratio']:.4f}",
+            f"active_count_mean: {stats['active_count_mean']:.2f}",
+            f"viol_mean_all: {stats['viol_mean_all']:.4f}",
+            f"viol_mean_act: {stats['viol_mean_act']:.4f}",
+            f"viol_max_act: {stats['viol_max_act']:.4f}",
+            f"raw_v_p90: {stats['raw_v_p90']:.4f}",
+            f"raw_v_p95: {stats['raw_v_p95']:.4f}",
+            f"raw_v_mean: {stats['raw_v_mean']:.4f}",
+            f"raw_v_min: {stats['raw_v_min']:.4f}",
+            f"raw_v_max: {stats['raw_v_max']:.4f}",
+            f"hard_neg_sim: {stats['hard_neg_sim']:.4f}",
+            f"sim_gap_mean: {stats['sim_gap_mean']:.4f}",
+            f"sim_gap_min: {stats['sim_gap_min']:.4f}",
+        ]
+        log_msg = " | ".join(log_parts)
+        self.logger.debug(f"{context}ANT flattening: {log_msg}")

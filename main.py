@@ -26,6 +26,10 @@ class ContinualLauncher:
         self.configs = vars(self.args)
         self.configs.update(**exp_configs)
 
+        # Ensure queue launches can disable debug mode even if a YAML sets debug: true.
+        if self.args.force_no_debug:
+            self.configs['debug'] = False
+
     def train(self):
         self._get_train_configs()
         data_manager = ContinualDataManager(self.configs, self.distributed)

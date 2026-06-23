@@ -238,6 +238,40 @@ class MultipleAugmentationDataset(Dataset):
         else:
             raise AttributeError(f'No attribute called {name}.')
 
+
+class WithIndexDataset(Dataset):
+    """Wraps any dataset to prepend the item's local index as the first element.
+
+    Used by SBS (Speed-Based Sampling) so the training loop can accumulate
+    per-sample correctness counts without changing the underlying dataset.
+
+    Example: base returns (sample1, sample2, target)
+             this returns (local_idx, sample1, sample2, target)
+    """
+
+    def __init__(self, dataset: Dataset) -> None:
+        super().__init__()
+        self.dataset = dataset
+
+    def __getitem__(self, idx: int):
+        item = self.dataset[idx]
+        if isinstance(item, tuple):
+            return (idx,) + item
+        return (idx, item)
+
+    def __getitems__(self, indices: list) -> list:
+        # Explicitly implement __getitems__ so the DataLoader's batch fetcher
+        # does not resolve this via __getattr__ and accidentally call the inner
+        # Subset.__getitems__, which would bypass our index-prepending logic.
+        return [self.__getitem__(idx) for idx in indices]
+
+    def __len__(self) -> int:
+        return len(self.dataset)
+
+    def __getattr__(self, name: str):
+        # Proxy attribute access to the wrapped dataset (e.g. .indices, .targets).
+        return getattr(self.dataset, name)
+
 def pil_loader(path: str):
     with open(path, "rb") as f:
         img = Image.open(f)

@@ -52,6 +52,7 @@ def train_arg(parser: ArgumentParser):
 
     # debug
     parser.add_argument('--debug', action='store_true', default=False, help='debug mode, only train with several epochs')
+    parser.add_argument('--force-no-debug', action='store_true', default=False, help='force debug=False after loading YAML configs')
 
 def evaluate_arg(parser: ArgumentParser):
     # checkpoints
