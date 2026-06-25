@@ -56,6 +56,9 @@ if [ -f "$SCRIPT_DIR/.venv/bin/activate" ]; then
     source "$SCRIPT_DIR/.venv/bin/activate"
 fi
 
+# ── CUDA allocator: use expandable segments to avoid OOM from fragmentation ──
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 # ── Directories ───────────────────────────────────────────────────────────────
 mkdir -p "$ORCH_LOG_DIR" "$CONSOLE_DIR"
 

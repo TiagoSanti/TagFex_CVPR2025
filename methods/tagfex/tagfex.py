@@ -567,10 +567,12 @@ class TagFex(HerdingIndicesLearner):
                 # self.print_logger.debug(f'rank {self.distributed["rank"]}, batch {batch}, aux_loss: {aux_loss}')
 
                 predicted_feature = out["predicted_feature"]
-                old_ta_feature = self.last_ta_net(samples.contiguous())["features"]
+                with torch.no_grad():
+                    old_ta_feature = self.last_ta_net(samples.contiguous())["features"]
+                    old_ta_projected = self.last_projector(old_ta_feature)
                 kd_loss = infoNCE_distill_loss(
                     self.last_projector(predicted_feature),
-                    self.last_projector(old_ta_feature),
+                    old_ta_projected,
                     self.configs["infonce_kd_temp"],
                     self.configs.get("nce_alpha", 1.0),
                     ant_beta,

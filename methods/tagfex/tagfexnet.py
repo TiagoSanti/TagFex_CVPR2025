@@ -53,7 +53,12 @@ class TagFexNet(ClassIncrementalNetwork):
                 self.ts_fmaps = out['fmaps']
                 ts_outs.append(out)
         else:
-            ts_outs = [net(x) for net in self.ts_nets]
+            for i, net in enumerate(self.ts_nets):
+                if i < len(self.ts_nets) - 1:
+                    with torch.no_grad():
+                        ts_outs.append(net(x))
+                else:
+                    ts_outs.append(net(x))
         
         ts_features = [out['features'] for out in ts_outs]
 
