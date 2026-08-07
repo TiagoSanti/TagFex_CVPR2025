@@ -1,0 +1,89 @@
+\chapter{Fundamentação Teórica e Trabalhos Relacionados}
+\label{ch:fundamentacao}
+
+% Meta editorial: 12--17 páginas. Narrativa: CIL -> interferência -> famílias
+% de métodos -> contraste -> destilação contrastiva -> TagFex -> ponto de
+% intervenção -> literatura relacionada -> lacuna.
+
+\section{Aprendizado contínuo e incremental de classes}
+
+\subsection{Definição e notação do cenário incremental}
+% Definir amostras, rótulos, etapas, classes disjuntas, memória de exemplares,
+% espaço de saída acumulado e avaliação após cada etapa.
+
+\subsection{Protocolos e informação de tarefa}
+% Diferenciar Task-IL, Domain-IL e Class-IL; task-aware, task-agnostic na
+% inferência e task-free/boundary-free no treinamento. Declarar o protocolo
+% efetivamente usado pelo TagFex e por este trabalho.
+
+\section{Esquecimento, interferência e estratégias de mitigação}
+
+\subsection{Estabilidade, plasticidade e fontes de erro}
+% Relacionar esquecimento, interferência, deriva de representação, viés do
+% classificador e desbalanceamento. Não atribuir toda queda a um único mecanismo.
+
+\subsection{Repetição, regularização e expansão arquitetural}
+% Revisão focada de rehearsal/herding, destilação, expansão dinâmica e métodos
+% híbridos; explicitar custos e pressupostos.
+
+\subsection{Alinhamento e classificação por médias de classe}
+% Preparar weight alignment, protótipos e NME usados no pipeline de referência.
+
+\section{Aprendizado contrastivo e destilação contrastiva}
+
+\subsection{Embeddings, similaridade e pares contrastivos}
+% Normalização L2, cosseno, temperatura, duas views, âncora, positivo, negativos
+% e estrutura da matriz 2B x 2B.
+
+\subsection{InfoNCE e fluxo de gradientes}
+% Derivar a perda por âncora e interpretar cada termo. Explicar o que continua
+% contribuindo para o gradiente, sem concluir antecipadamente que todo gradiente
+% residual seja prejudicial.
+
+\subsection{Destilação contrastiva em aprendizado incremental}
+% Distinguir contraste aluno--aluno de destilação aluno--professor e explicar
+% por que esse segundo caso é o foco científico do problema.
+
+\subsection{Ponte para os ajustes não essenciais}
+% Revisar a motivação da literatura e formular a possibilidade de relações já
+% preservadas continuarem ativas. A definição e solução pertencem ao Cap. 3.
+
+\section{TagFex como método de referência}
+
+\subsection{Arquitetura e visão geral do pipeline}
+% Expansão de atributos específicos à tarefa, ramo agnóstico, projetor,
+% preditor e cabeças. Inserir figura: TagFex -> destilação contrastiva -> ponto
+% exato em que a ANT intervém.
+
+\subsection{Primeira etapa e etapas incrementais}
+% Explicar expansão, congelamento, professor, duas views, replay e diferenças
+% entre o primeiro treinamento e os seguintes.
+
+\subsection{Termos da função objetivo}
+% Reunir classificação principal, cabeça/perda auxiliar, contraste,
+% destilação contrastiva, classificação de transferência e KL condicional.
+% Interpretar coeficientes e o fator automático de destilação.
+
+\subsection{Memória, herding, NME e alinhamento de pesos}
+% Explicar quando cada operação ocorre e como participa da avaliação.
+
+\subsection{Uma etapa incremental passo a passo}
+% Pseudocódigo/fluxograma alinhado a train() e _compute_incremental_loss() de
+% tagfex_clean.py. Encerrar identificando a chamada contrastiva modificada.
+
+\section{Ponto de intervenção e lacuna científica}
+% Mostrar em que termo do TagFex as relações contrastivas são construídas, por
+% que o critério de ativação é relevante e o que o método-base não controla.
+% Não apresentar ainda todas as decisões aGlobal/aLocal/aSymFull.
+
+\section{Trabalhos relacionados}
+
+\subsection{Métodos de CIL diretamente comparáveis}
+% TagFex, DER, iCaRL e apenas baselines efetivamente comparáveis.
+
+\subsection{Seleção contrastiva, margens e preservação de representações}
+% Revisão curta das linhas mais próximas ao mecanismo proposto.
+
+\subsection{Síntese e transição para a proposta}
+% Responder: o que existe, o que cobre, o que falta e como essa lacuna motiva a
+% ANT. Terminar apontando diretamente ao Capítulo~\ref{ch:proposta}.

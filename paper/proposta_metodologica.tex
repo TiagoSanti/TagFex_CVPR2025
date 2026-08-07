@@ -1,0 +1,154 @@
+\chapter{Proposta Metodológica}
+\label{ch:proposta}
+
+% Meta editorial: 22--32 páginas. Este é o capítulo central. A ordem narrativa
+% é problema -> formulação -> decisões de projeto -> diagnósticos -> validação.
+
+\section{Visão geral da ANT}
+% Responder antes das equações: qual problema resolve; que similaridades usa;
+% quais relações deixam de produzir pressão; quais continuam ativas; onde a
+% ANT entra na destilação contrastiva do TagFex. Inserir diagrama comparando
+% TagFex e TagFex+ANT.
+
+\section{Atualizações contrastivas não essenciais}
+
+\subsection{Cenário motivador e interpretação geométrica}
+% Exemplo visual pequeno com âncora, positivo, negativos adequados e violadores.
+% Mostrar intuitivamente por que relações adequadas não precisam receber a
+% mesma pressão de otimização indefinidamente.
+
+\subsection{Definição operacional e consequências esperadas}
+% Distinguir loss residual, gradiente não nulo, violação de margem, atualização
+% não essencial e dano ao conhecimento anterior. Definir quais serão observáveis
+% e quais permanecem inferências a testar.
+
+\subsection{Predições e diagnósticos do mecanismo}
+% Se a hipótese estiver correta: adjusted loss, active ratio, distribuição de
+% violações e hard-negative similarity devem evoluir de forma compatível, sem
+% perda de plasticidade medida no desempenho das novas classes.
+
+\section{Formulação base da ANT}
+% Desenvolver em sequência, com interpretação após cada equação:
+% (1) batch e duas views; (2) embeddings normalizados; (3) matriz de
+% similaridade; (4) máscaras de self/positivos; (5) negativos válidos;
+% (6) referência; (7) margem; (8) v_ij = s_ij - r + gamma;
+% (9) termos ativos; (10) agregação; (11) L_ANT;
+% (12) alpha L_InfoNCE + beta L_ANT; (13) fluxo de gradientes.
+% Conferir tudo contra _build_ant_matrix(), _compute_ant_loss() e
+% _compute_contrastive_loss_base() antes da redação definitiva.
+
+\section{Decisão de projeto I: referência da ANT}
+
+\subsection{Referência global (aGlobal)}
+% Um valor compartilhado extraído do domínio válido da matriz ANT. Formalizar
+% domínio, acoplamento entre âncoras, margem efetiva e gradientes esperados.
+
+\subsection{Referência por âncora (aLocal)}
+% Máximo por linha. Formalizar a diferença para aGlobal e discutir adaptação a
+% graus distintos de dificuldade, sem declarar benefício antes das ablações.
+
+% Inserir tabela: variante | domínio da referência | granularidade | efeito
+% esperado | hipótese/experimento.
+
+\section{Decisão de projeto II: cobertura da matriz}
+
+\subsection{Cobertura intra-view assimétrica}
+% Variante original: bloco Q1/S11, B âncoras e B-1 negativos. Explicitar quais
+% views e blocos não participam.
+
+\subsection{Cobertura simétrica completa (aSymFull)}
+% Matriz 2B x 2B, removendo self e par positivo; 2B-2 negativos por âncora.
+% Explicar simetria, cobertura, custo e comportamento esperado.
+
+% Figura obrigatória: Q1, Q2, Q3, Q4, self, positivos, negativos e blocos usados
+% por cada variante. Tabela: referência | cobertura | granularidade | custo.
+
+\section{Decisão associada: normalização da InfoNCE}
+
+\subsection{Normalização nGlobal e nLocal}
+% Apresentar as duas formas lado a lado, por linha, com matriz pequena. Tratar
+% como decisão da InfoNCE, separada da referência ANT.
+
+\subsection{Equivalência algébrica e verificação numérica}
+% A implementação nLocal subtrai uma constante por linha antes de uma expressão
+% invariável a deslocamentos. Demonstrar condições de equivalência, comparar
+% valores/gradientes e só então discutir estabilidade de ponto flutuante.
+% TODO crítico: resolver a inconsistência entre a narrativa histórica de
+% gradientes balanceados e a implementação atual.
+
+\subsection{Combinações das decisões}
+% aGlobal+nGlobal, aGlobal+nLocal, aLocal+nGlobal, aLocal+nLocal e aSymFull com
+% a normalização correspondente. Explicar que são produtos de decisões
+% independentes, não cinco métodos autônomos.
+
+\section{Formulações alternativas como ablações}
+% Consolidar logsumexp, expm1, softplus, top-k e active-only em uma tabela:
+% motivação | diferença matemática | comportamento esperado | hipótese |
+% experimento/status. Não elevar alternativas sem evidência a contribuições.
+% Explicar aqui o piso log(N_valid) da logsumexp e a diferença entre problema
+% diagnóstico e problema de otimização.
+
+\section{Investigações auxiliares}
+
+\subsection{Avg-K: estabilização temporal do professor}
+% Média dos últimos K checkpoints de ta_net/projector; relação complementar ou
+% independente da ANT; K=3/5/10; custo e evidência disponível. Não apresentar
+% como contribuição principal sem suporte adicional.
+
+\subsection{SBS: seleção de exemplares por velocidade de aprendizagem}
+% Score por acertos/tentativas, filtragem das caudas, herding posterior,
+% relação com rehearsal e limitações atuais (FFCV/distribuído).
+
+\section{Algoritmo integrado}
+
+\subsection{TagFex baseline e TagFex+ANT}
+% Pseudocódigo comparável: forward -> professor -> matriz -> InfoNCE ->
+% referência/margem/máscara ANT -> combinação -> backward -> atualização ->
+% memória -> alinhamento -> avaliação. Destacar visualmente as linhas novas.
+
+\subsection{Integração opcional dos mecanismos auxiliares}
+% Mostrar Avg-K/SBS como módulos opcionais após o núcleo, não como parte
+% necessária da definição da ANT. Incluir complexidade de tempo/memória.
+
+\section{Metodologia experimental}
+
+\subsection{Matriz de hipóteses e experimentos}
+% Tabela obrigatória: pergunta/hipótese | comparação controlada | datasets |
+% seeds/status | métricas de desempenho | métricas de mecanismo.
+
+\subsection{Protocolos e reprodutibilidade}
+% Datasets e divisões; classes iniciais/incrementais; seeds; arquitetura;
+% épocas; batch e views; memória; hiperparâmetros; baselines; hardware;
+% configuração e origem do resultado. Marcar completo/parcial/em execução/falha.
+
+\subsection{Métricas e análise estatística}
+% Avg Acc@1, NME@1, desempenho final, forgetting e curvas; raw/adjusted loss,
+% active ratio, hard-negative similarity, violações/percentis e gaps; média,
+% dispersão, tamanho de efeito e testes compatíveis com o desenho final.
+
+\section{Resultados preliminares e análise do mecanismo}
+
+\subsection{Comportamento interno da ANT}
+% Estrutura de cada resultado: hipótese -> expectativa -> métrica -> figura ->
+% observação -> interpretação -> limitação. Explicar matematicamente o piso:
+% log(254) ~= 5,54; raw loss quase plana não implica ausência de aprendizado.
+% Analisar adjusted loss, active ratio, hard negatives e percentis.
+
+\subsection{Desempenho incremental e ablações}
+% Accuracy/NME/forgetting com múltiplas seeds quando disponíveis; separar
+% resultados completos, parciais, em execução, falhos e exploratórios.
+% Organizar por decisão: referência, cobertura, normalização, formulação;
+% Avg-K/SBS vêm depois como investigações auxiliares.
+
+\subsection{Síntese das hipóteses}
+% Classificar evidência como forte, tendência, inconclusiva ou não sustentada.
+% Não converter diferenças pequenas de uma seed em superioridade.
+
+\section{Ameaças à validade e limitações}
+% Em uma seção coesa: validade interna, externa e de construto; seeds;
+% hiperparâmetros; baseline; datasets/backbones; custo; dependência do TagFex;
+% relação entre proxies geométricas e atualização realmente não essencial.
+
+\section{Extensões em investigação}
+% Separar da contribuição defendida: colisões entre tarefas, negativos baseados
+% em protótipos antigos e outras estratégias somente após validação diagnóstica.

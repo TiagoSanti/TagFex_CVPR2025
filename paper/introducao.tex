@@ -1,0 +1,87 @@
+\pagenumbering{arabic}
+
+\chapter{Introdução}
+\label{ch:introducao}
+
+% Meta editorial: 6--9 páginas. Este capítulo deve terminar com uma cadeia
+% inequívoca entre problema, pergunta, hipótese, objetivo e validação.
+
+\section{Contextualização}
+% Introduzir progressivamente aprendizado contínuo, fluxos não estacionários,
+% Class-Incremental Learning (CIL), cenário agnóstico à tarefa, esquecimento
+% catastrófico e dilema estabilidade--plasticidade. Delimitar o trabalho à
+% classificação de imagens. Não antecipar a formulação da ANT nesta seção.
+
+\section{Motivação e justificativa}
+% Partir das limitações práticas de CIL e da interferência durante atualizações
+% incrementais. Apresentar o papel dos objetivos contrastivos e a possibilidade
+% de continuarem exercendo pressão sobre relações já suficientemente
+% preservadas. Preparar o conceito de ajustes não essenciais sem tratá-lo como
+% causa de esquecimento já comprovada.
+
+\section{Problema de pesquisa}
+% Formular independentemente da solução: em métodos incrementais com
+% destilação contrastiva, relações já suficientemente preservadas podem
+% continuar contribuindo para o gradiente, produzindo atualizações
+% potencialmente desnecessárias e interferência adicional ao aprender novas
+% classes. Definir depois, no Capítulo 3, o que "suficientemente preservada" e
+% "não essencial" significam operacionalmente.
+
+\section{Questões de pesquisa}
+
+\subsection{Questão principal}
+% Investigar se restringir atualizações contrastivas às relações que ainda
+% violam um critério de preservação reduz interferência sem prejudicar o
+% aprendizado de novas classes e o desempenho incremental.
+
+\subsection{Questões secundárias}
+% Manter apenas questões respondidas pelos experimentos:
+% (Q1) referência compartilhada ou por âncora na ANT;
+% (Q2) cobertura intra-view ou simétrica completa;
+% (Q3) normalização nGlobal/nLocal e sua equivalência efetiva;
+% (Q4) comportamento das métricas internas do mecanismo;
+% (Q5) efeito sobre accuracy e forgetting entre datasets e sementes.
+
+\section{Hipóteses de pesquisa}
+
+\subsection{Hipótese principal}
+% H1: restringir a otimização contrastiva às violações relevantes reduz
+% atualizações não essenciais sem comprometer a aquisição de novas classes,
+% preservando ou melhorando o desempenho incremental. Formular também H0.
+
+\subsection{Hipóteses auxiliares e critérios de interpretação}
+% Criar uma hipótese auxiliar somente para decisões com comparação controlada.
+% Para cada hipótese, registrar: métrica -> experimento -> evidência esperada ->
+% critério para suportada, não suportada ou inconclusiva. Não considerar uma
+% diferença pequena de uma única semente como confirmação isolada.
+
+\section{Objetivos}
+
+\subsection{Objetivo geral}
+% Desenvolver e avaliar um método para evitar atualizações contrastivas não
+% essenciais em CIL agnóstico à tarefa, tendo a ANT como proposta central.
+
+\subsection{Objetivos específicos}
+% Caracterizar o problema; formular a ANT; investigar referência e cobertura;
+% auditar nGlobal/nLocal; desenvolver diagnósticos do mecanismo; avaliar em
+% diferentes datasets/protocolos/sementes; comparar com TagFex e baselines
+% adequados. Avg-K e SBS não são objetivos centrais.
+
+\section{Escopo e delimitações}
+% Fixar protocolo, informação disponível no treino/teste, memória limitada,
+% backbones, datasets e métricas. Distinguir task-agnostic na inferência de
+% task-free/boundary-free no treinamento. Separar trabalho consolidado de
+% extensões ainda exploratórias.
+
+\section{Contribuições esperadas}
+% Hierarquia obrigatória:
+% (1) contribuição principal: ANT;
+% (2) decisões metodológicas: aGlobal/aLocal, intra-view/aSymFull e auditoria
+%     nGlobal/nLocal;
+% (3) formulações alternativas como ablações;
+% (4) investigações auxiliares: Avg-K e SBS;
+% (5) extensões: colisões entre tarefas e negativos baseados em protótipos.
+
+\section{Organização do trabalho}
+% Cap. 2: fundamentos, TagFex e lacuna; Cap. 3: ANT, decisões, validação e
+% evidências preliminares; Cap. 4: trabalho restante até a defesa.

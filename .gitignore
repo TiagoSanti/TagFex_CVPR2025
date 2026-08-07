@@ -41,3 +41,17 @@ section0_cross_dataset_overview.html
 # External/reference projects and papers
 pace/
 difficult_examples_hurt_contrastive_learning/
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+
+# Generated thesis PDF
+paper/monografia.pdf

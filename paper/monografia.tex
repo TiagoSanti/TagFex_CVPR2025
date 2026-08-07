@@ -1,0 +1,119 @@
+%-----
+% Define o uso do modelo colorido ou preto e branco (escolha uma e descomente)
+% Mais abaixo, defina a figura de acordo com a escolha feita.
+%-----
+\let \ipdf \relax
+
+\documentclass{dct-class_bw}
+%\documentclass{dct-class}
+
+\usepackage{plain}
+%\usepackage{clrscode}
+%\usepackage[portugues]{algorithm2e}
+%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyphenat}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\graphicspath{{img/}}
+\setlength{\textwidth}{16cm}
+
+%\usepackage[portugues,ruled,vlined]{algorithm2e}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+
+
+\begin{document}
+\thispagestyle{empty}
+%----- As informações abaixo são obrigatórias  ----------------------
+\titulo{ANT: Evitando Ajustes Não-essenciais em Aprendizado Incremental de Classes Agnóstico à Tarefa \\[0.3cm]
+\large (ANT: Avoid Non-essential Tuning in Task-Agnostic Class-Incremental Learning)}
+
+
+\autor{Tiago Clarintino Santi}
+\doctipo{Monografia de Qualificação}
+% Observe que a macro doctipo acima tem 2 parâmetros
+% O primeiro refere-se ao nome do documento
+% O segundo é sua identificação numérica, quando ela existir.
+% Use a sintaxe \doctipo{XXXXX}{} quando não for
+% necessária a identificação numérica--------------------------------
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+%----- As informações abaixo são opcionais  -------------------------
+
+\orientacao{Edson Takashi Matsubara} \hspace{3,5cm}
+%\docarea{Inteligência Artificial}
+
+%\textofree{Monografia apresentada como requisito da qualificação
+%para a obtenção do título de mestre em Ciência da Computação.}
+%-----
+% Se você usa o latex para compilar, comente as figuras do pdflatex
+% Defina a figura do grafo a ser utilizada (escolha uma e descomente)
+% Faça essa escolha de acordo com a classe escolhida (dct-class_bw ou
+% dct-class)
+%-----
+%\vfill \centerline{\includegraphics[scale=0.8]{logo_dct_bw.mps}}
+%\vfill \centerline{\includegraphics[scale=0.8]{logo_dct_color.mps}}
+%-----
+% Se você usa o pdflatex para compilar, comente as figuras do latex
+% Defina a figura do grafo a ser utilizada (escolha uma e descomente)
+% Faça essa escolha de acordo com a classe escolhida (dct-class_bw ou
+% dct-class)
+%-----
+%\vfill\centerline{\includegraphics[scale=0.8]{logo_dct_bw-pdflatex.mps}}
+%\vfill \centerline{\includegraphics[scale=0.8]{logo_dct_color-pdflatex.mps}}
+\vfill \centerline{\includegraphics[scale=0.7]{grafo}}
+
+
+%--------------------------------------------------------------------
+% O trecho seguinte não pode ser mudado ou retirado -----------------
+\vskip 0.5cm
+\begin{center}
+        Faculdade de Computação\\
+%        Centro de Ciências Exatas e Tecnologia\\
+        Universidade Federal de Mato Grosso do Sul\\
+        \today
+\end{center}
+\newpage
+\pagenumbering{roman}
+%\include{resumo}
+%\include{abstract}
+%--------------------------------------------------------------------
+% Aqui começa a inclusão dos seus textos
+%
+\renewcommand{\contentsname}{Sumário}
+\tableofcontents
+
+%---- O comando abaixo deve ser usado caso queira incluir o conteúdo
+%como bookmark, visando facilitar a navegação no Acrobat Reader
+%---------------------------------------------------------------------
+%\addcontentsline{toc}{chapter}{Conteúdo}\label{conteudo}
+%---------------------------------------------------------------------
+%------ Aqui devem ser incluídos os capítulos ------------------------
+
+\include{introducao}
+\include{fundamentacao}
+\include{proposta_metodologica}
+\include{plano_trabalho}
+
+%---------------------------------------------------------------------
+% Aqui está um exemplo de bibliografia
+% Veja o arquivo bibi_exemplo.bib
+% Para você ter um " GUIA "
+%---------------------------------------------------------------------
+%%\refstepcounter{chapter}
+%%\refstepcounter{chapter}% Adiciona 1 to chapter ou seja (\thechapter=\thechapter+1)
+%%\addcontentsline{toc}{chapter}{Referências
+%%Bibliográficas}\label{bibliografia} \nocite{*}
+
+%-----
+% Define o estilo das referências bibliográficas
+%-----
+%\bibliographystyle{dct-alpha}
+\bibliographystyle{dct-plain}
+%\nocite{*}
+\bibliography{referencias}
+%--------------------------------------------------------------------
+\end{document}
