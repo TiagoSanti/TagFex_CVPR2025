@@ -1,3 +1,6 @@
 [submodule "ANT_Monografia"]
 	path = ANT_Monografia
 	url = https://github.com/TiagoSanti/ANT_Monografia.git
+[submodule "ANT_WOPFACOM"]
+	path = ANT_WOPFACOM
+	url = https://github.com/TiagoSanti/ANT_WOPFACOM.git
