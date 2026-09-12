@@ -1,0 +1,2 @@
+# Operational overlay for Xavier; keep it last in every local queue entry.
+log_dir: ./logs

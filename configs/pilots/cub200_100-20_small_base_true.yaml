@@ -1,0 +1,31 @@
+# Memory-feasibility pilot for CUB-200 100+20 on a 12 GiB GPU.
+# Apply after the complete experiment YAML so these values take precedence:
+#   python main.py train --exp-configs \
+#     configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml \
+#     configs/pilots/cub200_100-20_small_base_true.yaml --seed 1993
+#
+# The scientific batch composition is intentionally unchanged (64 images,
+# two augmented views).  Only the ResNet stem is normalised to the standard
+# ImageNet stem; the task/epoch/batch limits make this a feasibility run.
+
+study_max_tasks: 6
+study_max_epochs: 1
+study_max_batches_per_epoch: 2
+eval_interval: 1
+disable_save_ckpt: true
+log_dir: ./logs/pilots/cub200_100-20_smallBaseTrue_6tasks
+
+backbone_configs:
+  name: resnet18
+  params:
+    small_base: true
+
+trainloader_params:
+  batch_size: 64
+  num_workers: 8
+  drop_last: false
+
+testloader_params:
+  batch_size: 192
+  num_workers: 8
+  drop_last: false

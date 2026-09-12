@@ -1,0 +1,204 @@
+# queue_ablation_missing.txt
+
+# Priority continuation batch: seed 1995
+
+# Estimated runtime: ~37.5 hours
+
+# Active runs: 6
+
+# Format: <config_path>|<description>|<seed>
+
+# Lines starting with # or blank are skipped.
+
+#
+
+# Priority order:
+
+# 1. Complete aLocal nLocal avgK10 on Tiny-ImageNet
+
+# 2. Complete aSymFull nLocal avgK10 on Tiny-ImageNet
+
+# 3. Complete aLocal nLocal SBS on Tiny-ImageNet
+
+#
+
+# All previously completed runs and lower-priority experiments are commented out.
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# PRIORITY 1 — aLocal nLocal avgK10, seed 1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Completed:
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal avgK10|1993  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal avgK10|1994  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal avgK10|1995  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal avgK10|1993  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal avgK10|1994  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal avgK10|1995  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal avgK10|1993  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal avgK10|1994  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal avgK10|1993  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal avgK10|1994  # done
+
+# Active:
+
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal avgK10|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal avgK10|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# PRIORITY 2 — aSymFull nLocal avgK10, seed 1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Completed:
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull avgK10|1993  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull avgK10|1994  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull avgK10|1995  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull avgK10|1993  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull avgK10|1994  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull avgK10|1995  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull avgK10|1993  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull avgK10|1994  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull avgK10|1993  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull avgK10|1994  # done
+
+# Active:
+
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull avgK10|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull avgK10|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# PRIORITY 3 — aLocal nLocal SBS/sbsQS020, seed 1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Completed:
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-10-10] aLocal SBS|1993  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-10-10] aLocal SBS|1994  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-10-10] aLocal SBS|1995  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-50-10] aLocal SBS|1993  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-50-10] aLocal SBS|1994  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[C100-50-10] aLocal SBS|1995  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-100-20] aLocal SBS|1993  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-100-20] aLocal SBS|1994  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-20-20] aLocal SBS|1993  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-20-20] aLocal SBS|1994  # done
+
+# Active:
+
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-100-20] aLocal SBS|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQS020_resnet18.yaml|[TIN-20-20] aLocal SBS|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# DEFERRED — aSymFull SBS/sbsQS020
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+#
+
+# Lower priority. Keep seed 1995 disabled unless explicitly scheduled after the
+
+# six priority experiments above.
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-10-10] aSymFull SBS|1993  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-10-10] aSymFull SBS|1994  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-10-10] aSymFull SBS|1995  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-50-10] aSymFull SBS|1993  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-50-10] aSymFull SBS|1994  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[C100-50-10] aSymFull SBS|1995  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-100-20] aSymFull SBS|1993  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-100-20] aSymFull SBS|1994
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-100-20] aSymFull SBS|1995
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-20-20] aSymFull SBS|1993  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-20-20] aSymFull SBS|1994
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_sbsQS020_resnet18.yaml|[TIN-20-20] aSymFull SBS|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+# DEFERRED — aSymFull avgK3
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+#
+
+# Lower priority. Seeds 1994 and 1995 remain disabled until the priority batch
+
+# has completed and the existing avgK3 results have been reassessed.
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull avgK3|1993  # done
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull avgK3|1994
+
+# configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull avgK3|1995
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull avgK3|1993  # done
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull avgK3|1994
+
+# configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull avgK3|1995
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull avgK3|1993  # done
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull avgK3|1994
+
+# configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull avgK3|1995
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull avgK3|1993  # done
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull avgK3|1994
+
+# configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull avgK3|1995
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIN 20-20 — aGlobal nLocal / aGlobal nGlobal / aLocal nGlobal — seed 1995
+# (seeds 1993 and 1994 already complete; only 1995 was missing)
+# ─────────────────────────────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_resnet18.yaml|[TIN-20-20] aGlobal nLocal|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|[TIN-20-20] aGlobal nGlobal|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_resnet18.yaml|[TIN-20-20] aLocal nGlobal|1995

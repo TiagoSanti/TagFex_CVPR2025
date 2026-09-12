@@ -1,0 +1,85 @@
+scenario: cil 20-20
+dataset_name: cub200
+dataset_root: ~/data/datasets/CUB_200_2011/
+train_transform: imagenet_train_2
+test_transform: imagenet_test_1
+class_order: [105, 6, 168, 90, 65, 159, 71, 165, 111, 179, 92, 91, 171, 152, 157, 72, 131, 126, 54, 142, 139, 158, 180, 0, 117, 39, 191, 138, 153, 119, 68, 99, 198, 136, 163, 60, 145, 5, 123, 80, 116, 89, 10, 172, 13, 35, 83, 160, 154, 84, 36, 144, 112, 167, 17, 75, 187, 150, 70, 192, 109, 25, 155, 41, 87, 42, 174, 133, 124, 53, 102, 118, 98, 170, 122, 28, 93, 18, 106, 132, 141, 186, 16, 47, 43, 189, 8, 140, 64, 183, 82, 30, 94, 135, 97, 195, 44, 1, 149, 2, 196, 164, 11, 188, 103, 48, 37, 52, 162, 15, 88, 177, 23, 130, 129, 178, 38, 100, 50, 110, 55, 20, 9, 34, 74, 27, 114, 137, 57, 40, 148, 175, 22, 19, 108, 143, 4, 194, 81, 79, 85, 3, 161, 66, 147, 107, 197, 146, 134, 67, 151, 24, 193, 21, 156, 128, 62, 45, 86, 63, 125, 26, 51, 101, 49, 173, 96, 181, 61, 12, 32, 56, 46, 58, 14, 73, 166, 185, 190, 115, 31, 104, 176, 77, 76, 7, 199, 69, 113, 127, 121, 78, 120, 59, 182, 29, 169, 184, 33, 95]
+log_dir: /home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20
+
+method: tagfex
+
+init_epochs: 200
+inc_epochs: 170
+eval_interval: 5
+
+contrast_factor: 1
+contrast_kd_factor: 2
+aux_factor: 2
+trans_cls_factor: 1
+transfer_factor: 1
+
+infonce_temp: 0.2
+infonce_kd_temp: 0.2
+kd_temp: 2
+num_aug: 2
+# InfoNCE Loss Parameters (β=0 Local Anchor)
+nce_alpha: 1.0
+ant_beta: 0.0
+ant_margin: 0.1
+ant_max_global: false
+infonce_max_global: false
+
+debug_similarity: false
+
+backbone_configs:
+  name: resnet18
+
+network_configs:
+  classifier_type: 'unified'
+  proj_hidden_dim: 2048
+  proj_output_dim: 1024
+  init_from_last: false
+  init_from_interpolation: true
+  init_interpolation_factor: 0.95
+  attn_num_heads: 8
+  merge_attn: true
+
+memory_configs:
+  fixed_size: true
+  memory_size: 2000
+
+trainloader_params:
+  batch_size: 64
+  num_workers: 8
+  drop_last: false
+
+testloader_params:
+  batch_size: 192
+  num_workers: 8
+  drop_last: false
+
+init_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5.e-4
+
+init_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [60, 120, 170]
+    gamma: 0.1
+
+inc_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 2.e-4
+
+inc_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [80, 120, 150]
+    gamma: 0.1

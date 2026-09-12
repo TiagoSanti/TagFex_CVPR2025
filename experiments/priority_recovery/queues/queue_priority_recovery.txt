@@ -1,0 +1,7 @@
+# Priority recovery after the Wolverine shutdown.
+# Complete the missing scientific cell first, then resume RefDetach ablations.
+# Format: <config_path>|<description>|<seed>
+
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|TIN-20-20 ANT-IV-GR — missing seed|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|TIN-100-20 ANT-FS-AR + RefDetach|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|TIN-100-20 ANT-FS-AR + RefDetach|1995

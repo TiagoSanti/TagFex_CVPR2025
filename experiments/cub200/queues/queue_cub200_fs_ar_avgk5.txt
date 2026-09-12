@@ -1,0 +1,7 @@
+# CUB-200 20-20 — complete the missing ANT-FS-AR + TeacherAvg-5 cell.
+# Format: <config_path>|<description>|<seed>
+# Priority follows the CUB validation queue: 1994, then 1993 and 1995.
+
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|CUB-20-20 ANT-FS-AR + TeacherAvg-5|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|CUB-20-20 ANT-FS-AR + TeacherAvg-5|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|CUB-20-20 ANT-FS-AR + TeacherAvg-5|1995

@@ -1,0 +1,38 @@
+# CUB-200 100+20: baseline + canonical detached ANT, seeds 1993--1997.
+# Scientific base, common small-base/detach controls, method, local storage.
+# ANT order follows the current statistical mean-rank: FS-GR, IV-GR, IV-AR, FS-AR.
+
+# Baseline control
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/infonce.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 Baseline InfoNCE smallBase|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/infonce.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 Baseline InfoNCE smallBase|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/infonce.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 Baseline InfoNCE smallBase|1995
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/infonce.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 Baseline InfoNCE smallBase|1996
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/infonce.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 Baseline InfoNCE smallBase|1997
+
+# 1. ANT-FS-GR
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-GR detach smallBase|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-GR detach smallBase|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-GR detach smallBase|1995
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-GR detach smallBase|1996
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-GR detach smallBase|1997
+
+# 2. ANT-IV-GR
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-GR detach smallBase|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-GR detach smallBase|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-GR detach smallBase|1995
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-GR detach smallBase|1996
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_gr.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-GR detach smallBase|1997
+
+# 3. ANT-IV-AR
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-AR detach smallBase|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-AR detach smallBase|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-AR detach smallBase|1995
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-AR detach smallBase|1996
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/iv_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-IV-AR detach smallBase|1997
+
+# 4. ANT-FS-AR
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-AR detach smallBase|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-AR detach smallBase|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-AR detach smallBase|1995
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-AR detach smallBase|1996
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml,experiments/cub100_canonical_5seeds/configs/common.yaml,experiments/cub100_canonical_5seeds/configs/fs_ar.yaml,configs/hosts/xavier/cub100_canonical_5seeds/storage.yaml|CUB 100-20 ANT-FS-AR detach smallBase|1997

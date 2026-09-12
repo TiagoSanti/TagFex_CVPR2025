@@ -1,0 +1,52 @@
+autorank statistical report — avg_acc1, α=0.05
+Observations: 12  (4 datasets × 3 seeds)
+Methods: 17
+Selection: canonical > nGlobal > nLocal; full-name > debug-name
+
+RankResult(rankdf=
+                                               meanrank  ...  magnitude_above
+ANT-IV-AR [legado: ref. conectada]            11.833333  ...       negligible
+ANT-IV-AR [legado: ref. conectada] + TAvg-3   11.208333  ...       negligible
+Baseline InfoNCE + TAvg-5                     10.458333  ...       negligible
+ANT-FS-AR [legado: ref. conectada] + TAvg-10  10.416667  ...       negligible
+Baseline InfoNCE + TAvg-10                    10.250000  ...       negligible
+ANT-FS-AR                                      9.416667  ...       negligible
+ANT-IV-GR [legado: ref. conectada]             9.416667  ...       negligible
+Baseline InfoNCE                               9.208333  ...       negligible
+ANT-IV-AR                                      8.958333  ...       negligible
+ANT-IV-GR                                      8.708333  ...       negligible
+ANT-FS-AR [legado: ref. conectada]             8.666667  ...       negligible
+ANT-FS-AR [legado: ref. conectada] + TAvg-5    8.666667  ...       negligible
+ANT-IV-AR [legado: ref. conectada] + TAvg-10   8.500000  ...       negligible
+ANT-IV-AR [legado: ref. conectada] + TAvg-5    8.125000  ...       negligible
+Baseline InfoNCE + TAvg-3                      7.916667  ...       negligible
+ANT-FS-GR [legado: ref. conectada]             7.083333  ...       negligible
+ANT-FS-GR                                      4.166667  ...       negligible
+
+[17 rows x 9 columns]
+pvalue=0.11757500344786989
+cd=7.130076452608281
+omnibus=friedman
+posthoc=nemenyi
+all_normal=False
+pvals_shapiro=[np.float64(0.0010658156431873765), np.float64(0.0010394042031087185), np.float64(0.0009684198099323371), np.float64(0.0008667948841782591), np.float64(0.00103853529398514), np.float64(0.0012101081535476211), np.float64(0.0007402243606047097), np.float64(0.0011208803248045592), np.float64(0.001584220650624738), np.float64(0.0014098710612423558), np.float64(0.0017050736977403812), np.float64(0.0014337251308371903), np.float64(0.0009632578366321772), np.float64(0.0011570366224833558), np.float64(0.0009450262700523931), np.float64(0.0011450102520555506), np.float64(0.0009762479222575884)]
+homoscedastic=True
+pval_homogeneity=0.9999995263168024
+homogeneity_test=levene
+alpha=0.05
+alpha_normality=0.0029411764705882353
+num_samples=12
+posterior_matrix=
+None
+decision_matrix=
+None
+rope=None
+rope_mode=None
+effect_size=akinshin_gamma
+force_mode=None)
+
+The statistical analysis was conducted for 17 populations with 12 paired samples.
+The family-wise significance level of the tests is alpha=0.050.
+We rejected the null hypothesis that the population is normal for the populations ANT-IV-AR [legado: ref. conectada] (p=0.001), ANT-IV-AR [legado: ref. conectada] + TAvg-3 (p=0.001), Baseline InfoNCE + TAvg-5 (p=0.001), ANT-FS-AR [legado: ref. conectada] + TAvg-10 (p=0.001), Baseline InfoNCE + TAvg-10 (p=0.001), ANT-FS-AR (p=0.001), ANT-IV-GR [legado: ref. conectada] (p=0.001), Baseline InfoNCE (p=0.001), ANT-IV-AR (p=0.002), ANT-IV-GR (p=0.001), ANT-FS-AR [legado: ref. conectada] (p=0.002), ANT-FS-AR [legado: ref. conectada] + TAvg-5 (p=0.001), ANT-IV-AR [legado: ref. conectada] + TAvg-10 (p=0.001), ANT-IV-AR [legado: ref. conectada] + TAvg-5 (p=0.001), Baseline InfoNCE + TAvg-3 (p=0.001), ANT-FS-GR [legado: ref. conectada] (p=0.001), and ANT-FS-GR (p=0.001). Therefore, we assume that not all populations are normal.
+Because we have more than two populations and the populations and some of them are not normal, we use the non-parametric Friedman test as omnibus test to determine if there are any significant differences between the median values of the populations. We use the post-hoc Nemenyi test to infer which differences are significant. We report the median (MD), the median absolute deviation (MAD) and the mean rank (MR) among all populations over the samples. Differences between populations are significant, if the difference of the mean rank is greater than the critical distance CD=7.130 of the Nemenyi test.
+We failed to reject the null hypothesis (p=0.118) of the Friedman test that there is no difference in the central tendency of the populations ANT-IV-AR [legado: ref. conectada] (MD=69.075+-9.235, MAD=8.195, MR=11.833), ANT-IV-AR [legado: ref. conectada] + TAvg-3 (MD=68.800+-9.295, MAD=7.890, MR=11.208), Baseline InfoNCE + TAvg-5 (MD=69.215+-9.030, MAD=8.120, MR=10.458), ANT-FS-AR [legado: ref. conectada] + TAvg-10 (MD=69.190+-9.070, MAD=7.800, MR=10.417), Baseline InfoNCE + TAvg-10 (MD=68.885+-9.145, MAD=7.825, MR=10.250), ANT-FS-AR (MD=68.960+-9.380, MAD=7.990, MR=9.417), ANT-IV-GR [legado: ref. conectada] (MD=68.730+-9.525, MAD=7.840, MR=9.417), Baseline InfoNCE (MD=69.065+-9.510, MAD=8.185, MR=9.208), ANT-IV-AR (MD=69.290+-9.190, MAD=8.205, MR=8.958), ANT-IV-GR (MD=69.120+-9.100, MAD=8.030, MR=8.708), ANT-FS-AR [legado: ref. conectada] (MD=69.235+-9.650, MAD=8.310, MR=8.667), ANT-FS-AR [legado: ref. conectada] + TAvg-5 (MD=69.315+-9.130, MAD=8.170, MR=8.667), ANT-IV-AR [legado: ref. conectada] + TAvg-10 (MD=69.320+-8.960, MAD=8.090, MR=8.500), ANT-IV-AR [legado: ref. conectada] + TAvg-5 (MD=69.435+-9.065, MAD=8.105, MR=8.125), Baseline InfoNCE + TAvg-3 (MD=69.040+-9.125, MAD=7.995, MR=7.917), ANT-FS-GR [legado: ref. conectada] (MD=69.105+-9.070, MAD=7.925, MR=7.083), and ANT-FS-GR (MD=69.610+-9.075, MAD=8.055, MR=4.167). Therefore, we assume that there is no statistically significant difference between the median values of the populations.

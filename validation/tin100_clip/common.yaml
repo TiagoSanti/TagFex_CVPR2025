@@ -1,0 +1,19 @@
+# Controlled Tiny-ImageNet 100+20x5 validation.
+# Loaded after the historical baseline YAML so every active control is explicit.
+grad_clip_norm: 5.0
+
+# Keep ANT-related metadata identical between conditions; only ant_beta changes.
+nce_alpha: 1.0
+ant_margin: 0.5
+ant_max_global: false
+ant_symmetric_full: true
+ant_formulation: logsumexp
+infonce_max_global: true
+
+# Full runs: diagnostics that write every epoch are disabled to reduce I/O.
+debug_similarity: false
+debug_similarity_epoch_interval: 1
+debug_similarity_batches_per_epoch: 1
+
+log_dir: /home/tiago/ANT_validation_20260812/logs/full/tin100
+output_file_prefix: exp

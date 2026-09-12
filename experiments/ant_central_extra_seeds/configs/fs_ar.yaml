@@ -1,0 +1,7 @@
+# ANT-FS-AR with detached reference (detach is set in common.yaml).
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+ant_max_global: false
+infonce_max_global: true
+ant_symmetric_full: true

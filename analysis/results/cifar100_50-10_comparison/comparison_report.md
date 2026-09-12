@@ -1,3 +1,5 @@
+> Edição histórica com escala consistente. Os rótulos local/global InfoNCE não representam métodos distintos; as diferenças não demonstram efeito causal da normalização. O cenário 50-10 tem seis tarefas. O relatório paralelo com escala ×100 foi retirado; suas fontes permanecem preservadas.
+
 # InfoNCE + Local Anchor: Comparação de Experimentos
 
 **Gerado em**: 2025-11-20 02:16:53

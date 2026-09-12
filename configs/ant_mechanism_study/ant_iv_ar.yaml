@@ -1,0 +1,7 @@
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+ant_symmetric_full: false
+ant_max_global: false
+ant_detach_reference: false
+ant_formulation: logsumexp

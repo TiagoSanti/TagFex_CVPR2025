@@ -1,0 +1,29 @@
+# Fast integration test: reaches task 2 (KD) without attempting real training.
+study_max_tasks: 2
+study_max_epochs: 1
+study_max_batches_per_epoch: 2
+eval_interval: 1
+log_dir: ./study_outputs/ant_mechanism_20260909_smoke/training_logs
+trainloader_params:
+  batch_size: 16
+  num_workers: 0
+  drop_last: true
+testloader_params:
+  batch_size: 64
+  num_workers: 0
+  drop_last: false
+ant_study:
+  enabled: true
+  output_root: ./study_outputs/ant_mechanism_20260909_smoke
+  scalar_every_n_batches: 1
+  snapshot_tasks: [1, 2]
+  snapshot_batches: [1]
+  init_snapshot_epochs: [1]
+  inc_snapshot_epochs: [1]
+  shadow_variants: true
+  save_snapshots: true
+  parameter_gradient_probes: true
+  parameter_update_probes: true
+  snapshot_image_count: 4
+  min_free_gb: 20
+  max_output_gb: 2

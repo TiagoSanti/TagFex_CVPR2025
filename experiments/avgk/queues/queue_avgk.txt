@@ -1,0 +1,48 @@
+# Avg-K teacher ablation queue — CIFAR-100  10-10  seed 1993
+# Format: <config_path>|<description>|<seed>
+# Lines starting with # or blank lines are ignored.
+# The orchestrator skips entries whose experiment log already shows "avg_nme1"
+# (i.e. the run already completed), so this file is safe to re-run after a crash.
+
+# ── β=0.5 aLocal nLocal  ──────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|[C100-10-10] aLocal nLocal avgK=3|1993
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|[C100-10-10] aLocal nLocal avgK=5|1993
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-10-10] aLocal nLocal avgK=10|1993
+
+# ── β=0.5 aSymFull nLocal  ───────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-10-10] aSymFull nLocal avgK=3|1993
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|[C100-10-10] aSymFull nLocal avgK=5|1993
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-10-10] aSymFull nLocal avgK=10|1993
+
+# ── CIFAR-100 50-10 ───────────────────────────────────────────────────────────
+# ── β=0.5 aLocal nLocal  ──────────────────────────────────────────────────────
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|[C100-50-10] aLocal nLocal avgK=3|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|[C100-50-10] aLocal nLocal avgK=5|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[C100-50-10] aLocal nLocal avgK=10|1993
+
+# ── β=0.5 aSymFull nLocal  ───────────────────────────────────────────────────
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[C100-50-10] aSymFull nLocal avgK=3|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|[C100-50-10] aSymFull nLocal avgK=5|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[C100-50-10] aSymFull nLocal avgK=10|1993
+
+# ── Tiny-ImageNet 100-20 ──────────────────────────────────────────────────────
+# ── β=0.5 aLocal nLocal  ──────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|[TIN-100-20] aLocal nLocal avgK=3|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|[TIN-100-20] aLocal nLocal avgK=5|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-100-20] aLocal nLocal avgK=10|1993
+
+# ── β=0.5 aSymFull nLocal  ───────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-100-20] aSymFull nLocal avgK=3|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|[TIN-100-20] aSymFull nLocal avgK=5|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-100-20] aSymFull nLocal avgK=10|1993
+
+# ── Tiny-ImageNet 20-20 ───────────────────────────────────────────────────────
+# ── β=0.5 aLocal nLocal  ──────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|[TIN-20-20] aLocal nLocal avgK=3|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|[TIN-20-20] aLocal nLocal avgK=5|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|[TIN-20-20] aLocal nLocal avgK=10|1993
+
+# ── β=0.5 aSymFull nLocal  ───────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK3_resnet18.yaml|[TIN-20-20] aSymFull nLocal avgK=3|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|[TIN-20-20] aSymFull nLocal avgK=5|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|[TIN-20-20] aSymFull nLocal avgK=10|1993

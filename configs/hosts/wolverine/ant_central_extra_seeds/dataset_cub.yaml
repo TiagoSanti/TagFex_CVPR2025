@@ -1,0 +1,2 @@
+# CUB-200 staged on Wolverine's NVMe; load before storage_wolverine.yaml.
+dataset_root: /var/tmp/tiago/ANT_detach_cub20_20260904/datasets/CUB_200_2011

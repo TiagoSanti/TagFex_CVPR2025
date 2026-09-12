@@ -1,0 +1,6 @@
+# CUB-200 20-20 — complete the missing pure ANT-IV-GR cell.
+# Format: config_path|description|seed
+
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|CUB 20-20 ANT-IV-GR puro|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|CUB 20-20 ANT-IV-GR puro|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|CUB 20-20 ANT-IV-GR puro|1995

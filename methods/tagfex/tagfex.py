@@ -29,8 +29,10 @@ from modules import (
 )
 from modules import optimizer_dispatch, scheduler_dispatch, get_loaders
 from utils.funcs import parameter_count
+from utils.experiment_paths import experiment_log_dir
 
 from loggers import LoguruLogger, loguru
+from studies.ant_mechanism import ANTStudyObserver
 
 EPSILON = 1e-8
 
@@ -93,7 +95,24 @@ class TagFex(HerdingIndicesLearner):
         self._adjust_log_dir_with_loss_params()
         self._init_loggers()
         self._init_similarity_debug_logger()
+        self.ant_study_observer = ANTStudyObserver(self.configs, logger=self.print_logger)
+        self.ant_study_observer.set_dataset_metadata(
+            {
+                "dataset_name": self.data_manager.dataset_name,
+                "class_names": self.data_manager.get_class_names(),
+                "class_order": self.data_manager.class_order.tolist(),
+                "ordered_index_map": self.data_manager.ordered_index_map.tolist(),
+            }
+        )
+        self._ant_study_tracking = False
+        self._ant_study_task_abs_indices = None
+        self._ant_study_n_new = 0
         self.print_logger.info(configs)
+        if self.configs.get("infonce_max_global") is False:
+            self.print_logger.warning(
+                "'infonce_max_global=false' is a deprecated historical option "
+                "and is ignored; training uses the original canonical InfoNCE."
+            )
 
         self.print_logger.info(f"class order: {self.data_manager.class_order.tolist()}")
         self.ordered_index_map = torch.from_numpy(
@@ -112,15 +131,28 @@ class TagFex(HerdingIndicesLearner):
 
     def _init_network(self, backbone_configs, network_configs):
         if backbone_configs["name"] == "resnet18":
-            params = {
+            default_small_base = (
+                self.data_manager.init_num_cls == self.data_manager.inc_num_cls
+            )
+            params = dict(backbone_configs.get("params") or {})
+            params.update({
                 "dataset_name": self.data_manager.dataset_name,
-                "small_base": (
-                    self.data_manager.init_num_cls == self.data_manager.inc_num_cls
-                ),
-            }
-            backbone_configs.update(params=params)
+                # Preserve the historical automatic choice unless an experiment
+                # explicitly requests a stem.  This permits controlled memory
+                # pilots without changing any existing configuration.
+                "small_base": params.get("small_base", default_small_base),
+            })
+            backbone_configs["params"] = params
             if network_configs.get("new_backbone_configs"):
-                network_configs["new_backbone_configs"].update(params=params)
+                new_backbone_configs = network_configs["new_backbone_configs"]
+                new_params = dict(new_backbone_configs.get("params") or {})
+                new_params.update({
+                    "dataset_name": self.data_manager.dataset_name,
+                    "small_base": new_params.get(
+                        "small_base", params["small_base"]
+                    ),
+                })
+                new_backbone_configs["params"] = new_params
 
         self.network = TagFexNet(backbone_configs, network_configs, self.device)
         self.local_network = self.network  # for ddp compatibility
@@ -209,6 +241,10 @@ class TagFex(HerdingIndicesLearner):
         # <<< @train_start
 
         for task_id, (task_train, task_test) in enumerate(self.data_manager.tasks):
+            max_tasks = int(self.configs.get("study_max_tasks", self.data_manager.num_tasks))
+            if task_id >= max_tasks:
+                self.print_logger.info(f"Study task limit reached ({max_tasks}); stopping training loop.")
+                break
             # >>> @train_task_start
             cur_task_num_classes = self.data_manager.task_num_cls[task_id]
             sofar_num_classes = sum(self.data_manager.task_num_cls[: task_id + 1])
@@ -253,13 +289,22 @@ class TagFex(HerdingIndicesLearner):
             # add memory into training set.
             # >>> @sbs_pre_memory — save new-class count before memory is concatenated
             _sbs_enabled = (self._sbs_q > 0 or self._sbs_s > 0) and not self.configs.get("ffcv") and self.distributed is None
+            _study_enabled = (
+                self.ant_study_observer.enabled
+                and not self.configs.get("ffcv")
+                and self.distributed is None
+            )
             if _sbs_enabled:
                 self._sbs_n_new = len(task_train.indices)
                 self._sbs_task_new_abs = task_train.indices.copy()
+            if _study_enabled:
+                self._ant_study_n_new = len(task_train.indices)
             # <<< @sbs_pre_memory
             memory_indices = self.get_memory()
             new_indices = np.concatenate((task_train.indices, memory_indices))
             task_train.indices = new_indices
+            if _study_enabled:
+                self._ant_study_task_abs_indices = new_indices.copy()
 
             trainloader_params = self.configs["trainloader_params"].copy()
 
@@ -278,7 +323,8 @@ class TagFex(HerdingIndicesLearner):
                 )
             else:
                 # >>> @sbs_wrap_loader
-                _train_src = WithIndexDataset(task_train) if _sbs_enabled else task_train
+                _train_src = WithIndexDataset(task_train) if (_sbs_enabled or _study_enabled) else task_train
+                self._ant_study_tracking = _study_enabled
                 if _sbs_enabled:
                     n_total = len(task_train)
                     self._sbs_correct = np.zeros(n_total, dtype=np.int32)
@@ -318,6 +364,12 @@ class TagFex(HerdingIndicesLearner):
 
             # evaluation as task end
             results = self.eval_epoch(test_loader)
+            self.ant_study_observer.record_evaluation(
+                phase="task_end",
+                task=self.state["cur_task"],
+                epoch=self.state.get("cur_epoch"),
+                values=results,
+            )
             forward_metrics(
                 select_metrics(self.run_metrics, "acc1"), results["eval_acc1"]
             )
@@ -348,6 +400,7 @@ class TagFex(HerdingIndicesLearner):
         )
 
         self.update_state(run_state="finished")
+        self.ant_study_observer.close()
         # <<< @train_end
 
     def train_task(self, train_loader, test_loader):
@@ -374,6 +427,8 @@ class TagFex(HerdingIndicesLearner):
         # >>> @after_train_task_setups
         if self.configs["debug"]:
             num_epochs = 5
+        if self.configs.get("study_max_epochs") is not None:
+            num_epochs = min(num_epochs, int(self.configs["study_max_epochs"]))
         self.update_state(cur_task_num_epochs=num_epochs)
         if self._avg_last_k > 0:
             self._reset_ckpt_buffer()
@@ -403,6 +458,12 @@ class TagFex(HerdingIndicesLearner):
             # >>> @train_epoch_end
             if epoch % self.configs["eval_interval"] == 0:
                 eval_results = self.eval_epoch(test_loader)
+                self.ant_study_observer.record_evaluation(
+                    phase="epoch",
+                    task=self.state["cur_task"],
+                    epoch=self.state["cur_epoch"],
+                    values=eval_results,
+                )
                 self.print_logger.info(
                     f"{self._get_status()} | {self._metric_repr(train_results)} {self._metric_repr(eval_results)}"
                 )
@@ -468,21 +529,50 @@ class TagFex(HerdingIndicesLearner):
             )
 
         for batch, batch_data in enumerate(train_loader):
+            max_batches = self.configs.get("study_max_batches_per_epoch")
+            if max_batches is not None and batch >= int(max_batches):
+                break
             batch_data = tuple(
                 data.to(self.device, non_blocking=True) for data in batch_data
             )
 
-            if self._sbs_tracking:
+            if self._sbs_tracking or self._ant_study_tracking:
                 local_idx, sample1, sample2, targets = batch_data
             elif self.configs.get("ffcv"):
                 sample1, targets, sample2 = batch_data
             else:
                 sample1, sample2, targets = batch_data
-            targets = self.ordered_index_map[
-                targets.flatten()
-            ]  # map to continual class id.
+            original_targets = targets.flatten()
+            targets = self.ordered_index_map[original_targets]  # map to continual class id.
+            if self._ant_study_tracking:
+                local_idx_cpu = local_idx.detach().cpu().numpy()
+                absolute_indices = self._ant_study_task_abs_indices[local_idx_cpu]
+                source_is_replay = local_idx_cpu >= self._ant_study_n_new
+                self.ant_study_observer.set_batch_metadata(
+                    {
+                        "local_index": np.concatenate((local_idx_cpu, local_idx_cpu)),
+                        "absolute_index": np.concatenate((absolute_indices, absolute_indices)),
+                        "original_target": np.concatenate(
+                            (original_targets.detach().cpu().numpy(), original_targets.detach().cpu().numpy())
+                        ),
+                        "continual_target": np.concatenate(
+                            (targets.detach().cpu().numpy(), targets.detach().cpu().numpy())
+                        ),
+                        "view": np.concatenate(
+                            (np.zeros(len(local_idx_cpu), dtype=np.int8), np.ones(len(local_idx_cpu), dtype=np.int8))
+                        ),
+                        "is_replay": np.concatenate((source_is_replay, source_is_replay)),
+                    }
+                )
             samples = torch.cat((sample1, sample2))
             targets = torch.cat((targets, targets))
+            self.ant_study_observer.set_batch_payload(
+                "current",
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+                tensors={"view1": sample1, "view2": sample2},
+            )
             # self.print_logger.debug(f'train {batch}/{len(train_loader)}', samples.device, targets.device)
             # self.print_logger.debug(f'batch shape {samples.shape}')
 
@@ -498,6 +588,13 @@ class TagFex(HerdingIndicesLearner):
             # self.print_logger.debug(f'rank {self.distributed["rank"]}, batch {batch}, cls_loss: {cls_loss}')
 
             embedding = out["embedding"]
+            self.ant_study_observer.set_batch_payload(
+                "current",
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+                tensors={"view1": sample1, "view2": sample2, "embedding": embedding},
+            )
 
             # Get debug parameters if similarity debugging is enabled, gated by
             # epoch-interval and max-batches-per-epoch sampling controls.
@@ -524,20 +621,21 @@ class TagFex(HerdingIndicesLearner):
 
             ant_beta = self.configs.get("ant_beta", 0.0)
             ant_max_global = self.configs.get("ant_max_global", True)
-            infonce_max_global_cfg = self.configs.get("infonce_max_global", None)
             ant_symmetric_full = self.configs.get("ant_symmetric_full", False)
+            ant_detach_reference = self.configs.get("ant_detach_reference", False)
             ant_formulation = self.configs.get("ant_formulation", "logsumexp")
             ant_tau = self.configs.get("ant_tau", 0.1)
             ant_topk = self.configs.get("ant_topk", 32)
 
-            # Backward compatibility:
-            # - ANT disabled: InfoNCE follows ant_max_global (legacy baseline behavior)
-            # - ANT enabled: InfoNCE stays global unless explicitly configured
-            if infonce_max_global_cfg is None:
-                infonce_max_global = ant_max_global if ant_beta == 0.0 else True
-            else:
-                infonce_max_global = infonce_max_global_cfg
+            # The historical nGlobal/nLocal option is intentionally ignored.
+            # All new runs use the original canonical InfoNCE formulation.
+            infonce_max_global = True
 
+            diagnostic_logger = (
+                self.loguru_logger
+                if self.configs.get("legacy_debug_metrics", True)
+                else None
+            )
             infonce_loss = infoNCE_loss(
                 embedding,
                 self.configs["infonce_temp"],
@@ -547,15 +645,17 @@ class TagFex(HerdingIndicesLearner):
                 ant_max_global,
                 infonce_max_global,
                 ant_symmetric_full,
+                ant_detach_reference=ant_detach_reference,
                 ant_formulation=ant_formulation,
                 ant_tau=ant_tau,
                 ant_topk=ant_topk,
-                logger=self.loguru_logger,
+                logger=diagnostic_logger,
                 task=self.state["cur_task"],
                 epoch=self.state["cur_epoch"],
                 batch=batch + 1,
                 debug_logger=debug_logger,
                 heatmap_dir=heatmap_dir,
+                study_observer=self.ant_study_observer,
             )
 
             if (aux_logits := out.get("aux_logits")) is not None:
@@ -570,8 +670,19 @@ class TagFex(HerdingIndicesLearner):
                 with torch.no_grad():
                     old_ta_feature = self.last_ta_net(samples.contiguous())["features"]
                     old_ta_projected = self.last_projector(old_ta_feature)
+                predicted_projected = self.last_projector(predicted_feature)
+                self.ant_study_observer.set_batch_payload(
+                    "kd",
+                    task=self.state["cur_task"],
+                    epoch=self.state["cur_epoch"],
+                    batch=batch + 1,
+                    tensors={
+                        "student_prediction": predicted_projected,
+                        "teacher_projection": old_ta_projected,
+                    },
+                )
                 kd_loss = infoNCE_distill_loss(
-                    self.last_projector(predicted_feature),
+                    predicted_projected,
                     old_ta_projected,
                     self.configs["infonce_kd_temp"],
                     self.configs.get("nce_alpha", 1.0),
@@ -580,15 +691,17 @@ class TagFex(HerdingIndicesLearner):
                     ant_max_global,
                     infonce_max_global,
                     ant_symmetric_full,
+                    ant_detach_reference=ant_detach_reference,
                     ant_formulation=ant_formulation,
                     ant_tau=ant_tau,
                     ant_topk=ant_topk,
-                    logger=self.loguru_logger,
+                    logger=diagnostic_logger,
                     task=self.state["cur_task"],
                     epoch=self.state["cur_epoch"],
                     batch=batch + 1,
                     debug_logger=debug_logger,
                     heatmap_dir=heatmap_dir,
+                    study_observer=self.ant_study_observer,
                 )
 
                 trans_logits = out["trans_logits"]
@@ -643,15 +756,82 @@ class TagFex(HerdingIndicesLearner):
                 loss = cls_loss + self.configs["contrast_factor"] * infonce_loss
             # <<< @train_forward
 
+            if self.state["cur_task"] > 1:
+                branch_outer_weights = {
+                    "current": float(self.configs["contrast_factor"] * (1 - auto_kd_factor)),
+                    "kd": float(
+                        self.configs["contrast_factor"]
+                        * self.configs["contrast_kd_factor"]
+                        * auto_kd_factor
+                    ),
+                }
+            else:
+                branch_outer_weights = {
+                    "current": float(self.configs["contrast_factor"]),
+                    "kd": 0.0,
+                }
+            self.ant_study_observer.record_training_objective(
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+                values={
+                    "total_loss": loss,
+                    "classification_loss": cls_loss,
+                    "current_contrastive_loss": infonce_loss,
+                    "kd_contrastive_loss": kd_loss if self.state["cur_task"] > 1 else None,
+                    "auxiliary_loss": aux_loss if self.state["cur_task"] > 1 else None,
+                    "transfer_classification_loss": trans_cls_loss if self.state["cur_task"] > 1 else None,
+                    "kl_transfer_loss": transfer_loss if self.state["cur_task"] > 1 else None,
+                    "current_outer_weight": branch_outer_weights["current"],
+                    "kd_outer_weight": branch_outer_weights["kd"],
+                    "learning_rate": optimizer.param_groups[0]["lr"],
+                },
+            )
+            self.ant_study_observer.record_component_parameter_gradients(
+                self.local_network,
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+                branch_outer_weights=branch_outer_weights,
+                ant_beta=ant_beta,
+                nce_alpha=self.configs.get("nce_alpha", 1.0),
+            )
+
             # >>> @train_backward
             optimizer.zero_grad()
+            self.ant_study_observer.capture_parameter_state(
+                self.local_network,
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+            )
             loss.backward()
+            self.ant_study_observer.record_total_parameter_gradients(
+                self.local_network,
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+                stage="before_clip",
+            )
             grad_clip_norm = self.configs.get("grad_clip_norm", None)
             if grad_clip_norm is not None:
                 torch.nn.utils.clip_grad_norm_(
                     self.local_network.parameters(), max_norm=grad_clip_norm
                 )
+                self.ant_study_observer.record_total_parameter_gradients(
+                    self.local_network,
+                    task=self.state["cur_task"],
+                    epoch=self.state["cur_epoch"],
+                    batch=batch + 1,
+                    stage="after_clip",
+                )
             optimizer.step()
+            self.ant_study_observer.record_parameter_update(
+                self.local_network,
+                task=self.state["cur_task"],
+                epoch=self.state["cur_epoch"],
+                batch=batch + 1,
+            )
             # >>> @sbs_record — accumulate per-sample correctness (new-class samples only)
             if self._sbs_tracking:
                 self._sbs_record_batch(local_idx, logits, targets)
@@ -958,93 +1138,10 @@ class TagFex(HerdingIndicesLearner):
         )
 
     def _adjust_log_dir_with_loss_params(self):
-        """Adjust log directory name based on loss parameters (ANT, contrast factors, etc.)"""
-        log_dir = self.configs.get("log_dir")
-        if log_dir is None:
-            return
-
-        from pathlib import Path
-
-        log_dir = Path(log_dir)
-
-        # Build suffix based on parameters that differ from defaults
-        suffix_parts = []
-
-        # ANT parameters
-        ant_beta = self.configs.get("ant_beta", 0.0)
-        suffix_parts.append(f"antB{ant_beta:.3f}".rstrip("0").rstrip("."))
-
-        nce_alpha = self.configs.get("nce_alpha", 1.0)
-        suffix_parts.append(f"nceA{nce_alpha:.3f}".rstrip("0").rstrip("."))
-
-        # Only include ant_margin if ant_beta > 0 (ANT is active)
-        if ant_beta > 0:
-            ant_margin = self.configs.get("ant_margin", 0.1)
-            suffix_parts.append(f"antM{ant_margin:.3f}".rstrip("0").rstrip("."))
-
-        ant_max_global = self.configs.get("ant_max_global", True)
-        infonce_max_global = self.configs.get("infonce_max_global", ant_max_global)
-
-        # Check if symmetric_full is enabled
-        ant_symmetric_full = self.configs.get("ant_symmetric_full", False)
-        if ant_symmetric_full:
-            suffix_parts.append("antSymmetricFull")
-        else:
-            suffix_parts.append("antGlobal" if ant_max_global else "antLocal")
-        suffix_parts.append("nceGlobal" if infonce_max_global else "nceLocal")
-
-        # ANT loss formulation (only if non-default)
-        ant_formulation = self.configs.get("ant_formulation", "logsumexp")
-        if ant_formulation != "logsumexp":
-            suffix_parts.append(f"form{ant_formulation}")
-
-        # Avg-K teacher (only if enabled)
-        avg_last_k = self.configs.get("avg_last_k", 0)
-        if avg_last_k > 0:
-            suffix_parts.append(f"avgK{avg_last_k}")
-
-        # SBS (only if enabled)
-        sbs_q = self.configs.get("sbs_q", 0.0)
-        sbs_s = self.configs.get("sbs_s", 0.0)
-        if sbs_q > 0 or sbs_s > 0:
-            suffix_parts.append(f"sbsQ{sbs_q:.2f}S{sbs_s:.2f}".rstrip("0").rstrip("."))
-
-        # Always append seed so every run has a unique, traceable directory
-        seed = self.configs.get("seed", 1993)
-        suffix_parts.append(f"s{seed}")
-
-        # Contrast factors (optional - you can enable these if needed)
-        if self.configs.get("include_contrast_in_logdir", False):
-            contrast_factor = self.configs.get("contrast_factor", 1.0)
-            if contrast_factor != 1.0:
-                suffix_parts.append(f"cf{contrast_factor:.2f}".rstrip("0").rstrip("."))
-
-            contrast_kd_factor = self.configs.get("contrast_kd_factor", 2.0)
-            if contrast_kd_factor != 2.0:
-                suffix_parts.append(
-                    f"ckf{contrast_kd_factor:.2f}".rstrip("0").rstrip(".")
-                )
-
-        # Build new log directory path
-        if suffix_parts:
-            suffix = "_" + "_".join(suffix_parts)
-
-            # If log_dir is just a base directory (like './logs'), create experiment subdirectory
-            # Check if log_dir name is 'logs' or ends with 'logs'
-            if log_dir.name == "logs" or str(log_dir) in ["./logs", "logs"]:
-                # Create experiment name from dataset and scenario
-                dataset_name = self.configs.get("dataset_name", "dataset")
-                scenario = self.configs.get("scenario", "").split()[-1]
-                exp_name = f"exp_{dataset_name}_{scenario}{suffix}"
-                new_log_dir = log_dir / exp_name
-            else:
-                # Append suffix to existing experiment name
-                new_log_dir = log_dir.parent / (log_dir.name + suffix)
-
-            # Check if directory already exists and create a unique name if needed
-            new_log_dir = self._get_unique_log_dir(new_log_dir)
-
-            self.configs["log_dir"] = new_log_dir
+        """Preserve historical naming and allocate the next free run directory."""
+        log_dir = experiment_log_dir(self.configs)
+        if log_dir is not None:
+            self.configs["log_dir"] = self._get_unique_log_dir(log_dir)
 
     def _get_unique_log_dir(self, base_dir):
         """
@@ -1156,6 +1253,7 @@ def _compute_contrastive_loss_base(
     ant_formulation="logsumexp",
     ant_tau=0.1,
     ant_topk=32,
+    ant_detach_reference=False,
     logger=None,
     log_prefix="contrast",
     task=None,
@@ -1163,6 +1261,7 @@ def _compute_contrastive_loss_base(
     batch=None,
     debug_logger=None,
     heatmap_dir=None,
+    study_observer=None,
 ):
     """
     Base function for computing contrastive loss with ANT.
@@ -1172,10 +1271,10 @@ def _compute_contrastive_loss_base(
         cos_sim: Pre-computed cosine similarity matrix [N, N] where N = 2 * batch_size
         t: Temperature parameter for InfoNCE loss
         nce_alpha: Weight for InfoNCE loss component
-        ant_beta: Weight for ANT (Adaptive Negative Thresholding) loss component
+        ant_beta: Weight for the ANT (Avoid Non-essential Tuning) loss component
         ant_margin: Margin threshold for ANT loss
         ant_max_global: If True, ANT uses global maximum across anchors; if False, per-anchor maximum
-        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        infonce_max_global: Deprecated compatibility argument; ignored
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         ant_formulation: ANT loss variant - one of:
             "logsumexp"  (default) log(sum(exp(relu(v)))) — has count-floor = log(N)
@@ -1185,6 +1284,7 @@ def _compute_contrastive_loss_base(
             "active_only" mean(relu(v)) over active violations — direct violation severity
         ant_tau: Temperature for softplus formulation (default 0.1)
         ant_topk: Number of hard negatives for topk formulation (default 32)
+        ant_detach_reference: If True, stop gradients through the ANT reference
         logger: Logger instance for recording statistics
         log_prefix: Prefix for log messages ("contrast" or "kd")
         task: Current task number for logging
@@ -1197,6 +1297,15 @@ def _compute_contrastive_loss_base(
         total_loss: Combined loss value (InfoNCE + ANT)
     """
     device = cos_sim.device
+    study_cos_sim = None
+    if (
+        study_observer is not None
+        and task is not None
+        and epoch is not None
+        and batch is not None
+        and study_observer.should_capture(task, epoch, batch)
+    ):
+        study_cos_sim = cos_sim.detach().clone()
 
     # Always define pos_start for positive similarities calculation
     pos_start = cos_sim.shape[0] // 2
@@ -1215,7 +1324,7 @@ def _compute_contrastive_loss_base(
             log_prefix=log_prefix,
         )
 
-    # ANT (Adaptive Negative Thresholding) — build similarity matrix and valid-negative mask
+    # ANT (Avoid Non-essential Tuning) — build similarity matrix and valid-negative mask
     if ant_symmetric_full:
         # Full symmetric matrix: exclude self and positive pairs
         N = cos_sim.shape[0]
@@ -1242,8 +1351,12 @@ def _compute_contrastive_loss_base(
     else:
         ant_max = ant_sim_matrix.max(dim=-1, keepdim=True).values  # [N,1] or [B,1]
 
+    # Keep the forward threshold identical while optionally preventing the
+    # selected maximum from receiving gradient through its role as reference.
+    ant_reference = ant_max.detach() if ant_detach_reference else ant_max
+
     # Raw violation values before ReLU: v_i = neg_sim_i - ref_sim + margin
-    raw_v = ant_sim_matrix - ant_max + ant_margin  # same shape as ant_sim_matrix
+    raw_v = ant_sim_matrix - ant_reference + ant_margin  # same shape as ant_sim_matrix
 
     # Compute ANT loss per anchor based on chosen formulation
     if ant_formulation == "logsumexp":
@@ -1384,6 +1497,37 @@ def _compute_contrastive_loss_base(
         sim_gap_mean = sim_gap.mean()
         sim_gap_min = sim_gap.min()
 
+        # Reference-specific geometry.  For FS-AR this covers both views; for
+        # IV-AR it covers the first view, matching ant_sim_matrix.
+        anchor_ref_sims, anchor_ref_indices = ant_sim_matrix.max(dim=-1)
+        ref_mask = torch.zeros_like(valid_neg_mask)
+        ref_mask.scatter_(1, anchor_ref_indices.unsqueeze(1), True)
+        active_nonref_mask = active_mask & ~ref_mask
+        if active_nonref_mask.any():
+            ref_expanded = anchor_ref_sims.unsqueeze(1).expand_as(ant_sim_matrix)
+            active_nonref_sim_mean = ant_sim_matrix[active_nonref_mask].mean()
+            ref_nonref_gap = (
+                ref_expanded[active_nonref_mask]
+                - ant_sim_matrix[active_nonref_mask]
+            ).mean()
+        else:
+            active_nonref_sim_mean = torch.zeros((), device=device)
+            ref_nonref_gap = torch.zeros((), device=device)
+
+        if ant_symmetric_full:
+            ant_rows = torch.arange(cos_sim.shape[0], device=device)
+            ant_pos_indices = (ant_rows + pos_start) % cos_sim.shape[0]
+            ant_pos_sims = cos_sim[ant_rows, ant_pos_indices]
+        else:
+            ant_pos_sims = pos_sims
+        pos_ref_gap = ant_pos_sims - anchor_ref_sims
+
+        if int(num_negatives.min().item()) >= 2:
+            top2 = torch.topk(ant_sim_matrix, k=2, dim=-1).values
+            top1_top2_gap = (top2[:, 0] - top2[:, 1]).mean()
+        else:
+            top1_top2_gap = torch.zeros((), device=device)
+
         flattening_stats = {
             "num_neg_mean": num_neg_mean.item(),
             "ant_loss_raw": ant_loss.item(),
@@ -1401,6 +1545,11 @@ def _compute_contrastive_loss_base(
             "hard_neg_sim": hard_neg_sim_mean.item(),
             "sim_gap_mean": sim_gap_mean.item(),
             "sim_gap_min": sim_gap_min.item(),
+            "ref_sim_mean": anchor_ref_sims.mean().item(),
+            "active_nonref_sim_mean": active_nonref_sim_mean.item(),
+            "ref_nonref_gap": ref_nonref_gap.item(),
+            "pos_ref_gap_mean": pos_ref_gap.mean().item(),
+            "top1_top2_gap": top1_top2_gap.item(),
         }
         logger.log_ant_flattening_diagnostics(
             flattening_stats, task=task, epoch=epoch, batch=batch
@@ -1413,21 +1562,73 @@ def _compute_contrastive_loss_base(
     # Positive pair mask: batch_size//2 away from the original example
     pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
 
-    # InfoNCE loss with optional local anchor normalization
+    # Original canonical InfoNCE formulation.
     cos_sim = cos_sim / t
-
-    # Apply local anchor normalization for InfoNCE when configured.
-    # This strategy is independent from the ANT anchor selection.
-    if not infonce_max_global:
-        cos_sim_neg = cos_sim.clone()
-        cos_sim_neg[pos_mask] = -float("inf")
-        max_neg_per_anchor = cos_sim_neg.max(dim=-1, keepdim=True).values
-        cos_sim = cos_sim - max_neg_per_anchor
 
     # Compute InfoNCE loss
     nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
     nll_mean = nll.mean()
     total_loss = nce_alpha * nll_mean + ant_beta * ant_loss
+
+    if study_cos_sim is not None:
+        study_observer.record_contrastive(
+            study_cos_sim,
+            branch="current" if log_prefix == "contrast" else log_prefix,
+            task=task,
+            epoch=epoch,
+            batch=batch,
+            params={
+                "temperature": t,
+                "nce_alpha": nce_alpha,
+                "ant_beta": ant_beta,
+                "ant_margin": ant_margin,
+                "ant_max_global": ant_max_global,
+                "ant_symmetric_full": ant_symmetric_full,
+                "ant_detach_reference": ant_detach_reference,
+            },
+            nce_loss_tensor=nll_mean,
+            ant_loss_tensor=ant_loss,
+        )
+
+    # Cheap logit-level decomposition for the primary AR/logsumexp protocol.
+    # Positive derivative means gradient descent repels the reference.
+    if (
+        logger is not None
+        and ant_beta > 0
+        and not ant_max_global
+        and ant_formulation == "logsumexp"
+    ):
+        with torch.no_grad():
+            ant_probs = torch.softmax(mq, dim=-1)
+            ant_direct = ant_probs * active_mask.float()
+            ant_direct = ant_direct / ant_sim_matrix.shape[0]
+            ref_rows = torch.arange(ant_sim_matrix.shape[0], device=device)
+            ref_direct = ant_direct[ref_rows, anchor_ref_indices]
+            if ant_detach_reference:
+                ref_grad_ant = ref_direct
+            else:
+                ref_grad_ant = ref_direct - ant_direct.sum(dim=-1)
+
+            nce_probs = torch.softmax(cos_sim, dim=-1)
+            ref_grad_nce = (
+                nce_probs[ref_rows, anchor_ref_indices]
+                / (cos_sim.shape[0] * t)
+            )
+            ref_grad_ant = ant_beta * ref_grad_ant
+            ref_grad_nce = nce_alpha * ref_grad_nce
+            ref_grad_total = ref_grad_ant + ref_grad_nce
+            logger.log_ant_reference_gradients(
+                {
+                    "ant": ref_grad_ant.mean().item(),
+                    "nce": ref_grad_nce.mean().item(),
+                    "total": ref_grad_total.mean().item(),
+                    "repel_frac": (ref_grad_total > 0).float().mean().item(),
+                },
+                prefix=log_prefix,
+                task=task,
+                epoch=epoch,
+                batch=batch,
+            )
 
     # Log partial loss values
     if logger is not None:
@@ -1461,12 +1662,14 @@ def infoNCE_loss(
     ant_formulation="logsumexp",
     ant_tau=0.1,
     ant_topk=32,
+    ant_detach_reference=False,
     logger=None,
     task=None,
     epoch=None,
     batch=None,
     debug_logger=None,
     heatmap_dir=None,
+    study_observer=None,
 ):
     """
     InfoNCE contrastive loss with optional ANT.
@@ -1478,11 +1681,12 @@ def infoNCE_loss(
         ant_beta: Weight for ANT loss
         ant_margin: Margin threshold for ANT
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
-        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        infonce_max_global: Deprecated compatibility argument; ignored
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         ant_formulation: ANT loss variant (logsumexp, expm1, softplus, topk, active_only)
         ant_tau: Temperature for softplus formulation
         ant_topk: k for topk formulation
+        ant_detach_reference: If True, stop gradients through the ANT reference
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1493,8 +1697,9 @@ def infoNCE_loss(
     Returns:
         total_loss: Combined contrastive loss
     """
-    # Compute cosine similarity matrix
-    cos_sim = F.cosine_similarity(feats[:, None, :], feats[None, :, :], dim=-1)
+    # normalize→matmul avoids the [N,N,D] intermediate tensor (OOM for large images)
+    feats_n = F.normalize(feats, dim=-1)
+    cos_sim = feats_n @ feats_n.T
 
     # Use base function to compute loss
     return _compute_contrastive_loss_base(
@@ -1509,6 +1714,7 @@ def infoNCE_loss(
         ant_formulation=ant_formulation,
         ant_tau=ant_tau,
         ant_topk=ant_topk,
+        ant_detach_reference=ant_detach_reference,
         logger=logger,
         log_prefix="contrast",
         task=task,
@@ -1516,6 +1722,7 @@ def infoNCE_loss(
         batch=batch,
         debug_logger=debug_logger,
         heatmap_dir=heatmap_dir,
+        study_observer=study_observer,
     )
 
 
@@ -1532,12 +1739,14 @@ def infoNCE_distill_loss(
     ant_formulation="logsumexp",
     ant_tau=0.1,
     ant_topk=32,
+    ant_detach_reference=False,
     logger=None,
     task=None,
     epoch=None,
     batch=None,
     debug_logger=None,
     heatmap_dir=None,
+    study_observer=None,
 ):
     """
     InfoNCE distillation loss with optional ANT.
@@ -1551,11 +1760,12 @@ def infoNCE_distill_loss(
         ant_beta: Weight for ANT loss
         ant_margin: Margin threshold for ANT
         ant_max_global: If True, ANT uses global max; if False, per-anchor max
-        infonce_max_global: If True, InfoNCE uses global normalization; if False, per-anchor normalization
+        infonce_max_global: Deprecated compatibility argument; ignored
         ant_symmetric_full: If True, ANT uses full symmetric matrix; if False, uses intra-view only
         ant_formulation: ANT loss variant (logsumexp, expm1, softplus, topk, active_only)
         ant_tau: Temperature for softplus formulation
         ant_topk: k for topk formulation
+        ant_detach_reference: If True, stop gradients through the ANT reference
         logger: Logger instance
         task: Current task number
         epoch: Current epoch number
@@ -1566,8 +1776,10 @@ def infoNCE_distill_loss(
     Returns:
         total_loss: Combined distillation loss
     """
-    # Compute cosine similarity matrix between predicted and old features
-    cos_sim = F.cosine_similarity(p_feats[:, None, :], z_feats[None, :, :], dim=-1)
+    # normalize→matmul avoids the [M,N,D] intermediate tensor (OOM for large images)
+    p_n = F.normalize(p_feats, dim=-1)
+    z_n = F.normalize(z_feats, dim=-1)
+    cos_sim = p_n @ z_n.T
 
     # Use base function to compute loss
     return _compute_contrastive_loss_base(
@@ -1582,6 +1794,7 @@ def infoNCE_distill_loss(
         ant_formulation=ant_formulation,
         ant_tau=ant_tau,
         ant_topk=ant_topk,
+        ant_detach_reference=ant_detach_reference,
         logger=logger,
         log_prefix="kd",
         task=task,
@@ -1589,6 +1802,7 @@ def infoNCE_distill_loss(
         batch=batch,
         debug_logger=debug_logger,
         heatmap_dir=heatmap_dir,
+        study_observer=study_observer,
     )
 
 

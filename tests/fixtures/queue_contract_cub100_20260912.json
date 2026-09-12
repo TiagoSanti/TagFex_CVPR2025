@@ -1,0 +1,202 @@
+[
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "CUB 100-20 Baseline InfoNCE smallBase",
+    "config_sha256": "4cd24e1c21f0434163a24761cd92163caa2d8f69a3b27fca6ce17cf5157408c4",
+    "log_dir": "logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 7,
+    "queue_seed": 1994,
+    "description": "CUB 100-20 Baseline InfoNCE smallBase",
+    "config_sha256": "e750e2d3fb9fee69d0fa487564cde34081ed4906dc21fe3fe605a4052b4f2fba",
+    "log_dir": "logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 8,
+    "queue_seed": 1995,
+    "description": "CUB 100-20 Baseline InfoNCE smallBase",
+    "config_sha256": "e4ef212f61cfe758a0b6a38528da8c1bdae22cfb04e6155981eb48b529a110d3",
+    "log_dir": "logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 9,
+    "queue_seed": 1996,
+    "description": "CUB 100-20 Baseline InfoNCE smallBase",
+    "config_sha256": "a197c03762b95d73af139153c22b8aa10f0bbf9b343d6dece3ad93afdd8e7580",
+    "log_dir": "logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 10,
+    "queue_seed": 1997,
+    "description": "CUB 100-20 Baseline InfoNCE smallBase",
+    "config_sha256": "7a09e41a69e5467c305f9c7f0a7514306b2ad1e09316a21ae5c7651652e4646f",
+    "log_dir": "logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 13,
+    "queue_seed": 1993,
+    "description": "CUB 100-20 ANT-FS-GR detach smallBase",
+    "config_sha256": "ae9847ffd854a57e142859dc773e50b6f0f874c8590ff87df8b6c24ecec65113",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "CUB 100-20 ANT-FS-GR detach smallBase",
+    "config_sha256": "5bb25f43bc1a199da099afa85e9679a6bf984dc3154d004c8c778a74233e044e",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 15,
+    "queue_seed": 1995,
+    "description": "CUB 100-20 ANT-FS-GR detach smallBase",
+    "config_sha256": "f5e70aff7b78c1d49ac6b750ec081365e5e1f059ed72ba4bedd152bb52a80e0a",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 16,
+    "queue_seed": 1996,
+    "description": "CUB 100-20 ANT-FS-GR detach smallBase",
+    "config_sha256": "9bfddf2f2c00c55c8fe76d35d616e33017cf8b5c794f061ae03ee708d768ebc8",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 17,
+    "queue_seed": 1997,
+    "description": "CUB 100-20 ANT-FS-GR detach smallBase",
+    "config_sha256": "f683f9f8fddde6c1fef6147ead931e6af36eb41b47bf3d23cc585c24d8a4b54d",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 20,
+    "queue_seed": 1993,
+    "description": "CUB 100-20 ANT-IV-GR detach smallBase",
+    "config_sha256": "bcb42af66d90c68d8b8efad9cf082d4b7d1b8d78d1b71c563a73386f88ee63d5",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 21,
+    "queue_seed": 1994,
+    "description": "CUB 100-20 ANT-IV-GR detach smallBase",
+    "config_sha256": "beb891e2df1264695cfbe2441c5aa5c9a80ae941168b34321d4e6b0773afc894",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 22,
+    "queue_seed": 1995,
+    "description": "CUB 100-20 ANT-IV-GR detach smallBase",
+    "config_sha256": "f606354f53f3349c8eb39cc996dbf2a60450d3040d4c00fc6783e52745390e94",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 23,
+    "queue_seed": 1996,
+    "description": "CUB 100-20 ANT-IV-GR detach smallBase",
+    "config_sha256": "04f3dfc5ed7ad12920a6058bc2c98164e0571348bec301da617532d99a24b3d5",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 24,
+    "queue_seed": 1997,
+    "description": "CUB 100-20 ANT-IV-GR detach smallBase",
+    "config_sha256": "18243cdc3de4d34bbbd3a149a20655eea7bc063af31df89c599a66c79465a29b",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 27,
+    "queue_seed": 1993,
+    "description": "CUB 100-20 ANT-IV-AR detach smallBase",
+    "config_sha256": "220d0d50780ba7ef8e4fc0766614eb149fbcb75c59dbc00e1689457954707bf3",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 28,
+    "queue_seed": 1994,
+    "description": "CUB 100-20 ANT-IV-AR detach smallBase",
+    "config_sha256": "25f4501232cd43ed5e94dd8b9ffb6f4fcbd6e889e9ee1d86876a2d2769a5244e",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 29,
+    "queue_seed": 1995,
+    "description": "CUB 100-20 ANT-IV-AR detach smallBase",
+    "config_sha256": "f3b3b04401e8e409c793e51d2be50ab616ff507f415521057745005b178bb429",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 30,
+    "queue_seed": 1996,
+    "description": "CUB 100-20 ANT-IV-AR detach smallBase",
+    "config_sha256": "f079acc05bd1f3f6cc65b390829b4a7880eeba788a65fa22e88e8f855ef9470f",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 31,
+    "queue_seed": 1997,
+    "description": "CUB 100-20 ANT-IV-AR detach smallBase",
+    "config_sha256": "6f9959cdaf306c8b427b87b03d9f4960604b3c936dc0da298adcb104b11bcc36",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 34,
+    "queue_seed": 1993,
+    "description": "CUB 100-20 ANT-FS-AR detach smallBase",
+    "config_sha256": "b61bdbc4ffee63114d91f6792555afab5be5245d3066063990c9a67d268c3218",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 35,
+    "queue_seed": 1994,
+    "description": "CUB 100-20 ANT-FS-AR detach smallBase",
+    "config_sha256": "f29e82e71e60064074db6adad55d2e001088dee6a0759eb0e89abeea37fd4046",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 36,
+    "queue_seed": 1995,
+    "description": "CUB 100-20 ANT-FS-AR detach smallBase",
+    "config_sha256": "6845174da2884571edf52a1b4add586a4bdcfae725ca86c9908b8c46423b623a",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 37,
+    "queue_seed": 1996,
+    "description": "CUB 100-20 ANT-FS-AR detach smallBase",
+    "config_sha256": "b862e625c12da3c68ee5f8d06dde02d4d3eeb4b59c4256658d00cfa7622e7178",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/cub100_canonical_5seeds/queues/queue_cub100_canonical_5seeds_local.txt",
+    "line": 38,
+    "queue_seed": 1997,
+    "description": "CUB 100-20 ANT-FS-AR detach smallBase",
+    "config_sha256": "a9efdd85bb0b695cb2601ea29fddce1cfd1feacf122afa60b51d682f630eb619",
+    "log_dir": "logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  }
+]

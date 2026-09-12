@@ -1,0 +1,19 @@
+# Reference-detach ablation — 3 missing protocols x 3 seeds = 9 runs.
+# Compare pairwise against existing ANT-FS-AR and Baseline InfoNCE runs.
+# Format: <config_path>|<description>|<seed>
+# Tiny-ImageNet 100-20 seeds 1993, 1994, and 1995 are already complete.
+
+# Pass 1 — breadth-first validation across protocols
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-10-10 ANT-FS-AR + RefDetach|1993
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-50-10 ANT-FS-AR + RefDetach|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|TIN-20-20 ANT-FS-AR + RefDetach|1993
+
+# Pass 2 — seed 1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-10-10 ANT-FS-AR + RefDetach|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-50-10 ANT-FS-AR + RefDetach|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|TIN-20-20 ANT-FS-AR + RefDetach|1994
+
+# Pass 3 — seed 1995
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-10-10 ANT-FS-AR + RefDetach|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|C100-50-10 ANT-FS-AR + RefDetach|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_refDetached_resnet18.yaml|TIN-20-20 ANT-FS-AR + RefDetach|1995

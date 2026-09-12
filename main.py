@@ -1,7 +1,10 @@
 import os, datetime
+import sys
+from pathlib import Path
 import torch
 import utils.funcs as utlf
-from utils.configuration import load_configs, load_yaml
+from utils.configuration import load_configs, load_yaml, training_config
+from utils.provenance import safe_finalize_experiment, safe_start_experiment
 
 from modules.data.manager import ContinualDataManager
 from modules.learner.base import ContinualLearner
@@ -21,22 +24,37 @@ class ContinualLauncher:
             utlf.set_seed(args.seed)
 
     def _get_train_configs(self):
-        exp_configs = load_configs(self.args.exp_configs)
-
-        self.configs = vars(self.args)
-        self.configs.update(**exp_configs)
-
-        # Ensure queue launches can disable debug mode even if a YAML sets debug: true.
-        if self.args.force_no_debug:
-            self.configs['debug'] = False
+        self.configs = training_config(self.args)
 
     def train(self):
         self._get_train_configs()
-        data_manager = ContinualDataManager(self.configs, self.distributed)
-        
-        learner: ContinualLearner = method_dispatch(self.configs['method'], data_manager, self.configs, self.device, self.distributed)
+        tracker = None
+        is_primary = self.distributed is None or self.distributed["rank"] == 0
+        writes_logs = not self.configs.get("terminal_only", False) and not self.configs.get("disable_log_file", False)
 
-        learner.train()
+        try:
+            data_manager = ContinualDataManager(self.configs, self.distributed)
+
+            learner: ContinualLearner = method_dispatch(self.configs['method'], data_manager, self.configs, self.device, self.distributed)
+
+            # Some learners resolve a parameterised/seed-specific log_dir in
+            # their constructor.  Capture provenance only after that point so
+            # the manifest is colocated with the actual experiment artifacts.
+            if is_primary and writes_logs and self.configs.get("log_dir") is not None:
+                tracker = safe_start_experiment(
+                    repo=Path(__file__).resolve().parent,
+                    output_dir=Path(self.configs["log_dir"]),
+                    effective_configuration=self.configs,
+                    config_paths=self.args.exp_configs,
+                    command=[sys.executable, *sys.argv],
+                )
+
+            learner.train()
+        except BaseException as error:
+            safe_finalize_experiment(tracker, "failed", error)
+            raise
+        else:
+            safe_finalize_experiment(tracker, "completed")
 
     def _get_evaluate_configs(self):
         exp_configs = load_configs(self.args.exp_configs)

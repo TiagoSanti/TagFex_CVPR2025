@@ -1,0 +1,2474 @@
+[
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 57,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aLocal avgK10",
+    "config_sha256": "dee15f317ffd42a55892fec31fd46b702bbb6be307c3b15491c40a4301f2a2de",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 58,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aLocal avgK10",
+    "config_sha256": "b6547c54c9072a806091a7bdb39a4b7f16dcaa21c93f60edeb0aa8a7ecca7375",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 90,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aSymFull avgK10",
+    "config_sha256": "ca17d3e4fb1b290bb049f75dae56d75ea25b70152f3d69e9f82c337be445f10d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 91,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aSymFull avgK10",
+    "config_sha256": "3e13cef5a13f189730e2119300af43406ceaece895548ca33720a4c51df1384d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 123,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aLocal SBS",
+    "config_sha256": "e209de695beecec948f2c722a6438418e5638267e3eba00b454691b933fecc26",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 124,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aLocal SBS",
+    "config_sha256": "39afb1571e695ab098082afb55277e6ac9eb894b638c224a2e903aca8d795871",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 202,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aGlobal nLocal",
+    "config_sha256": "834d0800005d51514273da6571aa80002b18be998f7898ff4f9b31747c668707",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 203,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aGlobal nGlobal",
+    "config_sha256": "f5c8e19383709dae0ece9fdef2defe72660d55cbd9a378a8490ccbe334f28218",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/ablation_missing/queues/queue_ablation_missing.txt",
+    "line": 204,
+    "queue_seed": 1995,
+    "description": "[TIN-20-20] aLocal nGlobal",
+    "config_sha256": "90e85c692589bfabc43fb9b140c8a8e97a68e3902735071b87264e4588000636",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 4,
+    "queue_seed": 1996,
+    "description": "C100 50-10 Baseline InfoNCE nceGlobal",
+    "config_sha256": "80b0b926e9d0d8769a2beb4b32c60724edce1f8fc08f529e0a1371211684834e",
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 5,
+    "queue_seed": 1996,
+    "description": "C100 50-10 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "d8e24e1944322868ce76616d60b73ce301e733849c1cbbd178243b7533655cf6",
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 6,
+    "queue_seed": 1996,
+    "description": "C100 50-10 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "ae8d99db537255c530cdb679a4bf7cb87271e97a81b65a4b568122bbab972df4",
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 7,
+    "queue_seed": 1997,
+    "description": "C100 50-10 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "efee6be367cb423865065360ea36407d5f7842d3e8b099571bf29dc0b76bcd73",
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 8,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "a95af0bccc436b63ee27dc6528b61e2081c53a7ed152c5465c04cf1820073ca3",
+    "log_dir": "logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 9,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "70657ea8787334be348c82d4f90f3e6cf29d58601f48763703e5f11fe6c5e9a0",
+    "log_dir": "logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 10,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "93db22002474e06defd8aa18606e42e91237108606f299058d5867829a257e4b",
+    "log_dir": "logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 11,
+    "queue_seed": 1996,
+    "description": "C100 10-10 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "fdb243e00748d6a4ac6d0712d2aaef47f38c367e4e0fae8f07620bd0379f82ab",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 12,
+    "queue_seed": 1997,
+    "description": "C100 10-10 Baseline InfoNCE nceGlobal",
+    "config_sha256": "022f3ae5324e2edacf3854c16cb62e2509d69c3d83744ac39eeaf916d26719df",
+    "log_dir": "logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 13,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "0b7c52483c6607774856e76d2b77aa4dc5c9c78da22a4a5546abd9ba82497a8d",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 14,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "deb48941e043da8ae0bc71368b923728c51f8cb89f1d623dde7f5005b42d97df",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 15,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "c1b40ea3dd22e0d0bfb458401ddb2a1ea401898f9e702bf34f571fdb67e5a54f",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 16,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "088b1e386fca8f6c5069a304df78c5dc86c4cf60f0e8b2f893d34bed56886c6f",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 17,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "c494df988dbf27b85bd904a74ac6a0faf05d23f39fc7279da4b2feee391d1fa4",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 18,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "66c361aa579c54be664a7da2ae69c097d6c891e43e60d3710a6cda94ca2ad813",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 19,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "30d988c137b939125c574d9b1064ab62ee9f8efc0b3c1ec1c2e9a92658563ba8",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_local.txt",
+    "line": 20,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "d083fdd1675be58e3ce91d273097a66f154d50febc1b1cff95f1648c3a8ba486",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 4,
+    "queue_seed": 1996,
+    "description": "C100 10-10 Baseline InfoNCE nceGlobal",
+    "config_sha256": "608fcb8ce644d6ddd920b0b04d695eeeba52500d01e75654814870411bcf44b7",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 5,
+    "queue_seed": 1996,
+    "description": "C100 50-10 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "f1cb72372e5a90ce06272f8021336f75186f5c2efab3ff5eff09aa51531f3c96",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 6,
+    "queue_seed": 1997,
+    "description": "C100 50-10 Baseline InfoNCE nceGlobal",
+    "config_sha256": "69ed1ccd8e3150cb98477479606116439c703548563c477c46afb3f4ffb6fc27",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 7,
+    "queue_seed": 1997,
+    "description": "C100 50-10 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "32f110f351878d4ee607af37f71ba07559aaf2e081b4dd0739fbaf810b372ce4",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 8,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "7c6c541ebd6624f8be1897bd9cf00f8b74108f532f777da8dfa5cad61a1c4db9",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 9,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "e7110e4659bf1a9271a56550ddffbbb6fd53744f38069fa291238dbf47c40078",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 10,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "ffaf36369744e83763dee88bbb11c415a6ebfec30d14c41f2ba88fa8cf983efd",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 11,
+    "queue_seed": 1996,
+    "description": "C100 10-10 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "2a2488cb79facf335fafb35b0cfeba5170f138afcfa3967a1f94ede20e9b6513",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 12,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "2eaea36e32783b80094fd5d65b93f02ec6a4a10410d38c07449f7fe3965b6210",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 13,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "6ae8291a356a821e073571c93f965f15077409a71514ce469bbdf43b3d5f57fe",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 14,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "3977bf00fa90bca65d2b9daa61cacc49ae7629a7525f1fb241f3ea3c6d28ca13",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 15,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "1544483c1f21138f70648c8e03b1beff54ff69257a1af047030cf33b7bc08778",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 16,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "f66e80b27012bd7d8fd9b278be66aa22edcf9a64cc1d06b099ba8fd381a1067a",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 17,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "f868edf06d1b1dbdbacf60249906a206aed66a706526fdfe51ee431854a78c5b",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 18,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "d45b9d893634af3720a7293b1bd09e4ab9d620f6547138658bd9f098df8fe2f2",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu0.txt",
+    "line": 19,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "23021ce0f07d0d92ce032cf6090820a0ae1e1cea9bf9b0b9462e5b8a4ae8de6e",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 4,
+    "queue_seed": 1996,
+    "description": "C100 50-10 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "1a4775f13ae63470536aa9ee7034666fb25db06d89ea70bb86632e26fa766dc8",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 5,
+    "queue_seed": 1997,
+    "description": "C100 50-10 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "01ecbc3170c1164f09f718673e84020647696e195f685d2d0eabd29d65974d3b",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 6,
+    "queue_seed": 1997,
+    "description": "C100 50-10 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "ba6735a5d81fbc8e50f5a021e4d0958adac5b118857b4bff087ad15e5bdc612c",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 7,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "607d5e9819fcb1a01dc757a2e87062deb5f598e959719533de3c9001c9dc0686",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 8,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "369a8a6cb6124ee31d3576972034cc5be7e3516ecff11917315e7273f7f80673",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 9,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "5d10016db1fb9f06e539c1e73e3cafd44e130c3f438d57c71ebf9a636c040384",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 10,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "b4c5a0d1fc07ccd760d8990b80cf23b919dc0e0f1f1bcfb89d47e2797ed45179",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 11,
+    "queue_seed": 1996,
+    "description": "C100 10-10 ANT-IV-GR detach nceGlobal",
+    "config_sha256": "a86296ac835723dc17af2df965ae920212cabf9148872d027a9347cc23f4564d",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 12,
+    "queue_seed": 1996,
+    "description": "C100 10-10 ANT-FS-AR detach nceGlobal",
+    "config_sha256": "e8ca3395cc760e0b33d26f7a19ea930c89cc0ebf29d800de11cb8d6833bb6966",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 13,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "0d8f622af930d899f87b93e4a88e2a006c6bcbbfcbb2133c527f4c87dbc30c5e",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 14,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "4586ce301f0e9af8f7de7eea8df24aa8c1a3d6fee3e3c2da672c992597ade217",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 15,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "d33430ec547f3e01d4518570845a43300a327e71c42c13d556a473e28e74b1eb",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 16,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "855d5e6c14abdd47574a8e992e404b265d5994bb25e4b3b3d63755e9afcbd83f",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 17,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "532a212a9995ec02b1dc0f609520681ae9632601431fab4614439f87cb5cca8d",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 18,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-IV-AR detach nceGlobal",
+    "config_sha256": "1547f57a0474ff16a4598dbd13a4ff21da75dce25e7b63316f8eb4deacd7e924",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 19,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 Baseline InfoNCE nceGlobal",
+    "config_sha256": "84e1f884a7cc5c7132c0b7e4da5cb4cc1bedb278a8b7542b1323d1254fcb22e7",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1.txt",
+    "line": 20,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-FS-GR detach nceGlobal",
+    "config_sha256": "53d0cba84aa505d96f363508946af036823cdde2cb6388a386a4c2292a05a95f",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 4,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-IV-AR detach nceGlobal recovery",
+    "config_sha256": "1547f57a0474ff16a4598dbd13a4ff21da75dce25e7b63316f8eb4deacd7e924",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 5,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 Baseline InfoNCE nceGlobal recovery",
+    "config_sha256": "84e1f884a7cc5c7132c0b7e4da5cb4cc1bedb278a8b7542b1323d1254fcb22e7",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 6,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-FS-GR detach nceGlobal recovery",
+    "config_sha256": "53d0cba84aa505d96f363508946af036823cdde2cb6388a386a4c2292a05a95f",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 7,
+    "queue_seed": 1996,
+    "description": "C100 50-10 ANT-IV-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "f1cb72372e5a90ce06272f8021336f75186f5c2efab3ff5eff09aa51531f3c96",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 8,
+    "queue_seed": 1997,
+    "description": "C100 50-10 Baseline InfoNCE nceGlobal transferred from GPU0",
+    "config_sha256": "69ed1ccd8e3150cb98477479606116439c703548563c477c46afb3f4ffb6fc27",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 9,
+    "queue_seed": 1997,
+    "description": "C100 50-10 ANT-FS-GR detach nceGlobal transferred from GPU0",
+    "config_sha256": "32f110f351878d4ee607af37f71ba07559aaf2e081b4dd0739fbaf810b372ce4",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 10,
+    "queue_seed": 1996,
+    "description": "CUB 20-20 ANT-IV-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "7c6c541ebd6624f8be1897bd9cf00f8b74108f532f777da8dfa5cad61a1c4db9",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 11,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 Baseline InfoNCE nceGlobal transferred from GPU0",
+    "config_sha256": "e7110e4659bf1a9271a56550ddffbbb6fd53744f38069fa291238dbf47c40078",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 12,
+    "queue_seed": 1997,
+    "description": "CUB 20-20 ANT-FS-GR detach nceGlobal transferred from GPU0",
+    "config_sha256": "ffaf36369744e83763dee88bbb11c415a6ebfec30d14c41f2ba88fa8cf983efd",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 13,
+    "queue_seed": 1996,
+    "description": "C100 10-10 ANT-FS-GR detach nceGlobal transferred from GPU0",
+    "config_sha256": "2a2488cb79facf335fafb35b0cfeba5170f138afcfa3967a1f94ede20e9b6513",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 14,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-IV-GR detach nceGlobal transferred from GPU0",
+    "config_sha256": "2eaea36e32783b80094fd5d65b93f02ec6a4a10410d38c07449f7fe3965b6210",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 15,
+    "queue_seed": 1997,
+    "description": "C100 10-10 ANT-FS-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "6ae8291a356a821e073571c93f965f15077409a71514ce469bbdf43b3d5f57fe",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 16,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 Baseline InfoNCE nceGlobal transferred from GPU0",
+    "config_sha256": "3977bf00fa90bca65d2b9daa61cacc49ae7629a7525f1fb241f3ea3c6d28ca13",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 17,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-IV-GR detach nceGlobal transferred from GPU0",
+    "config_sha256": "1544483c1f21138f70648c8e03b1beff54ff69257a1af047030cf33b7bc08778",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 18,
+    "queue_seed": 1996,
+    "description": "TIN 100-20 ANT-FS-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "f66e80b27012bd7d8fd9b278be66aa22edcf9a64cc1d06b099ba8fd381a1067a",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 19,
+    "queue_seed": 1997,
+    "description": "TIN 100-20 ANT-IV-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "f868edf06d1b1dbdbacf60249906a206aed66a706526fdfe51ee431854a78c5b",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 20,
+    "queue_seed": 1996,
+    "description": "TIN 20-20 ANT-FS-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "d45b9d893634af3720a7293b1bd09e4ab9d620f6547138658bd9f098df8fe2f2",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceGlobal_refDetached_s1996"
+  },
+  {
+    "queue": "experiments/ant_central_extra_seeds/queues/queue_ant_central_extra_seeds_wolverine_gpu1_recovery.txt",
+    "line": 21,
+    "queue_seed": 1997,
+    "description": "TIN 20-20 ANT-IV-AR detach nceGlobal transferred from GPU0",
+    "config_sha256": "23021ce0f07d0d92ce032cf6090820a0ae1e1cea9bf9b0b9462e5b8a4ae8de6e",
+    "log_dir": "/var/tmp/tiago/ANT_central_extra_seeds_20260906/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 3,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-IV-GR detach",
+    "config_sha256": "3528672b36002e5a101cbedd8fbb073e287d913db607eed78c1a3cb37d828147",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 4,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-IV-AR detach",
+    "config_sha256": "77c4598f85b55d02e98dc8c620f5b771a5731ef03db8bc33e051f0e126ad444b",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 5,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-FS-GR detach",
+    "config_sha256": "d1e9a76b44e0406249ec20d3e88603343a1a4bbcd532c2522a341b97de0faa3f",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-FS-AR detach",
+    "config_sha256": "cd5c16d94991020f806e50447129060555ca7457545c628899bb7d6832d48e3d",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 7,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-IV-GR detach",
+    "config_sha256": "ba3f24e9763d631d31ada5d1479d7dfb32dae63626c539c354ffdb55cbcfe33c",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 8,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-IV-AR detach",
+    "config_sha256": "d288e802b364410e0ab55e83f707b9260cb4550162bcd163a374157d42aee7cb",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 9,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-FS-GR detach",
+    "config_sha256": "93c54e31df0951747cb38eca9ffb300cca8b5555e36eb406e1323f5affab3e32",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-FS-AR detach",
+    "config_sha256": "ea962edd6991c64a3ee22634aa4c1563264a7b01f1f33872ffeacd5dbfbced73",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 11,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-IV-GR detach",
+    "config_sha256": "02cb3f423cb5f932e9ad1ecce456801427a524b5040d7be044c2c89d86f577ea",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 12,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-IV-AR detach",
+    "config_sha256": "c805c269d06485f39a04e53d79908f7fb72b5f6ca825d88e00498a3f0f862877",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 13,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-FS-GR detach",
+    "config_sha256": "ff858cdd881be4de8e0ea9b6340d31c85643521129304b8715e16aa853ee7047",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_cub20/queues/queue_ant_detach_cub20_wolverine_gpu0.txt",
+    "line": 14,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-FS-AR detach",
+    "config_sha256": "c5ae034d186b7aaa94a2f0dd0d1b97195f7bb1081bb1c47f974074951e21cfff",
+    "log_dir": "/var/tmp/tiago/ANT_detach_cub20_20260904/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 4,
+    "queue_seed": 1993,
+    "description": "C100 10-10 ANT-IV-GR detach",
+    "config_sha256": "276b2d151b240b5aaa6f9624db7995882c1cd1853de63c0a021ffef0623446bf",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 5,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 ANT-IV-GR detach",
+    "config_sha256": "048887913557adab208b79c611c595e33ff6ba0c559a216c90c41342aff57d75",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "C100 10-10 ANT-IV-AR detach",
+    "config_sha256": "d4647f842bbd4aac03691ba33cadd8186120188ad7240f543ef5c3b7a54812ef",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 7,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 ANT-IV-AR detach",
+    "config_sha256": "229da82b26619381b74a452b37dc4877931b53f758ad6f05158fa5af3c91830d",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 8,
+    "queue_seed": 1993,
+    "description": "C100 10-10 ANT-FS-GR detach",
+    "config_sha256": "278b39a7b8163d33889561579839d6f9b87e6e3e8eab56f0f9455715ed097811",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 ANT-FS-GR detach",
+    "config_sha256": "372a41d8260d0fcb6bc74cbb0d4d55230ff68c77d8ca2db5ea9621c570d00662",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "C100 10-10 ANT-IV-GR detach",
+    "config_sha256": "2e4b3f092853086de13bc4cacd01e90314ef46e889897ab34677bfeb40213b7d",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 11,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 ANT-IV-GR detach",
+    "config_sha256": "5f84f45eea6476349481b6eb6a9d0a89b449c003e16588f7192f7de11934a130",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "C100 10-10 ANT-IV-AR detach",
+    "config_sha256": "b5675686fe941285d50aa4838b0aa19b19479eacebe6d96c5711caf86f20dbc7",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 ANT-IV-AR detach",
+    "config_sha256": "f618423d66d805b878d6edb47a9211e7cd71dfbe41a0fa5cb233aa6d1089492e",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "C100 10-10 ANT-FS-GR detach",
+    "config_sha256": "2ff0a8d97a192d9144e7c007fa78b828f8bd586d89d9bbe6e40d6f275d02b15d",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 15,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 ANT-FS-GR detach",
+    "config_sha256": "329c1faf00b3ecc580f70fc8abce27cd22ad1ee0c2f8f8e4e92d255c7c1a28ef",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 16,
+    "queue_seed": 1995,
+    "description": "C100 10-10 ANT-IV-GR detach",
+    "config_sha256": "11cfe5c60806e6341660ecbb48136019fc5b7c0f7395cd2b2377846dfca0f2f2",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 17,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 ANT-IV-GR detach",
+    "config_sha256": "d22cf76c9e8804351f642a6ed7afdc58506cd3f99b579cc575197d8aa4119fb2",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 18,
+    "queue_seed": 1995,
+    "description": "C100 10-10 ANT-IV-AR detach",
+    "config_sha256": "53270ce088213b7dc89db29df62e2e890e5f0f0b28a48ed6235d26ce659d9ae7",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 ANT-IV-AR detach",
+    "config_sha256": "3ce9e82baf1b21245855cad7556457bf001a41990135dd7f12fc66feb205cbd8",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 20,
+    "queue_seed": 1995,
+    "description": "C100 10-10 ANT-FS-GR detach",
+    "config_sha256": "225b7a1bfba8b2f3590a4045afa006b7f5bbdd5ad7a10fbb186bd9816270480d",
+    "log_dir": "logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_local.txt",
+    "line": 21,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 ANT-FS-GR detach",
+    "config_sha256": "a0ba5c47ccdb0c883e7dfbd6e40095bbef25695c503b05a0e7fcce574fa7f434",
+    "log_dir": "logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 4,
+    "queue_seed": 1993,
+    "description": "C100 50-10 ANT-IV-GR detach",
+    "config_sha256": "8b7b82769b1499e9b5801c94b1e3eda7d16eb86af74caa0616e286ca9b1fd05e",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 5,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 ANT-IV-GR detach",
+    "config_sha256": "85bbf50ef701d937edd9538f19d3a6301c90b3f1b4bbe01fecc67357ae893598",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "C100 50-10 ANT-IV-AR detach",
+    "config_sha256": "15cc4f296597302eadd379446d3ef77bccc0d580d4f97df3426e7287634a04aa",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 7,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 ANT-IV-AR detach",
+    "config_sha256": "fab97ddba6c1b23cf71b17b1b8564dad7be7e8ba8f56e488fe0f28f649ac9ba8",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 8,
+    "queue_seed": 1993,
+    "description": "C100 50-10 ANT-FS-GR detach",
+    "config_sha256": "797e01cace97012b9f7ec98daf6803ac29d08c7b60d39ebcbbbf030e2dbf0723",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 ANT-FS-GR detach",
+    "config_sha256": "ec9c6eec2b0b36a53048b904406605156b5afacfad2e66fc32f4b2cde7453828",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "C100 50-10 ANT-IV-GR detach",
+    "config_sha256": "8e7a88ce02494ccf8d02fed55451c76082fd24a397104e972a3dfe9472608866",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 11,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 ANT-IV-GR detach",
+    "config_sha256": "9cdaa04efe6c781e6b1d117cb02a5a692e5d2f456411d4c9f866b5782e4725ae",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "C100 50-10 ANT-IV-AR detach",
+    "config_sha256": "06ac363b4d3e0e619618371849aabbafb6fac54fbc6693d9eddf6d561e29c5d7",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 ANT-IV-AR detach",
+    "config_sha256": "bb6b3d62983aeae72d6228f8dc1bd61c9a6c63cdf0b0ce294dc13d4f60cce7ab",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "C100 50-10 ANT-FS-GR detach",
+    "config_sha256": "368eba50f88cf735f99c33b9a8040fc5eb3fc2fd287a368bfd63a8e5ed72d341",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 15,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 ANT-FS-GR detach",
+    "config_sha256": "37d98b7992e3b20b46b248c2cff9192b0956f3969cba3950eb2a5414b1287e75",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 16,
+    "queue_seed": 1995,
+    "description": "C100 50-10 ANT-IV-GR detach",
+    "config_sha256": "cf1563565f4ee90ca4ff6b8eb175adc9750efe0a26e5fa44b4d895d49b6e4a26",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 17,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 ANT-IV-GR detach",
+    "config_sha256": "11d2f09469db4d1ef041f5b3960f5b4c79f347161b994de8b2c6830bf3accbb3",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 18,
+    "queue_seed": 1995,
+    "description": "C100 50-10 ANT-IV-AR detach",
+    "config_sha256": "08bb8159cc1b371367048b2cf973dfc827dc8f7c5ef4ba7aa868d4ffcf13aa03",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 ANT-IV-AR detach",
+    "config_sha256": "6828a8e9d5f464d487cecca72de6cb610b86b5f9a475ef554f0fae51084fb28c",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 20,
+    "queue_seed": 1995,
+    "description": "C100 50-10 ANT-FS-GR detach",
+    "config_sha256": "83d239343a42d063eb27ccc05a44a60d2f680dd2199d401b7eaf7605080091d2",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine.txt",
+    "line": 21,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 ANT-FS-GR detach",
+    "config_sha256": "471668fc8ff2db3d7d3e2aed5c9b2f8f97417a53c23a8b5d3ea66618effd996f",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine_recovery.txt",
+    "line": 3,
+    "queue_seed": 1995,
+    "description": "C100 50-10 ANT-IV-GR detach recovery",
+    "config_sha256": "cf1563565f4ee90ca4ff6b8eb175adc9750efe0a26e5fa44b4d895d49b6e4a26",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_detach_factorial/queues/queue_ant_detach_factorial_wolverine_recovery.txt",
+    "line": 4,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 ANT-IV-GR detach recovery",
+    "config_sha256": "11d2f09469db4d1ef041f5b3960f5b4c79f347161b994de8b2c6830bf3accbb3",
+    "log_dir": "/var/tmp/tiago/ANT_detach_factorial_20260831/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "C100 10-10 ANT-FS-GR puro",
+    "config_sha256": "84ad9e2b77eba6a80732247824cd15c35d29f15fe4ca9a2ddcfdd3b5e0094897",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 10,
+    "queue_seed": 1993,
+    "description": "C100 50-10 ANT-FS-GR puro",
+    "config_sha256": "acde92399b6f14aa5c444bafb4ad7e9826aa3a3c8740645a1b84748878e5d831",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 11,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 ANT-FS-GR puro",
+    "config_sha256": "0cc46318713d6f1fc4ef2c8d5adbeab574f836b32dc0d5be2e34e207c13ef58a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 12,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 ANT-FS-GR puro",
+    "config_sha256": "9e8d36057883d29a20ae2999b45b0c7074f04613852720aa2b4a3916f3548b97",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 13,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-FS-GR puro",
+    "config_sha256": "2e1b9db6c7f777e7336f2cfa613ee611bd2c6baf335e109b0238195265dfe8e2",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 16,
+    "queue_seed": 1994,
+    "description": "C100 10-10 ANT-FS-GR puro",
+    "config_sha256": "6e8fb1c02e7a3968b25c8d3272c73e5e14b7744822ae9caf2b411b706c83b08e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 17,
+    "queue_seed": 1994,
+    "description": "C100 50-10 ANT-FS-GR puro",
+    "config_sha256": "c7903e0430b3f4e07bc0d157d03675907ce6761f510148259155c10528180645",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 18,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 ANT-FS-GR puro",
+    "config_sha256": "4a1e1f0a316e9bc949f683807d2f294c1bafe55907d8123d6b6f855e879ba10a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 19,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 ANT-FS-GR puro",
+    "config_sha256": "7ba3e5ca480c6200465cba01a222916fc6239f15ee719d3f966f885e06ccb414",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 20,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-FS-GR puro",
+    "config_sha256": "468990791c998da567d7e194465d2d49aaac0f9bfaba360671e6c41997a30b3f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 23,
+    "queue_seed": 1995,
+    "description": "C100 10-10 ANT-FS-GR puro",
+    "config_sha256": "ae1548e2f7f556eca03e2c765280be768071305580833a381144da2e49c9deda",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 24,
+    "queue_seed": 1995,
+    "description": "C100 50-10 ANT-FS-GR puro",
+    "config_sha256": "d8c84ff5c3c93e1bffd41c370b08938510c8adee59cafc0c898f3a563cb5196e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 25,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 ANT-FS-GR puro",
+    "config_sha256": "b0a11f4c2c3ee09fc735de728dd709103aaf24ed41fbe7457881f9eaa1ba45b0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 26,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 ANT-FS-GR puro",
+    "config_sha256": "4eeae3c4d3fc4d0330e6bc6cd097484c509ab9e073afc51fb13a23cb8df491a2",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ant_fs_gr/queues/queue_ant_fs_gr.txt",
+    "line": 27,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-FS-GR puro",
+    "config_sha256": "b6a30e281826174780f4c126496949d325f39df6d0d10040e50481f5cd0d8bc9",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 7,
+    "queue_seed": 1993,
+    "description": "C100-10-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "68f44dc0f208aecc6fb16b08b19ddb115f94325be82419dac8ba129540d74a37",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 8,
+    "queue_seed": 1993,
+    "description": "C100-50-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "2c943ece68cac85fb7d0c7beba10d05579f9a927fd47b76eabd2188076bef3b2",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "TIN-20-20 ANT-FS-AR + RefDetach",
+    "config_sha256": "6286c424575cb38fe3de9abf8c5355bf48c2f981ae1fd16b82648e10a1697177",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1993"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "C100-10-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "2ddab42a6d078d7b888db2e3cb71066ac2eb8ebcfcb5baf47a3a6552fc20a350",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "C100-50-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "a1d6a527c3868c2e911ac300cea73a32387f3b20ea7bbbffe6aea4e2e1f7aed5",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "TIN-20-20 ANT-FS-AR + RefDetach",
+    "config_sha256": "ffe08f24bc9861f56690ba054ba43cb8803610c2e2d301e686eaf9208d2e74f1",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 17,
+    "queue_seed": 1995,
+    "description": "C100-10-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "5e2d72ba46848e277b6ca8a6053903b9420c2684e561347fa726c56c433204de",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 18,
+    "queue_seed": 1995,
+    "description": "C100-50-10 ANT-FS-AR + RefDetach",
+    "config_sha256": "e35c111c3a8e909aee1667692ec8202f9fcd6722d8c295ea3de90c9f31b1b12d",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/ant_refdetach/queues/queue_ant_refdetach.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "TIN-20-20 ANT-FS-AR + RefDetach",
+    "config_sha256": "b63fb2dc3918bafafade2c8a3d5f2b8d2f972d246e6f7bced67e681fd2bcaa17",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 8,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aLocal nLocal avgK=3",
+    "config_sha256": "1ac589ee774088f129776403e51a37fbc70f2b9c92452830313eba2686a059fb",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aLocal nLocal avgK=5",
+    "config_sha256": "f0479d959ac1792033b9a4356af4945095d9f06d84556676df9d8d9d0587f2ce",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 10,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aLocal nLocal avgK=10",
+    "config_sha256": "0968b2ddd9f6dd8f0ac212725b3f9fb2ca762ff8f67b9c8628c8dcb91c6908a3",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 13,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aSymFull nLocal avgK=3",
+    "config_sha256": "b9bb38ef4eeb43fa6bc1841b480f81db895728a043e54effdd9e5988e20bf074",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 14,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aSymFull nLocal avgK=5",
+    "config_sha256": "bec17730eef76b2be82f37ad11a3723eb934d923bd59bfe6bb2589d5dbeea367",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 15,
+    "queue_seed": 1993,
+    "description": "[C100-10-10] aSymFull nLocal avgK=10",
+    "config_sha256": "516cb099001ac01b26eec54261131f243b7c4173530264acfbb084a917788355",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 19,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aLocal nLocal avgK=3",
+    "config_sha256": "e0f5bb0e97ccd0eeaf0d913d454858d4a5d5d4de9af800a12b7de4c1e79b9cb5",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 20,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aLocal nLocal avgK=5",
+    "config_sha256": "a5e8886bf9737e0daf990177bccbdd2db287df8d56e9ee650820f0613126e15b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 21,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aLocal nLocal avgK=10",
+    "config_sha256": "3495d1ac520aa052127b6a29a11e99c58f8369c7a50a00cef834a8b82052d776",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 24,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aSymFull nLocal avgK=3",
+    "config_sha256": "aaa56a81e8228b021ad92a8b0eb8987d165ff1d2e08c59aeb99d7bcd81d16f5f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 25,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aSymFull nLocal avgK=5",
+    "config_sha256": "9c2ce3aea98c86697069a1f7c4f225993f0565a386630156a3b7a1ff910a57c4",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 26,
+    "queue_seed": 1993,
+    "description": "[C100-50-10] aSymFull nLocal avgK=10",
+    "config_sha256": "f3ffdc1ae83bf04de63b48571f7e0d8b529bda1c4542fbc4e068f2be8ecaa99d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 30,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aLocal nLocal avgK=3",
+    "config_sha256": "8c9e698dfc4867e12fcc4d7e4032ce22d0e5301fe8ff86dc1afa959f87b165bb",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 31,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aLocal nLocal avgK=5",
+    "config_sha256": "34612403f90fcc131dfb7d96813d922a45cc226e6340ba8a57d9883d880dc05b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 32,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aLocal nLocal avgK=10",
+    "config_sha256": "7b170e154a8e22a6f5fd27c5193a5655e6641b139ac1dc63abf2c687c0b07572",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 35,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aSymFull nLocal avgK=3",
+    "config_sha256": "d8e25cf2e68ebfd8f80d9b87c69b98b19320f050eaef9df1da37a79aa353c9cf",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 36,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aSymFull nLocal avgK=5",
+    "config_sha256": "2868b368f814cbaead356b1f880b7d9d92da504c919228950d0fc1603b563cf0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 37,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aSymFull nLocal avgK=10",
+    "config_sha256": "d2e70039f1348847cb10e8224d05133a0c8b9260ce8886e06fd319e62497238c",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 41,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aLocal nLocal avgK=3",
+    "config_sha256": "b20f959446a498e5763ecd91bdac2bc1309a930dbc1925a64ee79662b4a01cb9",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 42,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aLocal nLocal avgK=5",
+    "config_sha256": "45385b92e813bd1bbb91a1f67a209a87ab9d7728305281b3292932d37b201dcc",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 43,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aLocal nLocal avgK=10",
+    "config_sha256": "0a60887a232f35ab2ff8c08e9b1b0ec280f958e0f88ca6c628b5351c176c7e5a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 46,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aSymFull nLocal avgK=3",
+    "config_sha256": "eafdd3d4f93d4cb1a4b18a9e570f0bb73398b7cd70ef90f123dca80ef4238024",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 47,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aSymFull nLocal avgK=5",
+    "config_sha256": "56881981e2af6fe5f261933420d33f25f8246c6c80f82ebeda343faa7f7ab40a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/avgk/queues/queue_avgk.txt",
+    "line": 48,
+    "queue_seed": 1993,
+    "description": "[TIN-20-20] aSymFull nLocal avgK=10",
+    "config_sha256": "ae1784e23d6ec8692c6f919de0ca01132dff8afeba245b8455be192adb637c1b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "C100 10-10 Baseline + TeacherAvg-3",
+    "config_sha256": "f9ef70de7b1380418aadcac8fcb42e6b6ac6b65d44d098b529727ced60bed761",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 7,
+    "queue_seed": 1994,
+    "description": "C100 10-10 Baseline + TeacherAvg-3",
+    "config_sha256": "b8b5f35f30239861f02493492b678432170a5b3ba423d8595e3b6233f53b54d4",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 8,
+    "queue_seed": 1995,
+    "description": "C100 10-10 Baseline + TeacherAvg-3",
+    "config_sha256": "e57e1eb53c7c1b4f9f2336149dc6466771edd7e5bd4c62ac5f1881b416bb208b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "C100 50-10 Baseline + TeacherAvg-3",
+    "config_sha256": "c4314401ff272a4d1ff2c09af6da755025ee1e83079bed2b2633c1909280ed0b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "C100 50-10 Baseline + TeacherAvg-3",
+    "config_sha256": "07cefddad9031062a7b028ddedefb254db74565d5a75320964c8a44bbfb8d61f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 11,
+    "queue_seed": 1995,
+    "description": "C100 50-10 Baseline + TeacherAvg-3",
+    "config_sha256": "0c3d1e02cda31d3bef0754f66b47b95705e060edbc5d9f2a5eb276f183440135",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 12,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 Baseline + TeacherAvg-3",
+    "config_sha256": "26bd247c9c6f2d85d52b9d57bb35e85d1f29007c5cb24f2cba80f086a5e0adbe",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 Baseline + TeacherAvg-3",
+    "config_sha256": "0330565bfaa7bf20e208a85cf7b35a2bcdbdcc25894aaa869264f7605dd0eb8f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 14,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 Baseline + TeacherAvg-3",
+    "config_sha256": "318ddb3a15b357390a948217370d6df12294b1c02e368befa64237937adf3ff9",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 15,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 Baseline + TeacherAvg-3",
+    "config_sha256": "89f0a2f79b98a25161ad999228db92f075d9a7e470a4727721dda7553332d0a8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 16,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 Baseline + TeacherAvg-3",
+    "config_sha256": "a0954cff63e1d2995e242191d5439a14c102506a91f972d1fecb6710c2e0f663",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 17,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 Baseline + TeacherAvg-3",
+    "config_sha256": "579f53768aeb472b4ed445758a8bd1f2abd8da4edca6c4af84a4cd47bfdcf288",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 20,
+    "queue_seed": 1993,
+    "description": "C100 10-10 Baseline + TeacherAvg-5",
+    "config_sha256": "b30767cdc75650bd68983d9844717cc0f8df47a5c8d97050b68490ec388bb0a0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 21,
+    "queue_seed": 1994,
+    "description": "C100 10-10 Baseline + TeacherAvg-5",
+    "config_sha256": "cc82b350dc0e42bbc1946f277cce61d3ba2b9eba98207fc91a691c24b050a080",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 22,
+    "queue_seed": 1995,
+    "description": "C100 10-10 Baseline + TeacherAvg-5",
+    "config_sha256": "8dcc80f0077b86ace8c925a47e0b908221c4db71382b0deda5c79c09922d41da",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 23,
+    "queue_seed": 1993,
+    "description": "C100 50-10 Baseline + TeacherAvg-5",
+    "config_sha256": "d2eaf4f8fc897525d4427391e36f055d4446f48bda028ef4d144a6e6488f2382",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 24,
+    "queue_seed": 1994,
+    "description": "C100 50-10 Baseline + TeacherAvg-5",
+    "config_sha256": "cc8e6f6d32c86809e186b0214d4c7feab8931d9dadfec257891728242f59662f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 25,
+    "queue_seed": 1995,
+    "description": "C100 50-10 Baseline + TeacherAvg-5",
+    "config_sha256": "b2aaa4b8056b63722d7f5ae20ffb5f894a83d90f4b3a2a802b057b2a40b35a16",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 26,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 Baseline + TeacherAvg-5",
+    "config_sha256": "0239b7acefa95b20e220cce024fa19b6fb4497fba4a7e14660969ddd92a6cfee",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 27,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 Baseline + TeacherAvg-5",
+    "config_sha256": "3240c7143afa3bfe044601f7a3be6d8b5884e169afca8c0ad2496bc1a9800de0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 28,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 Baseline + TeacherAvg-5",
+    "config_sha256": "674e702e83d64112eb6aaa1ffde90cbeaf4a064327c8971877eb82ff6e1e0419",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 29,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 Baseline + TeacherAvg-5",
+    "config_sha256": "39cf676b91f24eb4c0750520695a1dcaf82a418e3d675251a7d0ce0a1b365a30",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 30,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 Baseline + TeacherAvg-5",
+    "config_sha256": "27271a360e75592fe5735dae96b54b79312563c4c2aa33b774adb8c317c7656c",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 31,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 Baseline + TeacherAvg-5",
+    "config_sha256": "dc201651cbc614625729369669b74ee1e6b795261094b51dc802f022024ff590",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 34,
+    "queue_seed": 1993,
+    "description": "C100 10-10 Baseline + TeacherAvg-10",
+    "config_sha256": "906183a14d05847d44ef3e77a288570bb681c24d490b3a37a8616665daaea397",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 35,
+    "queue_seed": 1994,
+    "description": "C100 10-10 Baseline + TeacherAvg-10",
+    "config_sha256": "569d974e3b872b059be4601f714f4ef9672478351bf55c7621e07ebb3284b771",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 36,
+    "queue_seed": 1995,
+    "description": "C100 10-10 Baseline + TeacherAvg-10",
+    "config_sha256": "6ef76f1975d59db6b5f022e48918a4dc33ff085009b22e340ae7e085ef72a680",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 37,
+    "queue_seed": 1993,
+    "description": "C100 50-10 Baseline + TeacherAvg-10",
+    "config_sha256": "21641a410562228ad638c3fadb730ca128195edf548432358fd1b87e7e0c30c1",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 38,
+    "queue_seed": 1994,
+    "description": "C100 50-10 Baseline + TeacherAvg-10",
+    "config_sha256": "04f696c31eb457378315d3633fc6a6953399012eb94e23dd3d69a782ea22c21d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 39,
+    "queue_seed": 1995,
+    "description": "C100 50-10 Baseline + TeacherAvg-10",
+    "config_sha256": "8598a10a04edb0b0e369a51294cf8eb9a2120e66b3dc0e7220b74208b4cd6293",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 40,
+    "queue_seed": 1993,
+    "description": "TIN 20-20 Baseline + TeacherAvg-10",
+    "config_sha256": "8508c5915ddfa6dc9fe645287caf918bac90381230b32829e9e14e850aeea334",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 41,
+    "queue_seed": 1994,
+    "description": "TIN 20-20 Baseline + TeacherAvg-10",
+    "config_sha256": "0c34bfebe972a33983d4f9f0e4c3286567871439667deeb99321cec4adf752b8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 42,
+    "queue_seed": 1995,
+    "description": "TIN 20-20 Baseline + TeacherAvg-10",
+    "config_sha256": "8aacc77c1b09f75e7378595257367da8e14e79a6f1fd9e20d067ae57e7146d24",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 43,
+    "queue_seed": 1993,
+    "description": "TIN 100-20 Baseline + TeacherAvg-10",
+    "config_sha256": "c313cf2c56f2423a0d1824682a8cd16d91e5259048c9538be373bd2a08a60017",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 44,
+    "queue_seed": 1994,
+    "description": "TIN 100-20 Baseline + TeacherAvg-10",
+    "config_sha256": "8cc648f5ad19c28328e47389d9d50f9372f90b7c8ff40a74b744623be28296ca",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/baseline_teacheravg/queues/queue_baseline_teacheravg.txt",
+    "line": 45,
+    "queue_seed": 1995,
+    "description": "TIN 100-20 Baseline + TeacherAvg-10",
+    "config_sha256": "d22a34f319af0d4c8489d7f37f91a53778ac64f644624cb2334b56fea571e5f1",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "b795d9e8fc80f1ac558677df128b48ba4044f6779c33f0e9706cfe1c7a567ca8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 11,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "d0fada4517857331aa02b68571f8ea88fd70372fc30719984c9d1bed49519309",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "fcc87624768b1703d875d44be04597d12d289f0c8a9d2683145e14fa92d75424",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "fc22c2bef26c8c900ea33aabc61ef4e4d2195e4ba3097978e70573ef5e2b2c50",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "7ad6d93c5c23c2f2249efb57dae99d0746ba5257a065bf1f6b63e8b5e36f3e0e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 15,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "652a115fdeb34e1063245dba35eda09f5abe8aaf386e3b08768b53a760c008eb",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 18,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "d66c7f22a56055305ea6f36466462a22a4828ab7bcb662ba232a4e29dd84336d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "1c23e09397d5cad387d5097533d130e332d8dd46e9375c387ba91ebb3e74e2cc",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 20,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "ada317548cd4492efb429c90c7d4a293c670c869231fd6b334aaa8a20767d794",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 21,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "74c3287e3defab7ad4ae2dad03567ea15fa65814256405951312d81bf4352922",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 22,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "dd2bec79ad08ac25ea117ae0a2d7b6ea46fe3b845c8628c715c95c93d612987b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 23,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "f1564d3c46f995d5c0c7c2cbe51f854f2942cdc784d3e760a4c8eeb270c6d7d8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 24,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "239ff9780bca8564fe106a974dc419d0f004746a6b912f7b6922fe653bb82b1c",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 25,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "89da8af4e457b554b07f75ddf061d78bdb9c40fdf8d56da7cb52c2fb9ee5bcac",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 26,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "e4f5ff5b883691a2bdfdcc2339528565b4f1ad025177705aadfda0e8ceebe584",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 27,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "3c9d61b8bde69418b15111f6a112bd7cb0ca4533fdcb04197333f147741ffbfb",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 28,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "ff5f039eb592229303c4085b7b1ffd69538efad1ba43c89cd5cada96fe68980b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 29,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "89c777c6d9e84637cda21c9314e3245dcba9d0b7b43147921add6fdd8320e47a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 32,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "6cd65a6c1d66f1c840ccf24aeab791e56afe7d3f43abbb9568260cbf52955ab2",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 33,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "978b2682fb102ebf5ddbfc8bb3ef29767ce6737d23c720445f4f543e86ce75b0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 34,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0 aGlobal nGlobal",
+    "config_sha256": "c3451d6c994e51cb08b1db2856c653973ffa6a140faadb9b491764feed4a347d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 35,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "171baaf4c156396c9d72792b5a40ce431066452f93f1ab28139a5f4ff25a8dff",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 36,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "1b3625f301c87a8af5e5e188c6c225a4cf4505bcb579115d8de03c78cb815cdc",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 37,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal",
+    "config_sha256": "e42c137994cd44f918ee82726f76fb917eef25f10200f4ad6787255fc31b44ad",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 38,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "f2eb4dad412e125b64801edc0b74696cb2f5cac23a8d3a1fc99e337424d9eb12",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 39,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "12f24498a9595e19a0371e699ce3c792af9436a1e02be2cb9af5ff16b498d8e5",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 40,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK5",
+    "config_sha256": "243a7961d47acf54e90d77ed288d2cfc980a237356caccd87ddd7d96b7338340",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 41,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "10c60548e4a3b8de8a6fa4999cff081e59effabbee8511ca608e0ef369ef3126",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 42,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "d7ccf90885d78cd1e5f02e46d326eaeafc0cb2fdbccc84a2b1d1b0550d09353d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 43,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0.5 aLocal nLocal avgK10",
+    "config_sha256": "51f92ee483ce9dc0a1b0e1eaf998ac794166a12577a3414d398f26054208cb13",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 44,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "352aca32e4d21f4763f0ca6951d72a8d646fa9f113715a2db1fd05751081d728",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 45,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "f4d1035d73ffebfb0e5d3f3fc99e58001b753a2ff3bc921e8dc3ad797d7c565f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 46,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal",
+    "config_sha256": "f75bc9806429f69ec135d1e75d4296dbf12c4c6378435d5617e2b90f17d9e262",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 47,
+    "queue_seed": 1994,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "a43860bbe7bb43b1e0a7024548135954a5419e8a6ccff8dfe5a04e7ddbf4bd6f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 48,
+    "queue_seed": 1993,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "545ac2b1130c021536e86361a0acb261e8056fb2763a7cb87e8bf7af4b1ed4ed",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200.txt",
+    "line": 49,
+    "queue_seed": 1995,
+    "description": "CUB-100-20 \u03b2=0.5 aSymFull nLocal avgK10",
+    "config_sha256": "1abafd90d925928f6dfa8ac703d3e18faab958946a1b4fd355ef455932df4916",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK10_s1995"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200_fs_ar_avgk5.txt",
+    "line": 5,
+    "queue_seed": 1994,
+    "description": "CUB-20-20 ANT-FS-AR + TeacherAvg-5",
+    "config_sha256": "15d75cad456947d329f39261816e50e5dbda29ff7e7b3234eae8688e5e43e8a4",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200_fs_ar_avgk5.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "CUB-20-20 ANT-FS-AR + TeacherAvg-5",
+    "config_sha256": "fc8af7daa5083cd66709784865d00eea16916d0fb306f2afb2b3d0860c1304cf",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1993"
+  },
+  {
+    "queue": "experiments/cub200/queues/queue_cub200_fs_ar_avgk5.txt",
+    "line": 7,
+    "queue_seed": 1995,
+    "description": "CUB-20-20 ANT-FS-AR + TeacherAvg-5",
+    "config_sha256": "6890883960b92be59569ed7afb5f4f352da51949aa4a71b9442ec22d64b6aa9e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/cub_iv_gr/queues/queue_cub_iv_gr.txt",
+    "line": 4,
+    "queue_seed": 1993,
+    "description": "CUB 20-20 ANT-IV-GR puro",
+    "config_sha256": "06a68bdf14dc708cae2bfcc1050130872a64d1f62e4ffb0ef96e0e61fb34e315",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/cub_iv_gr/queues/queue_cub_iv_gr.txt",
+    "line": 5,
+    "queue_seed": 1994,
+    "description": "CUB 20-20 ANT-IV-GR puro",
+    "config_sha256": "f352ab1d94d6196790752cfecfc7fc07af765410f516c7c667c9037bc0514f77",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/cub_iv_gr/queues/queue_cub_iv_gr.txt",
+    "line": 6,
+    "queue_seed": 1995,
+    "description": "CUB 20-20 ANT-IV-GR puro",
+    "config_sha256": "d62edf173c4869f1fc1d4879fed05b83d2a38efc0ce237a89434c0aafb20bb05",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cub200_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 6,
+    "queue_seed": 1993,
+    "description": "ImageNet-100 50-10 ANT-FS-GR puro",
+    "config_sha256": "eb41a59c8d0d19562c32f22248766749ccd2dada75ad8ab3dc664dfd37901f93",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 7,
+    "queue_seed": 1993,
+    "description": "ImageNet-100 50-10 ANT-FS-AR puro",
+    "config_sha256": "0d28c68edcc3094ec968c986dd36b70227f0913dc8e64b142e58b6b27413ba30",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 8,
+    "queue_seed": 1993,
+    "description": "ImageNet-100 50-10 ANT-IV-GR puro",
+    "config_sha256": "fae44de4afa2181b42556c9c001f7f98d61470bd4371ff24a89b0612eff651a5",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 9,
+    "queue_seed": 1993,
+    "description": "ImageNet-100 50-10 ANT-IV-AR puro",
+    "config_sha256": "0936c9a42b086a8061237a88145ce40e79221913bfc167a49efd5b68331c9d4b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 11,
+    "queue_seed": 1994,
+    "description": "ImageNet-100 50-10 ANT-FS-GR puro",
+    "config_sha256": "4c862c4546fe10e149ec96b9dbc71d4c62eaa700d4667153ece7d49da40aa393",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "ImageNet-100 50-10 ANT-FS-AR puro",
+    "config_sha256": "c7809a9b3997af572e81d48742bb1838fe61d208d7fce35c7f7119148f5262ad",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "ImageNet-100 50-10 ANT-IV-GR puro",
+    "config_sha256": "00c12ee70ff58a7ac0ab2d05bc3309928c20c005f93b4eab87909429ff82197d",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "ImageNet-100 50-10 ANT-IV-AR puro",
+    "config_sha256": "1c757189bf2a73bad709a3407da9e2232ccaac2e7a35b98d1e163bb364c467ad",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 16,
+    "queue_seed": 1995,
+    "description": "ImageNet-100 50-10 ANT-FS-GR puro",
+    "config_sha256": "398a82db72d7281746e87753cd256176cf398c3f15eeccfcc121bf4a299ddacd",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 17,
+    "queue_seed": 1995,
+    "description": "ImageNet-100 50-10 ANT-FS-AR puro",
+    "config_sha256": "79a1b899fe637f7714bcc08144a1ac0f3d872e9b02bd73a9d6953b0c4183c623",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 18,
+    "queue_seed": 1995,
+    "description": "ImageNet-100 50-10 ANT-IV-GR puro",
+    "config_sha256": "b2cc3717a998cd8289e570b9f8c8ddcde08eaf8abbb85e6c2da39e00129ac062",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/imagenet100/queues/queue_imagenet100_50-10_ant_main.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "ImageNet-100 50-10 ANT-IV-AR puro",
+    "config_sha256": "334c5a9f5948103b1dca76541d03b3e49bca2d492c9e9258e75a67569ee73af7",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 10,
+    "queue_seed": 1994,
+    "description": "C100-10-10 aSymFull avgK5",
+    "config_sha256": "2a46e4496fc77bad5a59375e617f675dd1fb8757d80b76c39acdf078196c74f8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 11,
+    "queue_seed": 1995,
+    "description": "C100-10-10 aSymFull avgK5",
+    "config_sha256": "235538cd6346c257374e9669a560ee86dfd47350d9c7ec951c1859cb8e5c6b7a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 12,
+    "queue_seed": 1994,
+    "description": "C100-10-10 aLocal avgK3",
+    "config_sha256": "7cac09676f1941788216929100389a2b9411700148c9985833ae762f3f81272b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 13,
+    "queue_seed": 1995,
+    "description": "C100-10-10 aLocal avgK3",
+    "config_sha256": "5054ee81167abc242899697900e574e5559a4d8e2e8cd99312fb069c669b1c79",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 14,
+    "queue_seed": 1994,
+    "description": "C100-10-10 aLocal avgK5",
+    "config_sha256": "79d3cccea438a76b1f5f69606833e525aadabe1ded89bafb6ea8072154576420",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 15,
+    "queue_seed": 1995,
+    "description": "C100-10-10 aLocal avgK5",
+    "config_sha256": "ca5591912b877408be474e23f811bd84b5c0b97530c875d2ffdaf98fe1f41819",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 18,
+    "queue_seed": 1994,
+    "description": "C100-50-10 aSymFull avgK5",
+    "config_sha256": "3968898df2463117a4e06dc5cafd6a585240cb624441340895aa9979e39ea2a9",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "C100-50-10 aSymFull avgK5",
+    "config_sha256": "f0ee34be77bc24bb9090770d01e8f75a7ce70d066df1d17ebd40fc0d59996833",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 20,
+    "queue_seed": 1994,
+    "description": "C100-50-10 aLocal avgK3",
+    "config_sha256": "1df59a9a321c8d921edf2b406129ead2f75ce07139d08c62e38deef9f08b0e4f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 21,
+    "queue_seed": 1995,
+    "description": "C100-50-10 aLocal avgK3",
+    "config_sha256": "8917720078c7adf9be26aa37af81b53418aacb757b2f9dc90f9a91bbc150035a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 22,
+    "queue_seed": 1994,
+    "description": "C100-50-10 aLocal avgK5",
+    "config_sha256": "32c0b3ef52a34f02f0c9e005dfcce7b50764a2b147c99575f6778b74804e7b0a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 23,
+    "queue_seed": 1995,
+    "description": "C100-50-10 aLocal avgK5",
+    "config_sha256": "f0cddca93e06d06059040d4a1e21a93112075c1f754f0dd639a075565315dfd4",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 26,
+    "queue_seed": 1994,
+    "description": "TIN-100-20 aSymFull avgK5",
+    "config_sha256": "629bd4ff4c4a2d1b9d36e4b8c307a5deb77ed4cfb0361830f520f0e884a09af0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 27,
+    "queue_seed": 1995,
+    "description": "TIN-100-20 aSymFull avgK5",
+    "config_sha256": "d09f3845779a3766733e720824966c300c35585461d9e6beab2788cc80fd053a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 28,
+    "queue_seed": 1994,
+    "description": "TIN-100-20 aLocal avgK3",
+    "config_sha256": "11416f3c174138427ea9d45c67914f9e47fd6b405b0feb7be4b38ba2153bc209",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 29,
+    "queue_seed": 1995,
+    "description": "TIN-100-20 aLocal avgK3",
+    "config_sha256": "ddd6efb0fed29b41a9cca456cee2bd8745c5a3e3c77418402cc51f4af7b2a094",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 30,
+    "queue_seed": 1994,
+    "description": "TIN-100-20 aLocal avgK5",
+    "config_sha256": "d77789d6c161ab2bc7f67fb2e0a05a062de3404052d28f0c47c1f1f264f22876",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 31,
+    "queue_seed": 1995,
+    "description": "TIN-100-20 aLocal avgK5",
+    "config_sha256": "40cf243fb65d50090bb41fc029abc5e23ade99950ada1423fa827eeda5da9a49",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 34,
+    "queue_seed": 1994,
+    "description": "TIN-20-20 aSymFull avgK5",
+    "config_sha256": "cdb506bcd5ed80f6a6ef3744728c65465b3594e828f6c40a42fced6666aa0bc5",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 35,
+    "queue_seed": 1995,
+    "description": "TIN-20-20 aSymFull avgK5",
+    "config_sha256": "065017d2974365495277ababcdb6eec62f0744845ae6071edeb5ad55767f0247",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 36,
+    "queue_seed": 1994,
+    "description": "TIN-20-20 aLocal avgK3",
+    "config_sha256": "6e21608696733a925ff7201624ece583d1ce0021b943c9c0b970224f4c33b686",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 37,
+    "queue_seed": 1995,
+    "description": "TIN-20-20 aLocal avgK3",
+    "config_sha256": "9d210549347e357ffba39b0341fd8cfd318880ce81eefc34dbdda24df130255c",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_s1995"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 38,
+    "queue_seed": 1994,
+    "description": "TIN-20-20 aLocal avgK5",
+    "config_sha256": "08028c202ca1a0f7e465db349a42fd2fcce2a779bc538dd7bde1e02f36a19dfa",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1994"
+  },
+  {
+    "queue": "experiments/multiseed/queues/queue_multiseed.txt",
+    "line": 39,
+    "queue_seed": 1995,
+    "description": "TIN-20-20 aLocal avgK5",
+    "config_sha256": "418f0f0833f12930bc80a270d53e0249592aa57142a704b0e87961c4e067fb41",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_s1995"
+  },
+  {
+    "queue": "experiments/priority_recovery/queues/queue_priority_recovery.txt",
+    "line": 5,
+    "queue_seed": 1995,
+    "description": "TIN-20-20 ANT-IV-GR \u2014 missing seed",
+    "config_sha256": "f5c8e19383709dae0ece9fdef2defe72660d55cbd9a378a8490ccbe334f28218",
+    "log_dir": "logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/priority_recovery/queues/queue_priority_recovery.txt",
+    "line": 6,
+    "queue_seed": 1994,
+    "description": "TIN-100-20 ANT-FS-AR + RefDetach",
+    "config_sha256": "a1630e2b95f7d8970e7f830feb116cccd7c902cf871050d2acb296ab13bb99a6",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1994"
+  },
+  {
+    "queue": "experiments/priority_recovery/queues/queue_priority_recovery.txt",
+    "line": 7,
+    "queue_seed": 1995,
+    "description": "TIN-100-20 ANT-FS-AR + RefDetach",
+    "config_sha256": "f380b430e0aac2329e17ac447c8be1f992a10bf27c1e840939260f3925e82670",
+    "log_dir": "/var/tmp/tiago/ANT_refdetach_20260824/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_refDetached_s1995"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 14,
+    "queue_seed": 1993,
+    "description": "C100-10-10 aLocal sbsQS020",
+    "config_sha256": "92f602b79e8c885aaaf33c801af896f086671fc2f5c25dc0fd1723e920a6d7f8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 15,
+    "queue_seed": 1993,
+    "description": "C100-10-10 aSymFull sbsQS020",
+    "config_sha256": "79ed24e34aba82e94decf37992ad722c2e020a68383866fec0b404786c890ee5",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 18,
+    "queue_seed": 1993,
+    "description": "C100-50-10 aLocal sbsQS020",
+    "config_sha256": "14f82c21a8b04c2572a48b5616a01c0be101957a7a19f67ae4addc6f5957f29c",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 19,
+    "queue_seed": 1993,
+    "description": "C100-50-10 aSymFull sbsQS020",
+    "config_sha256": "7ec82302649b4607f7b9afb74f1aa215632ba1932d8337809dcb8599d12c2d86",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 22,
+    "queue_seed": 1993,
+    "description": "TIN-100-20 aLocal sbsQS020",
+    "config_sha256": "7cdec3a59157e42c2057b586c2f3d6e0c1061e258881ac4d9ad7e0fa4ba6507e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 23,
+    "queue_seed": 1993,
+    "description": "TIN-100-20 aSymFull sbsQS020",
+    "config_sha256": "a05eaa39625baff56d4d0bbcd3ec0fac9f3a66682822a2ffe85ff8cf032ecf7f",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 26,
+    "queue_seed": 1993,
+    "description": "TIN-20-20 aLocal sbsQS020",
+    "config_sha256": "67940e8818312fedc9155954ffbb5dbb49a68a756bd7e1986a61233a2629263b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/sbs/queues/queue_sbs.txt",
+    "line": 27,
+    "queue_seed": 1993,
+    "description": "TIN-20-20 aSymFull sbsQS020",
+    "config_sha256": "8d48cb41fd6ad83a7f864a7c96ec38c828f6bd94d6e1c6724f34da868d93adc0",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_nceLocal_sbsQ0.20S0.2_s1993"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 7,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aGlobal nGlobal",
+    "config_sha256": "cc06eb27c4d1dbd9b30046717c9cc2be8074d9469eb46bbff77ab76b99d9abb4",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 8,
+    "queue_seed": 1994,
+    "description": "[TIN-100-20] aGlobal nGlobal",
+    "config_sha256": "965b6f75ae3b1477e3526ee2c19f24df3e19661c2bdd542d71ed4e1d69a84173",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 9,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aGlobal nGlobal",
+    "config_sha256": "127315d038d664aacfd09f9231500662bd4553cb9d3862094e401dd2a00e6e73",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 12,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aLocal nGlobal",
+    "config_sha256": "ed229dce673949257e883efc40c7dffab4f41425306a71ca77ae2b65dbcaa09b",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_s1993"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 13,
+    "queue_seed": 1994,
+    "description": "[TIN-100-20] aLocal nGlobal",
+    "config_sha256": "437b8f387880795414f9fd82f133d1e99e8e7e029c200cb6e101a1e3acb5e1a6",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_s1994"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 14,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aLocal nGlobal",
+    "config_sha256": "57d072668566fc4bc3dcfc034e3aef51fe00ac8b3dc644a54d6995a91231a95e",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceGlobal_s1995"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 17,
+    "queue_seed": 1993,
+    "description": "[TIN-100-20] aGlobal nLocal",
+    "config_sha256": "7e9e2ef7f871399bdf4da976a5f02797ec713b1446c1828483aa9445591f75fd",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_s1993"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 18,
+    "queue_seed": 1994,
+    "description": "[TIN-100-20] aGlobal nLocal",
+    "config_sha256": "f35454242c40f458abb8446a5bde015a5d7e5dbb8a9bd570ea589861e77c27e8",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_s1994"
+  },
+  {
+    "queue": "experiments/tin100/queues/queue_tin100_ablation.txt",
+    "line": 19,
+    "queue_seed": 1995,
+    "description": "[TIN-100-20] aGlobal nLocal",
+    "config_sha256": "5e371f497182ac082e8dd3fd68a93919bf9415cffa2c741dc96d082def31b07a",
+    "log_dir": "/home/tiago/TagFex_CVPR2025/logs/exp_tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antGlobal_nceLocal_s1995"
+  }
+]

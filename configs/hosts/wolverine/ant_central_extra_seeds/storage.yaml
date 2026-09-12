@@ -1,0 +1,2 @@
+# Operational overlay for Wolverine; keep it last in every remote queue entry.
+log_dir: /var/tmp/tiago/ANT_central_extra_seeds_20260906/logs

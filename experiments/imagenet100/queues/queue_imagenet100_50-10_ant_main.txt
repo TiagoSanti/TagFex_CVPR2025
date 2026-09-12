@@ -1,0 +1,19 @@
+# ImageNet-100 50-10 — pure ANT 2x2 ablation.
+# Four methods (IV/FS x anchor/global reference) x three seeds = 12 runs.
+# The first run is ANT-FS-GR s1993 so the leading variant exercises the
+# most demanding ANT path before the rest of the queue proceeds.
+
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-FS-GR puro|1993
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|ImageNet-100 50-10 ANT-FS-AR puro|1993
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-GR puro|1993
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-AR puro|1993
+
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-FS-GR puro|1994
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|ImageNet-100 50-10 ANT-FS-AR puro|1994
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-GR puro|1994
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-AR puro|1994
+
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFullGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-FS-GR puro|1995
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|ImageNet-100 50-10 ANT-FS-AR puro|1995
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antGlobal_nceGlobal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-GR puro|1995
+configs/all_in_one/imagenet100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|ImageNet-100 50-10 ANT-IV-AR puro|1995

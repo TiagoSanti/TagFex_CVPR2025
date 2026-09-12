@@ -1,3 +1,9 @@
+> Hipótese de pesquisa, registrada em abril de 2026 e mantida em 11/09/2026.
+> As direções abaixo não são funcionalidades implementadas nem compromisso
+> de execução. A existência de colisões e o benefício de termos preventivos
+> precisam de diagnóstico e controles próprios. Consulte a
+> [formulação atual](ANT_METHOD.md) para separar hipótese e comportamento do código.
+
 # Cross-Task Embedding Collision in Continual Learning
 
 **Author:** Tiago  

@@ -34,7 +34,7 @@ SERIES_STYLE = {
     "β=0.5 aLocal nGlobal":  dict(color="tab:cyan",   marker="v", markersize=7,  linestyle="--", label="β=0.5 aLocal nGlobal (s1993)"),
 }
 
-# ── All data (from results_report.md) ────────────────────────────────────────
+# ── Consolidated experiment data ───────────────────────────────────────────
 # Structure: { dataset_key: { metric: { exp_name: (mean_list, std_list_or_None) } } }
 
 DATA = {

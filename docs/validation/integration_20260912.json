@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-12",
+  "tests": 71,
+  "subtests": 22,
+  "report_tests_after_provenance_update": 21,
+  "queues": 22,
+  "queue_entries": 334,
+  "historical_queue_contracts": 309,
+  "new_queue_contracts": 25,
+  "publication_builds": {
+    "monograph": "passed latexmk -pdf",
+    "article": "passed latexmk -pdf"
+  },
+  "training_on_gpu": "not run",
+  "fresh_environment_install": "not run",
+  "active_checkout": "not modified",
+  "research_inputs": {
+    "frozen_gistlogs": 363
+  },
+  "submodules": {
+    "ANT_Monografia": "eea12fe5ec605ab52a02090b647e58da001e035e",
+    "ANT_WOPFACOM": "c3d88008673edce672583491690b24e2853088a6"
+  }
+}

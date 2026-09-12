@@ -1,0 +1,39 @@
+# Multi-seed queue — 24 runs (seeds 1994, 1995)
+# Format: <config_path>|<description>|<seed>
+#
+# 3 variants × 4 scenarios × 2 seeds = 24 runs
+# Variants: aSymFull avgK5 | aLocal avgK3 | aLocal avgK5
+# Scenarios: C100 10-10 | C100 50-10 | TIN 100-20 | TIN 20-20
+# Seeds: 1994, 1995  (seed 1993 already exists for all variants)
+
+# ── CIFAR-100 10-10 ──────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|C100-10-10 aSymFull avgK5|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|C100-10-10 aSymFull avgK5|1995
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|C100-10-10 aLocal avgK3|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|C100-10-10 aLocal avgK3|1995
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|C100-10-10 aLocal avgK5|1994
+configs/all_in_one/cifar100_10-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|C100-10-10 aLocal avgK5|1995
+
+# ── CIFAR-100 50-10 ──────────────────────────────────────────────────────────
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|C100-50-10 aSymFull avgK5|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|C100-50-10 aSymFull avgK5|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|C100-50-10 aLocal avgK3|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|C100-50-10 aLocal avgK3|1995
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|C100-50-10 aLocal avgK5|1994
+configs/all_in_one/cifar100_50-10_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|C100-50-10 aLocal avgK5|1995
+
+# ── Tiny ImageNet 100-20 ─────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|TIN-100-20 aSymFull avgK5|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|TIN-100-20 aSymFull avgK5|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|TIN-100-20 aLocal avgK3|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|TIN-100-20 aLocal avgK3|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|TIN-100-20 aLocal avgK5|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|TIN-100-20 aLocal avgK5|1995
+
+# ── Tiny ImageNet 20-20 ──────────────────────────────────────────────────────
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|TIN-20-20 aSymFull avgK5|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK5_resnet18.yaml|TIN-20-20 aSymFull avgK5|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|TIN-20-20 aLocal avgK3|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK3_resnet18.yaml|TIN-20-20 aLocal avgK3|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|TIN-20-20 aLocal avgK5|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|TIN-20-20 aLocal avgK5|1995

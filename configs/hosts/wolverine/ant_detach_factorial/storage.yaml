@@ -1,0 +1,4 @@
+# Wolverine storage policy.
+# Its home filesystem is space-constrained, so runs are staged on /var/tmp and
+# synchronized back to Xavier by the dedicated collector.
+log_dir: /var/tmp/tiago/ANT_detach_factorial_20260831/logs

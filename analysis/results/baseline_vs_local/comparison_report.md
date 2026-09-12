@@ -1,3 +1,5 @@
+> Errata editorial (11/09/2026): observação histórica, não comparação causal de dois métodos InfoNCE. O termo “significativa” no texto original não é respaldado por teste apresentado; +0,32 é diferença em pontos percentuais. Consulte [métricas](../../../docs/RESULTS_AND_METRICS.md).
+
 # InfoNCE + Local Anchor: Comparação de Experimentos
 
 **Gerado em**: 2025-11-19 14:15:04

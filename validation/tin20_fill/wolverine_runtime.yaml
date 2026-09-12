@@ -1,0 +1,5 @@
+# Runtime-only overrides for the missing Tiny-ImageNet 20--20 ANT-IV-GR seed.
+# The method and optimization settings remain in the historical experiment YAML.
+log_dir: /home/tiago/ANT_validation_20260812/logs/full/tin20
+output_file_prefix: exp
+debug_similarity: false

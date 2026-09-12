@@ -1,0 +1,6 @@
+# Pipeline validation only; these runs are never included in scientific results.
+init_epochs: 1
+inc_epochs: 1
+eval_interval: 1
+debug_similarity: false
+log_dir: /home/tiago/ANT_validation_20260812/logs/smoke/tin100

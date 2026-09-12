@@ -1,0 +1,3 @@
+# IV-AR: one-way violations, anchor-relative threshold.
+ant_symmetric_full: false
+ant_max_global: false

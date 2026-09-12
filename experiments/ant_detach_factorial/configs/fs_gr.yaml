@@ -1,0 +1,3 @@
+# FS-GR: full symmetric term, global/reference-relative threshold.
+ant_symmetric_full: true
+ant_max_global: true

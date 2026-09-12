@@ -51,39 +51,45 @@ class HerdingIndicesLearner(RehearsalLearner):
 
     @torch.no_grad()
     def reduce_memory(self) -> None:
-        if len(self.memory_samples) == 0 or self.memory_configs.get('fixed_size'):
+        if len(self.memory_samples) == 0:
             return
 
-        previous_memsize_per_class = len(self.memory_samples[0])
-        self.memory_samples = np.array(self.memory_samples)[:, :self.num_exemplars_per_class].tolist()
+        # Always re-extract class_means so they stay in the current feature space.
+        # Only trim samples when fixed_size=False (dynamic budget).
+        is_fixed = self.memory_configs.get('fixed_size', False)
+
+        if not is_fixed:
+            previous_memsize_per_class = len(self.memory_samples[0])
+            self.memory_samples = np.array(self.memory_samples)[:, :self.num_exemplars_per_class].tolist()
 
         if self.distributed is not None:
             rank = self.distributed['rank']
             local_classes, all_num_classes = self.distributed_split_classes(0, len(self.memory_samples))
-            # self.print_logger.debug(f'rank{rank} {local_classes}')
         else:
             rank = 0
             local_classes = np.arange(len(self.memory_samples))
-        
+
         new_class_means = []
-        prog_bar_desc = f"Task {self.state['cur_task']}/{self.state['num_tasks']} Rank{rank} rdcmem [{local_classes[0]}~{local_classes[-1]}][{previous_memsize_per_class}->{self.num_exemplars_per_class}]"
+        if is_fixed:
+            prog_bar_desc = f"Task {self.state['cur_task']}/{self.state['num_tasks']} Rank{rank} updmeans [{local_classes[0]}~{local_classes[-1]}]"
+        else:
+            prog_bar_desc = f"Task {self.state['cur_task']}/{self.state['num_tasks']} Rank{rank} rdcmem [{local_classes[0]}~{local_classes[-1]}][{previous_memsize_per_class}->{self.num_exemplars_per_class}]"
         prog_bar = tqdm(local_classes, desc=prog_bar_desc, position=rank)
         for class_id in prog_bar:
-            # self.print_logger.debug(f'rank{rank} {class_id} in {local_classes}')
             class_indices = self.memory_samples[class_id]
             class_dataset = self.data_manager.get_dataset_by_indices(class_indices, split='train', mode='test')
-            
+
             class_features = self.extract_herding_features(class_dataset)
             class_mean = class_features.mean(0)
             class_mean /= class_mean.norm()
 
             new_class_means.append(class_mean)
         prog_bar.close()
-        
+
         if self.distributed is not None:
             gathered_class_means = self.distributed_gather_classes(torch.stack(new_class_means), all_num_classes)
             new_class_means = [m for m in gathered_class_means]
-        
+
         self.class_means = new_class_means
 
     @torch.no_grad()

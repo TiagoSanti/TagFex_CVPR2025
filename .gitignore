@@ -1,8 +1,5 @@
 __pycache__/
 
-# Generated reports (auto-created by generate_report.py)
-results_report.md
-
 # Experiment logs
 # Keep eval logs (exp_stdlog*.log, exp_gistlog.log) tracked, even in debug runs.
 # Exclude only the heavy debug-specific files:
@@ -28,15 +25,20 @@ papers/
 # All experiment output logs
 logs/
 
+# Raw artifacts from the ANT mechanism observability study
+study_outputs/
+
 # Generated reports
 results_report*.html
 results_report*.pdf
+results_report*.provenance.json
 section0_cross_dataset_overview.html
 
 # Common generated files
 *.pyc
 .pytest_cache/
 .mypy_cache/
+.provenance/cache/
 
 # External/reference projects and papers
 pace/
@@ -55,3 +57,18 @@ paper/*.synctex.gz
 
 # Generated thesis PDF
 paper/monografia.pdf
+
+# Legacy generated Markdown report
+/results_report.md
+
+# Private documentation review working copies
+/.local/documentation-review/
+
+# Private isolated restructuring snapshot
+/.local/restructure-20260911/
+
+# Local editor state, private workspaces and review-only execution guard.
+/.vscode/
+/.local/
+/.snapshot-isolated
+*.orig
