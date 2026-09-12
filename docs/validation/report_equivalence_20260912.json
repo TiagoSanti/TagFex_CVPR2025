@@ -1,0 +1,11 @@
+{
+  "frozen_gistlogs": 363,
+  "selected_html_rows": 298,
+  "statistical_candidates": 299,
+  "tables_and_observations_equal": true,
+  "selected_before_coverage_and_seed_projection": 232,
+  "selected_csv_rows": 228,
+  "observation_blocks": 12,
+  "observation_methods": 17,
+  "comparison": "Same frozen inputs; source paths and provenance source hashes change intentionally with relocation."
+}

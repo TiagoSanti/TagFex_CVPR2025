@@ -1,0 +1,4 @@
+# Analysis dependencies used by the validated 2026-09-12 research environment.
+-r requirements.txt
+autorank==1.3.0
+scipy==1.17.1

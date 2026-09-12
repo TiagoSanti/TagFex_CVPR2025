@@ -67,6 +67,10 @@ histórica até uma migração coordenada. Não mudar só um produtor ou consumi
 
 ## Validação
 
+Foram aprovados 71 testes e 22 subtestes. Monografia e artigo compilaram com
+`latexmk -pdf` em diretórios privados. A instalação limpa de dependências e
+treinamentos completos em GPU não foram executados.
+
 Os testes automatizados cobrem os contratos antigos e novos, overrides de
 backbone, separação de identidades, retomada, locks, preflight, CLI e seleção.
 Os dois orquestradores foram executados em fixtures com o lançador de GPU
@@ -88,3 +92,10 @@ Revalidar processos, unidades, fila aberta e coleta em cada host antes de migrar
 um checkout operacional. Atualizar a branch remota não autoriza interromper as
 campanhas nem mudar seus caminhos em uso. Os registros operacionais anteriores
 são observações datadas, não um monitoramento em tempo real.
+
+## Histórico remoto
+
+O histórico de `origin/main` foi incorporado à branch de integração. O gitlink
+anterior do artigo apontava para `6e5369c6574afb7360d34e7a7a3f2051105f9c2c`,
+que o remoto recusou fornecer (`not our ref`). A nova referência usa um commit
+validado descendente do `main` disponível no repositório do artigo.

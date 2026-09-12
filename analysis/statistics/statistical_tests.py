@@ -440,7 +440,8 @@ def run_analysis(
     }
     source_files = [
         file_record(Path(__file__).resolve(), root=repo),
-        file_record((repo / "utils" / "provenance.py").resolve(), root=repo),
+        *[file_record((repo / "utils" / name).resolve(), root=repo)
+          for name in ("provenance.py", "research_identity.py", "argument.py")],
     ]
     manifest = {
         "schema": SCHEMA_NAME,

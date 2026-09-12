@@ -36,11 +36,11 @@ python -m pip install -r requirements.txt
 ```
 
 O ambiente usado localmente é Python 3.11 com PyTorch/CUDA. Confira a
-compatibilidade do host antes de treinar. `requirements.txt` ainda não declara
-todas as ferramentas de análise: `autorank` e SciPy são utilizados na
-estatística; `pytest` nos testes e Streamlit no viewer. O arquivo atual não
-deve ser tratado como lock completo dessas ferramentas. Não reinstale o
-ambiente compartilhado de um treinamento ativo.
+compatibilidade do host antes de treinar. Para análise, instale
+`requirements-analysis.txt`; para testes, `requirements-dev.txt`. Esses arquivos
+registram as dependências usadas na validação, mas não houve reinstalação limpa
+do ambiente CUDA. O viewer opcional ainda requer Streamlit separadamente.
+Não reinstale o ambiente compartilhado de um treinamento ativo.
 
 - CIFAR-100: carregador com download automático.
 - Tiny ImageNet: `python setup_tiny_imagenet.py --help`.

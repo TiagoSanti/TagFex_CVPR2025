@@ -162,7 +162,10 @@ def main() -> None:
     print("OK: small_base=true, batch=64, num_aug=2, memória=2000")
     print("OK: ANT canônico detached; InfoNCE nceGlobal; sem TeacherAvg/SBS")
     print("OK: log_dir=./logs; configuração estática validada")
-    print(f"INFO: execuções completas que serão puladas: {len(set(existing_complete))}")
+    if args.inspect_logs:
+        print(f"INFO: candidatos com seis tarefas: {len(set(existing_complete))}; a retomada exige proveniência compatível")
+    else:
+        print("INFO: logs não inspecionados; validação estática somente")
 
 
 if __name__ == "__main__":

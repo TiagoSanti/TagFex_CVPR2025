@@ -2283,7 +2283,7 @@ def _report_provenance(
             f"Strict provenance rejected {len(missing)} selected experiments "
             "without run manifests"
         )
-    source_paths = [Path(__file__).resolve(), repo / "utils" / "provenance.py"]
+    source_paths = [Path(__file__).resolve(), *[repo / "utils" / name for name in ("provenance.py", "research_identity.py", "argument.py")]]
     source_records = [file_record(path, root=repo) for path in source_paths]
     parameters = {
         "mode": mode,
