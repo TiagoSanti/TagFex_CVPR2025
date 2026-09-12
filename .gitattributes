@@ -1,0 +1,7 @@
+
+# Markdown hard breaks and historical quoted text are intentional.
+*.md whitespace=-blank-at-eol
+# Preserve CSV data generated with CRLF without treating CR as trailing spaces.
+*.csv whitespace=cr-at-eol
+# Generated vector paths retain their renderer formatting.
+*.svg whitespace=-blank-at-eol

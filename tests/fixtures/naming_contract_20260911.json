@@ -1,0 +1,1088 @@
+[
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antLocal_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antLocal_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antLocal_nceLocal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antLocal_nceLocal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antLocal_nceLocal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antLocal_nceLocal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": false,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antGlobal_nceGlobal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFull_nceLocal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFull_nceLocal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": false,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFull_nceLocal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": false,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.0,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0_nceA1_antSymmetricFullGlobal_nceGlobal_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_refDetached_s1997"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "logs/exp_cifar100_50-10_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {
+      "log_dir": "outputs/custom",
+      "dataset_name": "cifar100",
+      "scenario": "cil 50-10",
+      "seed": 1997,
+      "ant_symmetric_full": true,
+      "ant_max_global": true,
+      "ant_detach_reference": true,
+      "ant_beta": 0.5,
+      "ant_formulation": "softplus",
+      "avg_last_k": 5,
+      "sbs_q": 0.2,
+      "sbs_s": 0.1,
+      "include_contrast_in_logdir": true,
+      "contrast_factor": 1.5,
+      "contrast_kd_factor": 3.0
+    },
+    "log_dir": "outputs/custom_antB0.5_nceA1_antM0.1_antSymmetricFullGlobal_nceGlobal_refDetached_formsoftplus_avgK5_sbsQ0.20S0.1_s1997_cf1.5_ckf3"
+  },
+  {
+    "config": {},
+    "log_dir": null
+  },
+  {
+    "config": {
+      "log_dir": null
+    },
+    "log_dir": null
+  },
+  {
+    "config": {
+      "log_dir": "."
+    },
+    "log_dir": "_antB0_nceA1_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "config": {
+      "log_dir": "logs",
+      "scenario": "cil joint"
+    },
+    "log_dir": "logs/exp_dataset_joint_antB0_nceA1_antGlobal_nceGlobal_s1993"
+  },
+  {
+    "config": {
+      "log_dir": "prefix",
+      "infonce_max_global": false
+    },
+    "log_dir": "prefix_antB0_nceA1_antGlobal_nceLocal_s1993"
+  }
+]

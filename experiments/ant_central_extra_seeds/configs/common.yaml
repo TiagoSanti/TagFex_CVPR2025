@@ -1,0 +1,6 @@
+# Shared scientific controls for seeds 1996/1997 of the main methods.
+# Host-specific paths belong exclusively to storage_*.yaml overlays.
+ant_detach_reference: true
+ant_formulation: logsumexp
+avg_last_k: 0
+debug_similarity: false

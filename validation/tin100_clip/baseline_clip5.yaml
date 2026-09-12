@@ -1,0 +1,2 @@
+# Control condition: canonical InfoNCE with the same clipping policy as ANT.
+ant_beta: 0.0

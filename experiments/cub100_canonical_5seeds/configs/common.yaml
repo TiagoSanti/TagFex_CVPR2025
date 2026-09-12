@@ -1,0 +1,11 @@
+# Shared scientific controls for the CUB-200 100+20 canonical-ANT campaign.
+# The standard ImageNet ResNet stem is required to fit the protocol on 12 GiB.
+ant_detach_reference: true
+ant_formulation: logsumexp
+avg_last_k: 0
+debug_similarity: false
+
+backbone_configs:
+  name: resnet18
+  params:
+    small_base: true

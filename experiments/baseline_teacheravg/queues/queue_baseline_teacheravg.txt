@@ -1,0 +1,45 @@
+# Baseline InfoNCE + TeacherAvg-K ablation.
+# Isolates the effect of averaging the last K teacher checkpoints with ANT off.
+# Format: <config_path>|<description>|<seed>
+
+# K=3
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-3|1993
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-3|1994
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-3|1995
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-3|1993
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-3|1994
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-3|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-3|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-3|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-3|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-3|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-3|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK3_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-3|1995
+
+# K=5
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-5|1993
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-5|1994
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-5|1995
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-5|1993
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-5|1994
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-5|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-5|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-5|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-5|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-5|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-5|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK5_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-5|1995
+
+# K=10
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-10|1993
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-10|1994
+configs/all_in_one/cifar100_10-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 10-10 Baseline + TeacherAvg-10|1995
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-10|1993
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-10|1994
+configs/all_in_one/cifar100_50-10_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|C100 50-10 Baseline + TeacherAvg-10|1995
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-10|1993
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-10|1994
+configs/all_in_one/tiny_imagenet_20-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 20-20 Baseline + TeacherAvg-10|1995
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-10|1993
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-10|1994
+configs/all_in_one/tiny_imagenet_100-20_antB0_nceA1_antGlobal_nceGlobal_avgK10_resnet18.yaml|TIN 100-20 Baseline + TeacherAvg-10|1995

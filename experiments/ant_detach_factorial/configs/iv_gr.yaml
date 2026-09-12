@@ -1,0 +1,3 @@
+# IV-GR: one-way violations, global/reference-relative threshold.
+ant_symmetric_full: false
+ant_max_global: true

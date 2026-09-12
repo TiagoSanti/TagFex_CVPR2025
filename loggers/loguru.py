@@ -42,17 +42,20 @@ class LoguruLogger:
                 debug_filename = f"{logfile_prefix}_debuglog{rank}.log"
                 self.logger.add(log_dir / debug_filename, level=0)
 
-            # Always create a debug log for similarity matrices and loss components
-            debug_log_filename = f"{logfile_prefix}_debug{rank}.log"
-            self.logger.add(
-                log_dir / debug_log_filename,
-                level="DEBUG",
-                filter=lambda record: "Matrix" in record["message"]
-                or "Loss components" in record["message"]
-                or "ANT distance stats" in record["message"]
-                or "ANT flattening" in record["message"]
-                or "Contrastive stats" in record["message"],
-            )
+            if self.configs.get("legacy_debug_metrics", True):
+                # Historical text diagnostics. ANT mechanism studies use their
+                # own sampled structured observer to avoid multi-GB text logs.
+                debug_log_filename = f"{logfile_prefix}_debug{rank}.log"
+                self.logger.add(
+                    log_dir / debug_log_filename,
+                    level="DEBUG",
+                    filter=lambda record: "Matrix" in record["message"]
+                    or "Loss components" in record["message"]
+                    or "ANT distance stats" in record["message"]
+                    or "ANT flattening" in record["message"]
+                    or "ANT reference gradients" in record["message"]
+                    or "Contrastive stats" in record["message"],
+                )
 
             if rank == 0:
                 performance_logname = f"{logfile_prefix}_gistlog.log"
@@ -204,6 +207,11 @@ class LoguruLogger:
                 - hard_neg_sim: mean hardest-negative similarity per anchor
                 - sim_gap_mean: mean(pos_sim - hardest_neg_sim)
                 - sim_gap_min: min(pos_sim - hardest_neg_sim)
+                - ref_sim_mean: mean per-anchor reference similarity
+                - active_nonref_sim_mean: mean similarity of active non-reference negatives
+                - ref_nonref_gap: mean reference-minus-active-non-reference gap
+                - pos_ref_gap_mean: mean positive-minus-reference gap
+                - top1_top2_gap: mean gap between the two hardest negatives
                 - raw_v_mean: mean raw violation value (pre-ReLU, over valid pairs)
                 - raw_v_min: min raw violation value (pre-ReLU, over valid pairs)
                 - raw_v_max: max raw violation value (pre-ReLU, over valid pairs)
@@ -235,6 +243,29 @@ class LoguruLogger:
             f"hard_neg_sim: {stats['hard_neg_sim']:.4f}",
             f"sim_gap_mean: {stats['sim_gap_mean']:.4f}",
             f"sim_gap_min: {stats['sim_gap_min']:.4f}",
+            f"ref_sim_mean: {stats['ref_sim_mean']:.4f}",
+            f"active_nonref_sim_mean: {stats['active_nonref_sim_mean']:.4f}",
+            f"ref_nonref_gap: {stats['ref_nonref_gap']:.4f}",
+            f"pos_ref_gap_mean: {stats['pos_ref_gap_mean']:.4f}",
+            f"top1_top2_gap: {stats['top1_top2_gap']:.4f}",
         ]
         log_msg = " | ".join(log_parts)
         self.logger.debug(f"{context}ANT flattening: {log_msg}")
+
+    def log_ant_reference_gradients(
+        self, stats, prefix="contrast", task=None, epoch=None, batch=None
+    ):
+        """Log the ANT/InfoNCE logit-gradient decomposition at the reference."""
+        context_parts = []
+        if task is not None:
+            context_parts.append(f"T{task}")
+        if epoch is not None:
+            context_parts.append(f"E{epoch}")
+        if batch is not None:
+            context_parts.append(f"B{batch}")
+        context = f"[{' '.join(context_parts)}] " if context_parts else ""
+        self.logger.debug(
+            f"{context}ANT reference gradients ({prefix}): "
+            f"ant: {stats['ant']:.8f} | nce: {stats['nce']:.8f} | "
+            f"total: {stats['total']:.8f} | repel_frac: {stats['repel_frac']:.4f}"
+        )

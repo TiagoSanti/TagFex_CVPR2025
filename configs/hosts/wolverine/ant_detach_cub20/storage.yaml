@@ -1,0 +1,4 @@
+# Wolverine GPU-0 campaign: keep dataset, results and orchestration outside
+# the space-constrained /home filesystem. This overlay must be loaded last.
+dataset_root: /var/tmp/tiago/ANT_detach_cub20_20260904/datasets/CUB_200_2011
+log_dir: /var/tmp/tiago/ANT_detach_cub20_20260904/logs

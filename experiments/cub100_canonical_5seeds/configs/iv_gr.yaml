@@ -1,0 +1,7 @@
+# ANT-IV-GR (second central method in the current statistical ranking).
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+ant_max_global: true
+infonce_max_global: true
+ant_symmetric_full: false

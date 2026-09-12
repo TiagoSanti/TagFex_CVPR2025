@@ -5,14 +5,14 @@ def get_loaders(ds_train, ds_test, trainloader_params, testloader_params, distri
         train_loader = DataLoader(
             ds_train,
             shuffle=True,
-            persistent_workers=True,
+            persistent_workers=trainloader_params.get('num_workers', 0) > 0,
             pin_memory=True,
             **trainloader_params
         )
         test_loader = DataLoader(
             ds_test,
             shuffle=False,
-            persistent_workers=True,
+            persistent_workers=testloader_params.get('num_workers', 0) > 0,
             pin_memory=True,
             **testloader_params
         )
@@ -29,7 +29,7 @@ def get_loaders(ds_train, ds_test, trainloader_params, testloader_params, distri
         )
         train_loader = DataLoader(
             ds_train,
-            persistent_workers=True,
+            persistent_workers=trainloader_params.get('num_workers', 0) > 0,
             **trainloader_params,
             sampler=train_sampler,
         )
@@ -45,7 +45,7 @@ def get_loaders(ds_train, ds_test, trainloader_params, testloader_params, distri
 
         test_loader = DataLoader(
             ds_test,
-            persistent_workers=True,
+            persistent_workers=testloader_params.get('num_workers', 0) > 0,
             **testloader_params,
             sampler=test_sampler,
         )

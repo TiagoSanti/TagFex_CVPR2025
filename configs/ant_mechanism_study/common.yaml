@@ -1,0 +1,21 @@
+# Shared observability policy. Load after the CIFAR-100 10x10 protocol config.
+legacy_debug_metrics: false
+debug_similarity: false
+study_max_tasks: 3
+log_dir: ./study_outputs/ant_mechanism_20260909/training_logs
+
+ant_study:
+  enabled: true
+  output_root: ./study_outputs/ant_mechanism_20260909
+  scalar_every_n_batches: 10
+  snapshot_tasks: [1, 2, 3]
+  snapshot_batches: [1]
+  init_snapshot_epochs: [1, 5, 20, 60, 120, 170, 200]
+  inc_snapshot_epochs: [1, 5, 20, 80, 120, 150, 170]
+  shadow_variants: true
+  save_snapshots: true
+  parameter_gradient_probes: true
+  parameter_update_probes: true
+  snapshot_image_count: 8
+  min_free_gb: 50
+  max_output_gb: 10

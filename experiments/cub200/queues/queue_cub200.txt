@@ -1,0 +1,49 @@
+# CUB-200 Benchmark Queue — 36 runs (3 seeds × 6 variants × 2 scenarios)
+# Format: <config_path>|<description>|<seed>
+#
+# Variants: 6 selected validation configurations
+# Scenarios: CUB-200 20-20 | CUB-200 100-20
+# Seeds: 1994 (priority — verify collapse fix), 1993, 1995
+# Memory protocol: fixed_size=true, memory_size=2000 (consistent with other datasets)
+
+# ── CUB-200 20-20 ── seed 1994 runs FIRST to verify collapse is eliminated ────
+configs/all_in_one/cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-20-20 β=0 aGlobal nGlobal|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK5|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK10|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal|1994
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal avgK10|1994
+
+# ── CUB-200 20-20 ── seeds 1993 and 1995 ─────────────────────────────────────
+configs/all_in_one/cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-20-20 β=0 aGlobal nGlobal|1993
+configs/all_in_one/cub200_20-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-20-20 β=0 aGlobal nGlobal|1995
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal|1995
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK5|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK5|1995
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK10|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aLocal nLocal avgK10|1995
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal|1995
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal avgK10|1993
+configs/all_in_one/cub200_20-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-20-20 β=0.5 aSymFull nLocal avgK10|1995
+
+# ── CUB-200 100-20 ─────────────────────────────────────────────────────────────
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-100-20 β=0 aGlobal nGlobal|1994
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-100-20 β=0 aGlobal nGlobal|1993
+configs/all_in_one/cub200_100-20_antB0_nceA1_antGlobal_nceGlobal_resnet18.yaml|CUB-100-20 β=0 aGlobal nGlobal|1995
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal|1994
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal|1993
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal|1995
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK5|1994
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK5|1993
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK5_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK5|1995
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK10|1994
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK10|1993
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antLocal_nceLocal_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aLocal nLocal avgK10|1995
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal|1994
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal|1993
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal|1995
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal avgK10|1994
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal avgK10|1993
+configs/all_in_one/cub200_100-20_antB0.5_nceA1_antM0.5_antSymmetricFull_avgK10_resnet18.yaml|CUB-100-20 β=0.5 aSymFull nLocal avgK10|1995

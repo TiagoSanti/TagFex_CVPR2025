@@ -1,0 +1,3 @@
+# Host-local storage policy for Xavier.
+# Keep completed runs directly under the report's canonical input directory.
+log_dir: ./logs

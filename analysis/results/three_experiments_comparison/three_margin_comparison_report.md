@@ -1,3 +1,5 @@
+> Edição histórica: dez tarefas nos três métodos. “Vencedor” é ordenação descritiva de uma execução; os deltas são pontos percentuais. Semântica dos gaps e violações depende do logger histórico. Este relatório substitui a comparação anterior de horizontes incompatíveis, não fornece evidência multi-seed.
+
 # Comparação de Margens ANT: Baseline vs antM=0.3 vs antM=0.5
 
 **Gerado em**: 2025-12-02 10:08:51

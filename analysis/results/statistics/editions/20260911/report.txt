@@ -1,0 +1,44 @@
+autorank statistical report — avg_acc1, α=0.05
+Observations: 12  (4 datasets × 3 seeds)
+Methods: 9
+Selection: canonical > nGlobal > nLocal; full-name > debug-name
+
+RankResult(rankdf=
+                     meanrank  median  ... effect_size_above magnitude_above
+ANT-IV-AR            6.416667  69.075  ...               0.0      negligible
+ANT-IV-AR + TAvg-3   5.750000  68.800  ...          0.023059      negligible
+ANT-FS-AR + TAvg-10  5.500000  69.190  ...         -0.033531      negligible
+Baseline InfoNCE     5.000000  69.065  ...          0.010546      negligible
+ANT-IV-GR            4.916667  68.730  ...          0.028194      negligible
+ANT-FS-AR + TAvg-5   4.500000  69.315  ...         -0.049281      negligible
+ANT-FS-AR            4.416667  69.235  ...          0.006548      negligible
+ANT-IV-AR + TAvg-10  4.333333  69.320  ...         -0.006991      negligible
+ANT-IV-AR + TAvg-5   4.166667  69.435  ...         -0.009579      negligible
+
+[9 rows x 9 columns]
+pvalue=0.5058086313753833
+cd=3.4678478570682523
+omnibus=friedman
+posthoc=nemenyi
+all_normal=False
+pvals_shapiro=[np.float64(0.0010394042031087185), np.float64(0.0009684198099323371), np.float64(0.0014337251308371903), np.float64(0.0014098710612423558), np.float64(0.001584220650624738), np.float64(0.0009762479222575884), np.float64(0.0017050736977403812), np.float64(0.0007402243606047097), np.float64(0.0011570366224833558)]
+homoscedastic=True
+pval_homogeneity=0.999701772685339
+homogeneity_test=levene
+alpha=0.05
+alpha_normality=0.005555555555555556
+num_samples=12
+posterior_matrix=
+None
+decision_matrix=
+None
+rope=None
+rope_mode=None
+effect_size=akinshin_gamma
+force_mode=None)
+
+The statistical analysis was conducted for 9 populations with 12 paired samples.
+The family-wise significance level of the tests is alpha=0.050.
+We rejected the null hypothesis that the population is normal for the populations ANT-IV-AR (p=0.001), ANT-IV-AR + TAvg-3 (p=0.001), ANT-FS-AR + TAvg-10 (p=0.001), Baseline InfoNCE (p=0.001), ANT-IV-GR (p=0.002), ANT-FS-AR + TAvg-5 (p=0.001), ANT-FS-AR (p=0.002), ANT-IV-AR + TAvg-10 (p=0.001), and ANT-IV-AR + TAvg-5 (p=0.001). Therefore, we assume that not all populations are normal.
+Because we have more than two populations and the populations and some of them are not normal, we use the non-parametric Friedman test as omnibus test to determine if there are any significant differences between the median values of the populations. We use the post-hoc Nemenyi test to infer which differences are significant. We report the median (MD), the median absolute deviation (MAD) and the mean rank (MR) among all populations over the samples. Differences between populations are significant, if the difference of the mean rank is greater than the critical distance CD=3.468 of the Nemenyi test.
+We failed to reject the null hypothesis (p=0.506) of the Friedman test that there is no difference in the central tendency of the populations ANT-IV-AR (MD=69.075+-9.235, MAD=8.195, MR=6.417), ANT-IV-AR + TAvg-3 (MD=68.800+-9.295, MAD=7.890, MR=5.750), ANT-FS-AR + TAvg-10 (MD=69.190+-9.070, MAD=7.800, MR=5.500), Baseline InfoNCE (MD=69.065+-9.510, MAD=8.185, MR=5.000), ANT-IV-GR (MD=68.730+-9.525, MAD=7.840, MR=4.917), ANT-FS-AR + TAvg-5 (MD=69.315+-9.130, MAD=8.170, MR=4.500), ANT-FS-AR (MD=69.235+-9.650, MAD=8.310, MR=4.417), ANT-IV-AR + TAvg-10 (MD=69.320+-8.960, MAD=8.090, MR=4.333), and ANT-IV-AR + TAvg-5 (MD=69.435+-9.065, MAD=8.105, MR=4.167). Therefore, we assume that there is no statistically significant difference between the median values of the populations.

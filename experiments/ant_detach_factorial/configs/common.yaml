@@ -1,0 +1,10 @@
+# Shared overlay for the detach factorial.  Loaded after the protocol config.
+# InfoNCE remains canonical/local; only the ANT reference gradient is ablated.
+nce_alpha: 1.0
+ant_beta: 0.5
+ant_margin: 0.5
+infonce_max_global: false
+ant_formulation: logsumexp
+ant_detach_reference: true
+avg_last_k: 0
+debug_similarity: false
